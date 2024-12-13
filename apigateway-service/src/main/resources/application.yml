@@ -1,0 +1,31 @@
+server:
+  port: 9000
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  application:
+    name: apigateway-service
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: first-service #when the service comes in,
+            uri: http://localhost:8081/ #192.168.45.104 #allocate it at this port
+            predicates:
+              - Path=/first-service/** #when first-service comes, allocate 8081 port
+            filters:
+              - AddRequestHeader=first-request, first-requests-header2
+              - AddResponseHeader=first-response, first-response-header2
+          - id: second-service
+            uri: http://localhost:8082/ #192.168.45.104
+            predicates:
+              - Path=/second-service/**
+            filters:
+              - AddRequestHeader=second-request, second-requests-header2
+              - AddResponseHeader=second-response, second-response-header2
