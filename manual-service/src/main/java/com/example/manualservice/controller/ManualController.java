@@ -1,7 +1,9 @@
 package com.example.manualservice.controller;
 
 import com.example.manualservice.dto.ManualDTO;
+import com.example.manualservice.dto.ManualTaskDTO;
 import com.example.manualservice.service.ManualService;
+import com.example.manualservice.service.ManualTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ManualController {
     private final ManualService manualService;
+    private final ManualTaskService manualTaskService;
 
     // 매뉴얼 목록 조회
     @GetMapping
@@ -46,6 +49,14 @@ public class ManualController {
     public ResponseEntity<Void> deleteManual(@PathVariable Integer id) {
         manualService.deleteManual(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    // 매뉴얼 태스크 목록 조회
+    @GetMapping("/{manualId}/tasks")
+    public ResponseEntity<List<ManualTaskDTO>> getManualTasksByManualId(@PathVariable Integer manualId) {
+        List<ManualTaskDTO> tasks = manualTaskService.getManualTasksByManualId(manualId);
+        return ResponseEntity.ok(tasks);
     }
 
 

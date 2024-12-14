@@ -10,5 +10,4 @@ import java.util.Optional;
 @Repository
 public interface ManualRepository extends JpaRepository<Manual, Integer> {
     List<Manual> findByBranchId(Integer branchId);
-    Optional<Manual> findByIdAndBranchId(Integer id, Integer branchId);
 }
