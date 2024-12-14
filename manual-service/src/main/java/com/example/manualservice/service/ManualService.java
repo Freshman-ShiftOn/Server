@@ -36,6 +36,33 @@ public class ManualService {
         return toManualDTO(manualById);
     }
 
+    // 매뉴얼 생성
+    public ManualDTO createManual(ManualDTO manualDTO) {
+        Manual manual = toManualEntity(manualDTO);
+        Manual savedManual = manualRepository.save(manual);
+        return toManualDTO(savedManual);
+    }
+
+    // 매뉴얼 수정
+    public ManualDTO updateManual(Integer manualId, ManualDTO manualDTO) {
+        Manual existingManual = manualRepository.findById(manualId)
+                .orElseThrow(() -> new ManualNotFoundException("해당하는 매뉴얼이 없습니다. 매뉴얼ID: " + manualId));
+
+        existingManual.setBranchId(manualDTO.getBranchId());
+        existingManual.setTitle(manualDTO.getTitle());
+        existingManual.setWorkerId(manualDTO.getWorkerId());
+
+        Manual updatedManual = manualRepository.save(existingManual);
+        return toManualDTO(updatedManual);
+    }
+
+    // 매뉴얼 삭제
+    public void deleteManual(Integer manualId) {
+        Manual manual = manualRepository.findById(manualId)
+                .orElseThrow(() -> new ManualNotFoundException("해당하는 매뉴얼이 없습니다. 매뉴얼ID: " + manualId));
+        manualRepository.delete(manual);
+    }
+
     // DTO 변환 메서드
     private ManualDTO toManualDTO(Manual manual) {
         return ManualDTO.builder()
