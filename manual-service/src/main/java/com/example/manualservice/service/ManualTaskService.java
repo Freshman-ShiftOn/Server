@@ -34,7 +34,7 @@ public class ManualTaskService {
     // 매뉴얼 태스크 생성
     public ManualTaskDTO createManualTask(Integer manualId, ManualTaskDTO manualTaskDTO) {
         Manual manual = manualRepository.findById(manualId)
-                .orElseThrow(() -> new ManualNotFoundException("Manual not found with id: " + manualId));
+                .orElseThrow(() -> new ManualNotFoundException("해당하는 매뉴얼이 없습니다. " + manualId));
 
         ManualTask manualTask = ManualTaskMapper.toEntity(manualTaskDTO, manual);
         ManualTask savedTask = manualTaskRepository.save(manualTask);
@@ -44,11 +44,9 @@ public class ManualTaskService {
     // 매뉴얼 태스크 수정
     public ManualTaskDTO updateManualTask(Integer manualId, Integer taskId, ManualTaskDTO manualTaskDTO) {
         ManualTask existingTask = manualTaskRepository.findById(taskId)
-                .orElseThrow(() -> new ManualTaskNotFoundException("ManualTask not found with id: " + taskId));
-
-        // 매뉴얼 ID 확인
+                .orElseThrow(() -> new ManualTaskNotFoundException("해당하는 매뉴얼이 없습니다. " + taskId));
         if (!existingTask.getManual().getId().equals(manualId)) {
-            throw new IllegalArgumentException("Task does not belong to the specified manual");
+            throw new IllegalArgumentException("매뉴얼 수정을 실패했습니다. - 매뉴얼 ID 오류");
         }
 
         existingTask.setContent(manualTaskDTO.getContent());
@@ -62,13 +60,10 @@ public class ManualTaskService {
     // 매뉴얼 태스크 삭제
     public void deleteManualTask(Integer manualId, Integer taskId) {
         ManualTask task = manualTaskRepository.findById(taskId)
-                .orElseThrow(() -> new ManualTaskNotFoundException("ManualTask not found with id: " + taskId));
-
-        // 매뉴얼 ID 확인
+                .orElseThrow(() -> new ManualTaskNotFoundException("해당하는 매뉴얼이 없습니다. " + taskId));
         if (!task.getManual().getId().equals(manualId)) {
-            throw new IllegalArgumentException("Task does not belong to the specified manual");
+            throw new IllegalArgumentException("매뉴얼 삭제를 실패했습니다. - 매뉴얼 ID 오류");
         }
-
         manualTaskRepository.delete(task);
     }
 }
