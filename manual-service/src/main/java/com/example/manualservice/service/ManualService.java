@@ -1,6 +1,7 @@
 package com.example.manualservice.service;
 
 import com.example.manualservice.dto.ManualDTO;
+import com.example.manualservice.dto.ManualTaskDTO;
 import com.example.manualservice.exception.ManualNotFoundException;
 import com.example.manualservice.model.Manual;
 import com.example.manualservice.repository.ManualRepository;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class ManualService {
-
     private final ManualRepository manualRepository;
+    private final ManualTaskService manualTaskService;
 
     // 매뉴얼 목록 조회
     @Transactional(readOnly = true)
@@ -25,15 +26,19 @@ public class ManualService {
                 .collect(Collectors.toList());
     }
 
+    // 매뉴얼 상세 조회(태스크 포함)
     @Transactional(readOnly = true)
     public ManualDTO getManualByIdAndBranchId(Integer id, Integer branchId) {
-        Manual manualById = manualRepository.findById(id)
+        Manual manual = manualRepository.findById(id)
                 .orElseThrow(() -> new ManualNotFoundException("해당 ID(" + id + ")에 해당하는 메뉴얼이 존재하지 않습니다."));
-        if (!manualById.getBranchId().equals(branchId)) {
+        if (!manual.getBranchId().equals(branchId)) {
             throw new ManualNotFoundException("ID(" + id + ")에 해당하는 메뉴얼이 branchId(" + branchId + ")와 일치하지 않습니다.");
         }
+        List<ManualTaskDTO> tasks = manualTaskService.getManualTasksByManualId(id);
+        ManualDTO manualDTO = ManualDTO.fromEntity(manual);
+        manualDTO.setTasks(tasks);
 
-        return toManualDTO(manualById);
+        return toManualDTO(manual);
     }
 
     // 매뉴얼 생성
