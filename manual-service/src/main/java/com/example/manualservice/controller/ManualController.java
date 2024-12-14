@@ -59,28 +59,5 @@ public class ManualController {
         return ResponseEntity.ok(tasks);
     }
 
-    // 매뉴얼 태스크 생성
-    @PostMapping("/{manualId}/tasks")
-    public ResponseEntity<ManualTaskDTO> createManualTask(@PathVariable Integer manualId, @RequestBody ManualTaskDTO manualTaskDTO) {
-        ManualTaskDTO createdTask = manualTaskService.createManualTask(manualId, manualTaskDTO);
-        return ResponseEntity.ok(createdTask);
-    }
-
-    // 매뉴얼 태스크 수정
-    @PutMapping("/{manualId}/tasks/{taskId}")
-    public ResponseEntity<ManualTaskDTO> updateManualTask(
-            @PathVariable Integer manualId,
-            @PathVariable Integer taskId,
-            @RequestBody ManualTaskDTO manualTaskDTO) {
-        ManualTaskDTO updatedTask = manualTaskService.updateManualTask(manualId, taskId, manualTaskDTO);
-        return ResponseEntity.ok(updatedTask);
-    }
-
-    // 매뉴얼 태스크 삭제
-    @DeleteMapping("/{manualId}/tasks/{taskId}")
-    public ResponseEntity<Void> deleteManualTask(@PathVariable Integer manualId, @PathVariable Integer taskId) {
-        manualTaskService.deleteManualTask(manualId, taskId);
-        return ResponseEntity.noContent().build();
-    }
 
 }
