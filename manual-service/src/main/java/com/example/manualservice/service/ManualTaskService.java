@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,9 @@ public class ManualTaskService {
 
         ManualTask manualTask = ManualTaskMapper.toEntity(manualTaskDTO, manual);
         ManualTask savedTask = manualTaskRepository.save(manualTask);
+        // Manual의 lastUpdated 필드 갱신
+        manual.setLastUpdated(new Date());
+        manualRepository.save(manual);
         return ManualTaskMapper.toDTO(savedTask);
     }
 
@@ -54,6 +58,11 @@ public class ManualTaskService {
         existingTask.setImageUrl(manualTaskDTO.getImageUrl());
 
         ManualTask updatedTask = manualTaskRepository.save(existingTask);
+
+        // Manual의 lastUpdated 필드 갱신
+        Manual manual = existingTask.getManual();
+        manual.setLastUpdated(new Date());
+        manualRepository.save(manual);
         return ManualTaskMapper.toDTO(updatedTask);
     }
 
@@ -65,5 +74,9 @@ public class ManualTaskService {
             throw new IllegalArgumentException("매뉴얼 삭제를 실패했습니다. - 매뉴얼 ID 오류");
         }
         manualTaskRepository.delete(task);
+        // Manual의 lastUpdated 필드 갱신
+        Manual manual = task.getManual();
+        manual.setLastUpdated(new Date());
+        manualRepository.save(manual);
     }
 }
