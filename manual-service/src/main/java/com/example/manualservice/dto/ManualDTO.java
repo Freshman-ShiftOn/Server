@@ -7,18 +7,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManualDTO {
-
     private Integer id;
     private Integer branchId;
     private String title;
     private Integer workerId;
     private Date lastUpdated;
+    private List<ManualTaskDTO> tasks;
 
     public static ManualDTO fromEntity(Manual manual) {
         return ManualDTO.builder()

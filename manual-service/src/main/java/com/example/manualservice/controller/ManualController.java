@@ -23,10 +23,12 @@ public class ManualController {
         return ResponseEntity.ok(manuals);
     }
 
-    // 매뉴얼 상세 조회
+    // 매뉴얼 상세 조회 및 태스크 포함
     @GetMapping("/{id}")
-    public ResponseEntity<ManualDTO> getManualByIdAndBranchId(@PathVariable Integer branchId, @PathVariable Integer id) {
+    public ResponseEntity<ManualDTO> getManualWithTasks(@PathVariable Integer branchId, @PathVariable Integer id) {
         ManualDTO manual = manualService.getManualByIdAndBranchId(id, branchId);
+        List<ManualTaskDTO> tasks = manualTaskService.getManualTasksByManualId(id);
+        manual.setTasks(tasks);
         return ResponseEntity.ok(manual);
     }
 
@@ -60,7 +62,7 @@ public class ManualController {
     }
 
     // 매뉴얼 태스크 생성
-    @PostMapping("/{manualId}/tasks")
+    @PostMapping("/{manualId}/tasks")//taskNo는 바로 직전 taskNo 가져와서 +1해주도록 프론트 로직짜야 함
     public ResponseEntity<ManualTaskDTO> createManualTask(@PathVariable Integer manualId, @RequestBody ManualTaskDTO manualTaskDTO) {
         ManualTaskDTO createdTask = manualTaskService.createManualTask(manualId, manualTaskDTO);
         return ResponseEntity.ok(createdTask);
