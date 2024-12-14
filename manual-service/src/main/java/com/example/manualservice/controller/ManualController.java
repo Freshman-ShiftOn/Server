@@ -26,4 +26,27 @@ public class ManualController {
         ManualDTO manual = manualService.getManualByIdAndBranchId(id, branchId);
         return ResponseEntity.ok(manual);
     }
+
+    // 매뉴얼 생성
+    @PostMapping
+    public ResponseEntity<ManualDTO> createManual(@RequestBody ManualDTO manualDTO) {
+        ManualDTO createdManual = manualService.createManual(manualDTO);
+        return ResponseEntity.ok(createdManual);
+    }
+
+    // 매뉴얼 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<ManualDTO> updateManual(@PathVariable Integer id, @RequestBody ManualDTO manualDTO) {
+        ManualDTO updatedManual = manualService.updateManual(id, manualDTO);
+        return ResponseEntity.ok(updatedManual);
+    }
+
+    // 매뉴얼 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteManual(@PathVariable Integer id) {
+        manualService.deleteManual(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
