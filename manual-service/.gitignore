@@ -1,4 +1,5 @@
 HELP.md
+.gradle
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -12,12 +13,18 @@ target/
 .settings
 .springBeans
 .sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
 .idea
 *.iws
 *.iml
 *.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 ### NetBeans ###
 /nbproject/private/
@@ -25,9 +32,18 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+###  Build ###
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
 ### VS Code ###
 .vscode/
+
+### security ###
+application.properties
+application.yml
+
+### apple ###
+.DS_Store
