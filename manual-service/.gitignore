@@ -1,9 +1,9 @@
 HELP.md
 .gradle
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 ### STS ###
 .apt_generated
@@ -33,17 +33,5 @@ out/
 /nbdist/
 /.nb-gradle/
 
-###  Build ###
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
 ### VS Code ###
 .vscode/
-
-### security ###
-application.properties
-application.yml
-
-### apple ###
-.DS_Store
