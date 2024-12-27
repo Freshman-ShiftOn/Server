@@ -73,18 +73,18 @@ jobs:
           chmod 600 epicode_key.pem
 
           # Copy Docker images, compose file, and .env to EC2
-          scp -i epicode_key.pem manual-service.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i epicode_key.pem apigateway-service.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i epicode_key.pem discoveryservice.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i epicode_key.pem docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i epicode_key.pem .env ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no discoveryservice.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
 
           # Deploy with Docker Compose
-          ssh -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }} << EOF
+          ssh -i epicode_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} << EOF
             docker load -i manual-service.tar
             docker load -i apigateway-service.tar
             docker load -i discoveryservice.tar
-            cd /home/ec2-user/
+            cd /home/ubuntu/
             docker-compose down || true
             docker-compose up -d
           EOF
