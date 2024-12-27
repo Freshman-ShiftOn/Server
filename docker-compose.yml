@@ -40,6 +40,9 @@ services:
       context: ./manual-service
     ports:
       - "13001:13001"
+    environment:
+      DB_USERNAME: ${DB_USERANAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - app-network
     depends_on:
