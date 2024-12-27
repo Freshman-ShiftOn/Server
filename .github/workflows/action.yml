@@ -58,6 +58,10 @@ jobs:
           docker save manual-service:latest -o manual-service.tar
           docker save apigateway-service:latest -o apigateway-service.tar
           docker save discoveryservice:latest -o discoveryservice.tar
+          
+      - name: Verify .tar files
+        run: |
+          ls -lh ./*.tar
 
   deploy:
     runs-on: ubuntu-latest
