@@ -15,8 +15,7 @@ services:
       - app-network
 
   discoveryservice:
-    build:
-      context: ./discoveryservice
+    image: discoveryservice
     ports:
       - "18761:18761"
     networks:
@@ -25,8 +24,7 @@ services:
       - mysql
 
   apigateway-service:
-    build:
-      context: ./apigateway-service
+    image: apigateway-service
     ports:
       - "11000:11000"
     networks:
@@ -36,8 +34,7 @@ services:
       - mysql
 
   manual-service:
-    build:
-      context: ./manual-service
+    image: manual-service
     ports:
       - "13001:13001"
     environment:
