@@ -69,15 +69,15 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           # Save the private key
-          echo "${{ secrets.PRIVATE_KEY }}" > key.pem
+          echo "${{ secrets.PRIVATE_KEY }}" > epicode_key.pem
           chmod 600 key.pem
 
           # Copy Docker images, compose file, and .env to EC2
-          scp -i key.pem manual-service.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i key.pem apigateway-service.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i key.pem discoveryservice.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i key.pem docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
-          scp -i key.pem .env ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
+          scp -i epicode_key.pem manual-service.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
+          scp -i epicode_key.pem apigateway-service.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
+          scp -i epicode_key.pem discoveryservice.tar ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
+          scp -i epicode_key.pem docker-compose.yml ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
+          scp -i epicode_key.pem .env ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }}:/home/ec2-user/
 
           # Deploy with Docker Compose
           ssh -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_IP }} << EOF
