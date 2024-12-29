@@ -1,0 +1,90 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Create .env file for build
+        run: |
+          echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+
+      - name: Build manual-service
+        working-directory: manual-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: ./gradlew clean build -x test
+
+      - name: Build apigateway-service
+        working-directory: apigateway-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: ./gradlew clean build -x test
+
+      - name: Build discoveryservice
+        working-directory: discoveryservice
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: ./gradlew clean build -x test
+
+      - name: Build Docker images
+        run: |
+          docker build -t manual-service:latest ./manual-service
+          docker build -t apigateway-service:latest ./apigateway-service
+          docker build -t discoveryservice:latest ./discoveryservice
+
+      - name: Save Docker images to files
+        run: |
+          docker save manual-service:latest -o manual-service.tar
+          docker save apigateway-service:latest -o apigateway-service.tar
+          docker save discoveryservice:latest -o discoveryservice.tar
+          
+      - name: Verify .tar files
+        run: |
+          ls -lh ./*.tar
+      
+      - name: Deploy to EC2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          # Save the private key
+          echo "${{ secrets.PRIVATE_KEY }}" > epicode_key.pem
+          chmod 600 epicode_key.pem
+
+          # Copy Docker images, compose file, and .env to EC2
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no discoveryservice.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+
+          # Deploy with Docker Compose
+          ssh -i epicode_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} << EOF
+            docker load -i manual-service.tar
+            docker load -i apigateway-service.tar
+            docker load -i discoveryservice.tar
+            cd /home/ubuntu/
+            docker-compose down || true
+            docker-compose up -d
+          EOF
