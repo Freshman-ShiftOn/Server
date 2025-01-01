@@ -14,8 +14,8 @@ services:
     networks:
       - app-network
 
-  discoveryservice:
-    image: discoveryservice
+  discovery-service:
+    image: discovery-service
     ports:
       - "18761:18761"
     networks:
@@ -30,7 +30,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - discoveryservice
+      - discovery-service
       - mysql
 
   manual-service:
@@ -43,7 +43,7 @@ services:
     networks:
       - app-network
     depends_on:
-      - discoveryservice
+      - discovery-service
       - apigateway-service
       - mysql
 
