@@ -1,9 +1,15 @@
 server:
-  port: 13001
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
+  port: 0
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+logging:
+  level:
+    org.springdoc: DEBUG
+    org.springframework: DEBUG
+
 spring:
   application:
     name: manual-service
@@ -34,6 +40,14 @@ spring:
       connection-timeout: 20000
       connection-test-query: SELECT 1
       leak-detection-threshold: 60000
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:18761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 #  cache:
 #    type: redis
 #    data:
