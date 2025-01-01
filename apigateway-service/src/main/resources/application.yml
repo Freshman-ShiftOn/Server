@@ -3,29 +3,44 @@ server:
 
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://localhost:18761/eureka
 
 spring:
   application:
     name: apigateway-service
   cloud:
     gateway:
-      mvc:
-        routes:
-          - id: first-service #when the service comes in,
-            uri: http://localhost:8081/ #192.168.45.104 #allocate it at this port
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway Global Filter
+            preLogger: true
+            postLogger: true
+      routes:
+          - id: user-service
+            uri: lb://USER-SERVICE
             predicates:
-              - Path=/first-service/** #when first-service comes, allocate 8081 port
+              - Path=/user-service/**
+
+          - id: first-service
+            uri: lb://FIRST-SERVICE
+            predicates:
+              - Path=/first-service/**
             filters:
-              - AddRequestHeader=first-request, first-requests-header2
-              - AddResponseHeader=first-response, first-response-header2
+#              - AddRequestHeader=first-request, first-requests-header2
+#              - AddResponseHeader=first-response, first-response-header2
+              - name: CustomFilter
+              - name: LoggingFilter
+                args:
+                  baseMessage: Hi, there.
+                  preLogger: true
+                  postLogger: true
           - id: second-service
-            uri: http://localhost:8082/ #192.168.45.104
+            uri: lb://SECOND-SERVICE #192.168.45.104
             predicates:
               - Path=/second-service/**
             filters:
-              - AddRequestHeader=second-request, second-requests-header2
-              - AddResponseHeader=second-response, second-response-header2
+              - CustomFilter
