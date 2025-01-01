@@ -1,5 +1,5 @@
 server:
-  port: 0
+  port: 13001
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -26,10 +26,10 @@ spring:
         cache.use_second_level_cache: false
         cache.use_query_cache: false
 
-  datasource:
+  datasource: #mysql_container #localhost
     url: jdbc:mysql://mysql_container:3306/manual_db?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ${DB_USERNAME} #${DB_USERNAME}
+    password: ${DB_PASSWORD} #${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariCP
