@@ -40,7 +40,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           chmod +x mvnw
-          ./mvnw clear compile package
+          ./mvnw clean compile package
 
       - name: Build discoveryservice
         working-directory: discoveryservice
@@ -49,7 +49,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           chmod +x mvnw
-          ./mvnw clear compile package
+          ./mvnw clean compile package
 
       - name: Build Docker images
         run: |
