@@ -38,14 +38,14 @@ jobs:
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: ./gradlew clean build -x test
+        run: ./mvn clear compile package
 
       - name: Build discoveryservice
         working-directory: discoveryservice
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: ./gradlew clean build -x test
+        run: ./mvn clear compile package
 
       - name: Build Docker images
         run: |
