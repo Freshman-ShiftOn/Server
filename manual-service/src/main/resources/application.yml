@@ -27,9 +27,9 @@ spring:
         cache.use_query_cache: false
 
   datasource:
-    url: jdbc:mysql://localhost:3306/manual_db?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: root
-    password: '0000'
+    url: jdbc:mysql://mysql_container:3306/manual_db?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariCP
