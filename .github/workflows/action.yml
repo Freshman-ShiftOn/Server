@@ -87,7 +87,7 @@ jobs:
           ssh -i epicode_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} << EOF
             docker load -i manual-service.tar
             docker load -i apigateway-service.tar
-            docker load -i discoveryservice.tar
+            docker load -i discovery-service.tar
             cd /home/ubuntu/
             docker-compose down || true
             docker-compose up -d
