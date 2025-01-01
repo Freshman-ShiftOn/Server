@@ -42,8 +42,8 @@ jobs:
           chmod +x mvnw
           ./mvnw clean compile package
 
-      - name: Build discoveryservice
-        working-directory: discoveryservice
+      - name: Build discovery-service
+        working-directory: discovery-service
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -55,13 +55,13 @@ jobs:
         run: |
           docker build -t manual-service:latest ./manual-service
           docker build -t apigateway-service:latest ./apigateway-service
-          docker build -t discoveryservice:latest ./discoveryservice
+          docker build -t discovery-service:latest ./discovery-service
 
       - name: Save Docker images to files
         run: |
           docker save manual-service:latest -o manual-service.tar
           docker save apigateway-service:latest -o apigateway-service.tar
-          docker save discoveryservice:latest -o discoveryservice.tar
+          docker save discovery-service:latest -o discovery-service.tar
           
       - name: Verify .tar files
         run: |
@@ -79,7 +79,7 @@ jobs:
           # Copy Docker images, compose file, and .env to EC2
           scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no discoveryservice.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no discovery-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
 
