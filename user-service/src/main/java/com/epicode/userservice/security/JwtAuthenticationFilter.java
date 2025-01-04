@@ -23,9 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        // JWT 헤더가 없을 경우 요청 통과
         String header = request.getHeader("Authorization");
-
         if (header == null || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
@@ -40,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .getBody();
             String email = claims.getSubject();
 
-            // 사용자 인증 객체 생성
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(email, null, null);
 
@@ -50,11 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("Authenticated user: {}", email);
 
         } catch (ExpiredJwtException e) {
-            log.error("JWT token has expired", e);
+            log.error("JWT 기한 만료", e);
             respondWithError(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT token has expired");
             return;
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
-            log.error("Invalid JWT token", e);
+            log.error("유효하지 않은 JWT token", e);
             respondWithError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
             return;
         } catch (Exception e) {

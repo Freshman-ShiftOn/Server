@@ -24,7 +24,7 @@ public class AuthController {
             String clientId = env.getProperty("spring.security.oauth2.client.registration.kakao.client-id");
             String redirectUri = env.getProperty("spring.security.oauth2.client.registration.kakao.redirect-uri");
             if (clientId == null || redirectUri == null) {
-                throw new IllegalStateException("Kakao OAuth configuration is missing in the application.yml");
+                throw new IllegalStateException("url error! yml 파일 확인 요망");
             }
 
             String kakaoAuthUrl = String.format(
@@ -33,7 +33,7 @@ public class AuthController {
             return "redirect:" + kakaoAuthUrl;
 
         } catch (Exception e) {
-            System.err.println("Error generating Kakao OAuth URL: " + e.getMessage());
+            System.err.println("Error Kakao OAuth URL: " + e.getMessage());
             return "error/redirect-error";
         }
     }
@@ -45,8 +45,8 @@ public class AuthController {
             String jwtToken = kakaoService.authenticateWithKakao(code);
             return ResponseEntity.ok(jwtToken);
         } catch (Exception e) {
-            System.err.println("Error during Kakao authentication: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + e.getMessage());
+            System.err.println("카카오 콜백 오류(JWT발급 실패): " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("콜백url 오류: " + e.getMessage());
         }
     }
 }

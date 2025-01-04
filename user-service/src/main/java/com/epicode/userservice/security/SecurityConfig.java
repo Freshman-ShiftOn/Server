@@ -24,7 +24,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(secretKey),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/api/auth/kakao/callback") // 사용자 정의 경로
+                        .loginPage("/api/auth/kakao/callback") //커스텀 정의 경로
                 );
 
         return http.build();

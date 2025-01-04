@@ -38,7 +38,6 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // JWT 유효성 검사
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);

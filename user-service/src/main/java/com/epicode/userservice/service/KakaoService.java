@@ -25,21 +25,21 @@ public class KakaoService {
         try {
             String accessToken = getAccessTokenFromKakao(code);
             if (accessToken == null || accessToken.isEmpty()) {
-                throw new IllegalStateException("Failed to retrieve access token from Kakao");
+                throw new IllegalStateException("토큰이 비어있습니다.");
             }
 
             String userEmail = getUserInfoFromKakao(accessToken);
             if (userEmail == null || userEmail.isEmpty()) {
-                throw new IllegalStateException("Failed to retrieve user email from Kakao");
+                throw new IllegalStateException("유저 정보가 비어있습니다.");
             }
 
             if (!userRepository.existsByEmail(userEmail)) {
-                saveNewUser(userEmail);
+                saveNewUser(userEmail);//저장
             }
 
             return jwtUtil.generateToken(userEmail);
         } catch (Exception e) {
-            throw new RuntimeException("Kakao Authentication with code failed: " + e.getMessage(), e);
+            throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함.  " + e.getMessage(), e);
         }
     }
     private void saveNewUser(String email) {
@@ -50,8 +50,7 @@ public class KakaoService {
         userRepository.save(user);
     }
 
-    private String
-    getAccessTokenFromKakao(String code) {
+    private String getAccessTokenFromKakao(String code) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -76,7 +75,7 @@ public class KakaoService {
                 throw new RuntimeException("Failed to fetch access token from Kakao: " + response.getStatusCode());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error while requesting Kakao access token: " + e.getMessage());
+            throw new RuntimeException("카카오AccessToken 발급 중 오류: " + e.getMessage());
         }
     }
 
@@ -100,7 +99,7 @@ public class KakaoService {
                 throw new RuntimeException("Failed to fetch user info from Kakao: " + response.getStatusCode());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error while requesting Kakao user info: " + e.getMessage());
+            throw new RuntimeException("카카오 유저 정보 요청 중 오류: " + e.getMessage());
         }
     }
 }
