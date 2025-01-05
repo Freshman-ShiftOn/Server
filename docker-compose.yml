@@ -27,6 +27,8 @@ services:
     image: apigateway-service
     ports:
       - "11000:11000"
+    environment:
+      EUREKA_SERVER: ${EUREKA_SERVER}
     networks:
       - app-network
     depends_on:
@@ -40,6 +42,7 @@ services:
     environment:
       DB_USERNAME: ${DB_USERANAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_SERVER: ${EUREKA_SERVER}
     networks:
       - app-network
     depends_on:
