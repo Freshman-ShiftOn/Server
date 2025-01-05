@@ -31,6 +31,7 @@ jobs:
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
         run: ./gradlew clean build -x test
 
       - name: Build apigateway-service
@@ -38,6 +39,7 @@ jobs:
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
         run: |
           chmod +x mvnw
           ./mvnw clean compile package
