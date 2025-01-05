@@ -6,7 +6,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://3.38.195.202:18761/eureka/
+      defaultZone: ${EUREKA_SERVER}
 
 spring:
   application:
@@ -25,10 +25,10 @@ spring:
             predicates:
               - Path=/user-service/**
 
-          - id: first-service
-            uri: lb://FIRST-SERVICE
+          - id: manual-service
+            uri: lb://MANUAL-SERVICE
             predicates:
-              - Path=/first-service/**
+              - Path=/api/manuals/**
             filters:
 #              - AddRequestHeader=first-request, first-requests-header2
 #              - AddResponseHeader=first-response, first-response-header2
