@@ -25,6 +25,7 @@ jobs:
         run: |
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "EUREKA_SERVER=${{ secrets.EUREKA_SERVER }}" >> .env
 
       - name: Build manual-service
         working-directory: manual-service
