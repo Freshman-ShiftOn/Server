@@ -1,5 +1,6 @@
 package com.example.calendarservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +44,7 @@ public class Schedule {
     @Column(name = "last_updated", nullable = false)
     private Date lastUpdated;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ShiftRequest> shiftRequests = new ArrayList<>();
 }
