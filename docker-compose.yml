@@ -47,6 +47,20 @@ services:
       - apigateway-service
       - mysql
 
+  calendar-service:
+    image: manual-service
+    ports:
+      - "13002:13002"
+    environment:
+      DB_USERNAME: ${DB_USERANAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - app-network
+    depends_on:
+      - discovery-service
+      - apigateway-service
+      - mysql
+
 networks:
   app-network:
     driver: bridge
