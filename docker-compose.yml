@@ -51,7 +51,7 @@ services:
       - mysql
 
   calendar-service:
-    image: manual-service
+    image: calendar-service
     ports:
       - "13002:13002"
     environment:
