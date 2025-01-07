@@ -53,18 +53,28 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw clean compile package
+          
+      - name: Build calendar-service
+        working-directory: calendar-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+        run: ./gradlew clean build -x test
 
       - name: Build Docker images
         run: |
           docker build -t manual-service:latest ./manual-service
           docker build -t apigateway-service:latest ./apigateway-service
           docker build -t discovery-service:latest ./discovery-service
+          docker build -t calendar-service:latest ./calendar-service
 
       - name: Save Docker images to files
         run: |
           docker save manual-service:latest -o manual-service.tar
           docker save apigateway-service:latest -o apigateway-service.tar
           docker save discovery-service:latest -o discovery-service.tar
+          docker save calendar-service:latest -o calendar-service.tar
           
       - name: Verify .tar files
         run: |
@@ -83,6 +93,7 @@ jobs:
           scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no discovery-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no calendar-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
 
@@ -91,6 +102,7 @@ jobs:
             docker load -i manual-service.tar
             docker load -i apigateway-service.tar
             docker load -i discovery-service.tar
+            docker load -i calendar-service.tar
             cd /home/ubuntu/
             docker-compose down || true
             docker-compose up -d
