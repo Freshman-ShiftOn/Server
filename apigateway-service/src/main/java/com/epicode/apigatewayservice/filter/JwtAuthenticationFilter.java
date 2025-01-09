@@ -14,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
@@ -21,7 +22,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
     public JwtAuthenticationFilter(@Value("${jwt.secret-key}") String secretKey) {
         super(Config.class);
-        this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey));
     }
 
     public static class Config {
@@ -50,22 +51,28 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                         .parseClaimsJws(jwt)
                         .getBody();
 
-                String email = claims.getSubject();
+                String email = claims.getSubject(); // JWT의 subject에서 email 추출
+
                 if (email == null || email.isEmpty()) {
                     return onError(exchange, "JWT 토큰에 email이 없습니다.", HttpStatus.UNAUTHORIZED);
                 }
 
+                // 기존 요청에 사용자 정보를 추가하여 새로운 요청 생성
                 ServerHttpRequest modifiedRequest = request.mutate()
                         .header("X-Authenticated-User", email)
                         .build();
 
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());
             } catch (ExpiredJwtException e) {
-                return onError(exchange, "JWT 토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED);
-            } catch (UnsupportedJwtException | MalformedJwtException e) {
-                return onError(exchange, "유효하지 않은 JWT 토큰입니다.", HttpStatus.UNAUTHORIZED);
+                return onError(exchange, "JWT 토큰이 만료되었습니다: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+            } catch (UnsupportedJwtException e) {
+                return onError(exchange, "지원되지 않는 JWT 토큰입니다: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+            } catch (MalformedJwtException e) {
+                return onError(exchange, "잘못된 형식의 JWT 토큰입니다: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
             } catch (Exception e) {
-                return onError(exchange, "JWT 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+                // 예외 메시지를 로그와 응답에 포함
+                e.printStackTrace(); // 자세한 예외 정보를 로그로 출력
+                return onError(exchange, "JWT 처리 중 오류가 발생했습니다: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         };
     }
