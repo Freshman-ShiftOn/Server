@@ -13,6 +13,8 @@ import java.util.List;
 
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
+    Long findIdByName(String name);
+
     @Query("SELECT b.name FROM Branch b WHERE b.id IN :branchIds")
     List<String> findBranchNamesByIds(@Param("branchIds") List<Long> branchIds);
 }

@@ -6,10 +6,7 @@ import com.epicode.repository.UserRepository;
 import com.epicode.service.BranchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +27,9 @@ public class BranchController {
         }
         //Branch 목록 반환
         return branchService.getBranchNamesByUserId(Long.valueOf(userId));
+    }
+    @GetMapping("/{branchName}")
+    public Long getBranchIdByName(@PathVariable String branchName) {
+        return branchService.getBranchIdByName(branchName);
     }
 }
