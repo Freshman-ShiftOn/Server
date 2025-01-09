@@ -24,7 +24,6 @@ public class ManualController {
     private final ManualService manualService;
     private final ManualTaskService manualTaskService;
 
-
     @GetMapping("/check")
     @Operation(summary = "매뉴얼API 동작 테스트", description = "동작 테스트를 위한 API, 동작 포트 확인")
     public String check(HttpServletRequest request)
