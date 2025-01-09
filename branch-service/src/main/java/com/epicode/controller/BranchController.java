@@ -7,6 +7,8 @@ import com.epicode.repository.UserRepository;
 import com.epicode.service.BranchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,8 +37,18 @@ public class BranchController {
         }
         return branchNames;
     }
-    @GetMapping("/{branchName}")
-    public Long getBranchIdByName(@PathVariable String branchName) {
+    @GetMapping(value = {"/{branchName}", "/"})
+    public Long getBranchIdByName(@PathVariable(required = false) String branchName) {
+        if (branchName == null) {
+            throw new IllegalArgumentException("Branch name is required.");
+        }
         return branchService.getBranchIdByName(branchName);
+    }
+    @PostMapping("/create")
+    public ResponseEntity<Void> createBranch(@RequestBody Branch branch,
+                                             @RequestHeader("X-User-Id") String userId,
+                                             @RequestHeader("X-Authenticated-User") String email) {
+        branchService.createBranch(branch, Long.valueOf(userId), email);
+        return ResponseEntity.ok().build();//200
     }
 }

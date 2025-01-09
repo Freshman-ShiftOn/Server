@@ -22,7 +22,4 @@ public class Branch {
 
     @Column
     private String contents;
-
-    @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserBranch> userBranches = new ArrayList<>();
 }
