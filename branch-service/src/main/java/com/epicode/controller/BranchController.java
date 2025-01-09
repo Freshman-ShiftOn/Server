@@ -5,6 +5,7 @@ import com.epicode.model.User;
 import com.epicode.model.UserBranch;
 import com.epicode.repository.UserRepository;
 import com.epicode.service.BranchService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -22,6 +23,7 @@ public class BranchController {
     private final UserRepository userRepository;
 
     @GetMapping("/list")
+    @Operation(summary = "사용자 지점 가입 목록 조회", description = "사용자가 가입한 매장 목록을 조회한다.")
     public List<String> getBranchNames(@RequestHeader("X-Authenticated-User") String email,
                                        @RequestHeader("X-User-Id") String userId) {
         User user = userRepository.findIdByEmail(email);
@@ -38,6 +40,7 @@ public class BranchController {
         return branchNames;
     }
     @GetMapping(value = {"/{branchName}", "/"})
+    @Operation(summary = "특정 매장 조회", description = "해당 매장을 선택하면 branchId가 리턴된다.")
     public Long getBranchIdByName(@PathVariable(required = false) String branchName) {
         if (branchName == null) {
             throw new IllegalArgumentException("Branch name is required.");
@@ -45,6 +48,7 @@ public class BranchController {
         return branchService.getBranchIdByName(branchName);
     }
     @PostMapping("/create")
+    @Operation(summary = "지점 추가", description = "매장을 새로 생성한다.")
     public ResponseEntity<Void> createBranch(@RequestBody Branch branch,
                                              @RequestHeader("X-User-Id") String userId,
                                              @RequestHeader("X-Authenticated-User") String email) {
