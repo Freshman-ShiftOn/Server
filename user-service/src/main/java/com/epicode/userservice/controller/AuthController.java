@@ -1,12 +1,10 @@
 package com.epicode.userservice.controller;
-import com.epicode.userservice.domain.Branch;
 import com.epicode.userservice.domain.User;
-
-import java.util.List;
-import java.util.Optional;
 import com.epicode.userservice.repository.UserRepository;
 import com.epicode.userservice.security.JwtUtil;
 import com.epicode.userservice.service.KakaoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -20,6 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "auth-service-controller", description = "OAuth2.0 Auth 서비스 API")
 public class AuthController {
     private final Environment env;
     private final KakaoService kakaoService;
@@ -45,6 +44,7 @@ public class AuthController {
             return "error/redirect-error";
         }
     }
+
     @GetMapping("/kakao/callback")
     public ResponseEntity<String> handleKakaoCallback(@RequestParam String code) {
         log.info("Request Parameters: {}", code);
