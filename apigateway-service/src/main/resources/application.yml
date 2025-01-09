@@ -1,4 +1,5 @@
 server:
+  shutdown: immediate
   port: 11000
 
 eureka:
@@ -6,10 +7,19 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_SERVER}
+      defaultZone: ${EUREKA_SERVER} #http://localhost:18761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${server.port}}
 
 spring:
+  devtools:
+    restart:
+      enabled: false
+  jmx:
+    enabled: false
   application:
+    admin:
+      enabled: false
     name: apigateway-service
   cloud:
     gateway:
@@ -20,27 +30,28 @@ spring:
             preLogger: true
             postLogger: true
       routes:
-          - id: user-service
-            uri: lb://USER-SERVICE
-            predicates:
-              - Path=/user-service/**
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/auth/**
 
-          - id: manual-service
-            uri: lb://MANUAL-SERVICE
-            predicates:
-              - Path=/api/manuals/**
-            filters:
-#              - AddRequestHeader=first-request, first-requests-header2
-#              - AddResponseHeader=first-response, first-response-header2
-              - name: CustomFilter
-              - name: LoggingFilter
-                args:
-                  baseMessage: Hi, there.
-                  preLogger: true
-                  postLogger: true
-          - id: second-service
-            uri: lb://SECOND-SERVICE #192.168.45.104
-            predicates:
-              - Path=/second-service/**
-            filters:
-              - CustomFilter
+        - id: manual-service
+          uri: lb://MANUAL-SERVICE
+          predicates:
+            - Path=/api/manuals/**
+          filters:
+            - JwtAuthenticationFilter
+
+        - id: branch-service
+          uri: lb://BRANCH-SERVICE
+          predicates:
+            - Path=/api/branch/**
+          filters:
+            - JwtAuthenticationFilter
+jwt:
+  secret-key: ${JWT_KEY}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+
