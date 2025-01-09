@@ -26,6 +26,10 @@ jobs:
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "EUREKA_SERVER=${{ secrets.EUREKA_SERVER }}" >> .env
+          echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+          echo "KAKAO_RESTAPI=${{ secrets.KAKAO_RESTAPI }}" >> .env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
 
       - name: Build manual-service
         working-directory: manual-service
@@ -33,6 +37,10 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
         run: ./gradlew clean build -x test
 
       - name: Build apigateway-service
@@ -41,6 +49,10 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
         run: |
           chmod +x mvnw
           ./mvnw clean compile package
@@ -61,6 +73,27 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
         run: ./gradlew clean build -x test
+        
+      - name: Build user-service
+        working-directory: user-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+        run: ./gradlew clean build -x test
+
+      - name: Build branch-service
+        working-directory: branch-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+        run: ./gradlew clean build -x test
 
       - name: Build Docker images
         run: |
@@ -68,6 +101,8 @@ jobs:
           docker build -t apigateway-service:latest ./apigateway-service
           docker build -t discovery-service:latest ./discovery-service
           docker build -t calendar-service:latest ./calendar-service
+          docker build -t user-service:latest ./user-service
+          docker build -t branch-service:latest ./branch-service
 
       - name: Save Docker images to files
         run: |
@@ -75,6 +110,8 @@ jobs:
           docker save apigateway-service:latest -o apigateway-service.tar
           docker save discovery-service:latest -o discovery-service.tar
           docker save calendar-service:latest -o calendar-service.tar
+          docker save user-service:latest -o user-service.tar
+          docker save branch-service:latest -o branch-service.tar
           
       - name: Verify .tar files
         run: |
@@ -103,6 +140,8 @@ jobs:
             docker load -i apigateway-service.tar
             docker load -i discovery-service.tar
             docker load -i calendar-service.tar
+            docker load -i user-service.tar
+            docker load -i branch-service.tar
             cd /home/ubuntu/
             docker-compose down || true
             docker-compose up -d
