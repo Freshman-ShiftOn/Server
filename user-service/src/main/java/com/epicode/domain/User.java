@@ -1,4 +1,4 @@
-package com.epicode.userservice.domain;
+package com.epicode.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 

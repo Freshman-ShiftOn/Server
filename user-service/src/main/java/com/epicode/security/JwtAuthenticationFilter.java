@@ -1,4 +1,4 @@
-package com.epicode.userservice.security;
+package com.epicode.security;
 
 import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;

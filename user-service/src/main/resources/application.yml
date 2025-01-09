@@ -1,5 +1,5 @@
 server:
-  port: 13002
+  port: 13004
 springdoc:
   api-docs:
     path: /v3/api-docs

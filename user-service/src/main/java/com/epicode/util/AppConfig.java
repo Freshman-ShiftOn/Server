@@ -1,4 +1,4 @@
-package com.epicode.userservice.util;
+package com.epicode.util;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

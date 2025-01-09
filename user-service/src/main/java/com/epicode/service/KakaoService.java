@@ -1,7 +1,7 @@
-package com.epicode.userservice.service;
-import com.epicode.userservice.domain.User;
-import com.epicode.userservice.repository.UserRepository;
-import com.epicode.userservice.security.JwtUtil;
+package com.epicode.service;
+import com.epicode.domain.User;
+import com.epicode.repository.UserRepository;
+import com.epicode.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
