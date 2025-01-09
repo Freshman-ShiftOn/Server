@@ -1,4 +1,5 @@
 package com.epicode.controller;
+import com.epicode.exception.NoBranchFoundException;
 import com.epicode.model.Branch;
 import com.epicode.model.User;
 import com.epicode.model.UserBranch;
@@ -25,8 +26,14 @@ public class BranchController {
         if (!user.getId().equals(Long.valueOf(userId))) {
             throw new IllegalArgumentException("User ID does not match the authenticated email.");
         }
-        //Branch 목록 반환
-        return branchService.getBranchNamesByUserId(Long.valueOf(userId));
+        //Branch 목록 가져오기
+        List<String> branchNames = branchService.getBranchNamesByUserId(Long.valueOf(userId));
+
+        // Branch 목록이 비어 있는 경우 예외 처리
+        if (branchNames == null || branchNames.isEmpty()) {
+            throw new NoBranchFoundException("가입된 지점이 없습니다.");
+        }
+        return branchNames;
     }
     @GetMapping("/{branchName}")
     public Long getBranchIdByName(@PathVariable String branchName) {
