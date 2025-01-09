@@ -40,14 +40,14 @@ spring:
           predicates:
             - Path=/api/manuals/**
           filters:
-            - name: JwtAuthenticationFilter
+            - JwtAuthenticationFilter
 
-        - id: second-service
-          uri: lb://SECOND-SERVICE #192.168.45.104
+        - id: branch-service
+          uri: lb://BRANCH-SERVICE
           predicates:
-            - Path=/second-service/**
+            - Path=/api/branch/**
           filters:
-            - CustomFilter
+            - JwtAuthenticationFilter
 jwt:
   secret-key: ${JWT_KEY}
 

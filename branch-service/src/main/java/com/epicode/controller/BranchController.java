@@ -2,13 +2,11 @@ package com.epicode.controller;
 import com.epicode.exception.NoBranchFoundException;
 import com.epicode.model.Branch;
 import com.epicode.model.User;
-import com.epicode.model.UserBranch;
 import com.epicode.repository.UserRepository;
 import com.epicode.service.BranchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,14 +22,14 @@ public class BranchController {
 
     @GetMapping("/list")
     @Operation(summary = "사용자 지점 가입 목록 조회", description = "사용자가 가입한 매장 목록을 조회한다.")
-    public List<String> getBranchNames(@RequestHeader("X-Authenticated-User") String email,
-                                       @RequestHeader("X-User-Id") String userId) {
+    public List<String> getBranchNames(@RequestHeader("X-Authenticated-User") String email) {
         User user = userRepository.findIdByEmail(email);
-        if (!user.getId().equals(Long.valueOf(userId))) {
-            throw new IllegalArgumentException("User ID does not match the authenticated email.");
+        Long userId = user.getId();
+        if (user==null) {
+            throw new IllegalArgumentException("해당하는 사용자가 없습니다.");
         }
         //Branch 목록 가져오기
-        List<String> branchNames = branchService.getBranchNamesByUserId(Long.valueOf(userId));
+        List<String> branchNames = branchService.getBranchNamesByUserId(userId);
 
         // Branch 목록이 비어 있는 경우 예외 처리
         if (branchNames == null || branchNames.isEmpty()) {
@@ -50,9 +48,9 @@ public class BranchController {
     @PostMapping("/create")
     @Operation(summary = "지점 추가", description = "매장을 새로 생성한다.")
     public ResponseEntity<Void> createBranch(@RequestBody Branch branch,
-                                             @RequestHeader("X-User-Id") String userId,
                                              @RequestHeader("X-Authenticated-User") String email) {
-        branchService.createBranch(branch, Long.valueOf(userId), email);
+        Long userId = userRepository.findIdByEmail(email).getId();
+        branchService.createBranch(branch, userId, email);
         return ResponseEntity.ok().build();//200
     }
 }
