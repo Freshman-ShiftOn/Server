@@ -51,13 +51,21 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                         .parseClaimsJws(jwt)
                         .getBody();
 
-                String email = claims.getSubject();
+                String email = claims.getSubject(); // JWT의 subject에서 email 추출
+                String userId = claims.get("userId", String.class); // JWT의 클레임에서 userId 추출
+
                 if (email == null || email.isEmpty()) {
                     return onError(exchange, "JWT 토큰에 email이 없습니다.", HttpStatus.UNAUTHORIZED);
                 }
 
+                if (userId == null || userId.isEmpty()) {
+                    return onError(exchange, "JWT 토큰에 userId가 없습니다.", HttpStatus.UNAUTHORIZED);
+                }
+
+                // 기존 요청에 사용자 정보를 추가하여 새로운 요청 생성
                 ServerHttpRequest modifiedRequest = request.mutate()
                         .header("X-Authenticated-User", email)
+                        .header("X-User-Id", userId)
                         .build();
 
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());
