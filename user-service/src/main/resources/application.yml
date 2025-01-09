@@ -11,6 +11,9 @@ logging:
     org.springframework: DEBUG
 
 spring:
+  devtools:
+    restart:
+      enabled: false
   application:
     name: user-service
   security:
