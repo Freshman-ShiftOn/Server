@@ -1,9 +1,8 @@
-package com.epicode.userservice.controller;
-import com.epicode.userservice.domain.User;
-import com.epicode.userservice.repository.UserRepository;
-import com.epicode.userservice.security.JwtUtil;
-import com.epicode.userservice.service.KakaoService;
-import io.swagger.v3.oas.annotations.Operation;
+package com.epicode.controller;
+import com.epicode.domain.User;
+import com.epicode.repository.UserRepository;
+import com.epicode.security.JwtUtil;
+import com.epicode.service.KakaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

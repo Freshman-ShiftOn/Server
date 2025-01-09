@@ -1,4 +1,4 @@
-package com.epicode.userservice.util;
+package com.epicode.util;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
