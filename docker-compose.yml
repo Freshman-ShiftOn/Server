@@ -69,7 +69,7 @@ services:
     ports:
       - "13003:13003"
     environment:
-      DB_USERNAME: ${DB_USERANAME}
+      DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_URL: ${DB_URL}
       EUREKA_SERVER: ${EUREKA_SERVER}
@@ -85,7 +85,7 @@ services:
     ports:
       - "13004:13004"
     environment:
-      DB_USERNAME: ${DB_USERANAME}
+      DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_URL: ${DB_URL}
       EUREKA_SERVER: ${EUREKA_SERVER}
