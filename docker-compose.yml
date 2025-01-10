@@ -29,6 +29,7 @@ services:
       - "11000:11000"
     environment:
       EUREKA_SERVER: ${EUREKA_SERVER}
+      JWT_KEY: ${JWT_KEY}
     networks:
       - app-network
     depends_on:
