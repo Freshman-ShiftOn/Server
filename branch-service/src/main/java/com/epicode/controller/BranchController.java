@@ -8,9 +8,12 @@ import com.epicode.service.BranchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RequestMapping({"/api/branch"})
@@ -19,15 +22,11 @@ import java.util.List;
         description = "Branch 서비스 API"
 )
 @RestController
+@RequiredArgsConstructor
 public class BranchController {
-
     private final BranchService branchService;
     private final UserRepository userRepository;
 
-    public BranchController(final BranchService branchService, final UserRepository userRepository) {
-        this.branchService = branchService;
-        this.userRepository = userRepository;
-    }
 
     @GetMapping({"/list"})
     @Operation(
@@ -36,31 +35,36 @@ public class BranchController {
     )
     public List<String> getBranchNames(
             @Parameter(
-                    name = "X-Authenticated-User",
-                    description = "사용자의 인증된 이메일 주소",
+                    name = "X-Branch-Ids",
+                    description = "사용자의 지점 가입 정보",
                     required = true,
-                    example = "user@example.com"
+                    example = "[101,202]"
             )
-            @RequestHeader("X-Authenticated-User") String email
+            @RequestHeader("X-Authenticated-User") String email,
+            @RequestHeader("X-Branch-Ids") String branches // 문자열로 받음
     ) {
-        User user = this.userRepository.findIdByEmail(email);
-        Long userId = user.getId();
+        // 사용자 검증
+        User user = userRepository.findIdByEmail(email);
+        List<String> branchNames = new ArrayList<>();
         if (user == null) {
             throw new IllegalArgumentException("해당하는 사용자가 없습니다.");
         } else {
-            List<String> branchNames = this.branchService.getBranchNamesByUserId(userId);
-            if (branchNames != null && !branchNames.isEmpty()) {
-                return branchNames;
-            } else {
+            //List<String> branchNames = branchService.getBranchNamesByUserId(userId);
+            Long[] branchIds = Arrays.stream(branches.split(",")) // ','로 분리
+                    .map(Long::valueOf) // Long으로 변환
+                    .toArray(Long[]::new);
+            branchNames = branchService.getBranchNamesByUserIds(branchIds);
+            if (branchNames == null || branchNames.isEmpty()) {
                 throw new NoBranchFoundException("가입된 지점이 없습니다.");
             }
         }
+        return branchNames;
     }
 
     @GetMapping({"/{branchName}"})
     @Operation(
             summary = "특정 매장 조회",
-            description = "해당 매장을 선택하면 branchId가 리턴된다."
+            description = "해당 매장 이름을 선택하면 branchId가 리턴된다."
     )
     public Long getBranchIdByName(
             @Parameter(
@@ -74,7 +78,7 @@ public class BranchController {
         if (branchName == null) {
             throw new IllegalArgumentException("Branch name is required.");
         } else {
-            return this.branchService.getBranchIdByName(branchName);
+            return branchService.getBranchIdByName(branchName);
         }
     }
 
@@ -97,8 +101,8 @@ public class BranchController {
             )
             @RequestHeader("X-Authenticated-User") String email
     ) {
-        Long userId = this.userRepository.findIdByEmail(email).getId();
-        this.branchService.createBranch(branch, userId, email);
+        Long userId = userRepository.findIdByEmail(email).getId();
+        branchService.createBranch(branch, userId, email);
         return ResponseEntity.ok().build();
     }
 }

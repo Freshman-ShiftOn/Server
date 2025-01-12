@@ -19,12 +19,17 @@ public class BranchServiceImpl implements BranchService {
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
 
-    // branchId 기반 branchName 조회
-    public List<String> getBranchNamesByUserId(Long userId) {
-        //UserBranch에서 branchId 목록 조회
-        List<Long> branchIds = userBranchRepository.findBranchIdsByUserId(userId);
-        //Branch에서 branchName 목록 조회
-        return branchRepository.findBranchNamesByIds(branchIds);
+//    // branchId 기반 branchName 조회
+//    public List<String> getBranchNamesByUserId(Long userId) {
+//        //UserBranch에서 branchId 목록 조회
+//        List<Long> branchIds = userBranchRepository.findBranchIdsByUserId(userId);
+//        //Branch에서 branchName 목록 조회
+//        return branchRepository.findBranchNamesByIds(branchIds);
+//    }
+    //branchIds기반 branchName 조회
+    public List<String> getBranchNamesByUserIds(Long[] branchIds) {
+        //branchIds -> branchName 목록 조회
+        return branchRepository.findBranchNamesByIds(List.of(branchIds));
     }
     // branchName 기반 branchId 조회
     public Long getBranchIdByName(String name) {
