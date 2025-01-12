@@ -41,7 +41,7 @@ public class KakaoService {
             Long userId = userRepository.findByEmail(userEmail).getId();
             Long[] branches = userBranchRepository.findBranchIdsByUserId(userId);
 
-            return jwtUtil.generateToken(userEmail,branches);
+            return jwtUtil.generateToken(userEmail,branches,userId);
         } catch (Exception e) {
             throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함.  " + e.getMessage(), e);
         }

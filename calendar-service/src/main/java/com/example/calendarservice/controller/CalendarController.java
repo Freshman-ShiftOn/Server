@@ -26,15 +26,6 @@ public class CalendarController {
     private final ScheduleService scheduleService;
     private final ShiftRequestService shiftRequestService;
 
-    @GetMapping("/check")
-    @Operation(summary = "캘린더API 동작 테스트", description = "동작 테스트를 위한 API, 동작 포트 확인")
-    public String check(HttpServletRequest request)
-    {
-        log.info("Server port={}", request.getServerPort());
-        return String.format("Hi, There This is a message from Manual Service on PORT %s",
-                env.getProperty("local.server.port"));
-    }
-
     // 지점 스케줄 목록 조회 (월단위)
     @GetMapping("/{branchId}/{month}")
     @Operation(summary = "지점 스케줄 목록 조회 (월단위)", description = "해당 매장의 지점 스케줄을 월 단위로 조회한다.")
@@ -46,85 +37,97 @@ public class CalendarController {
     }
 
     // 지점 스케줄 유저 별 조회 (월 단위)
-    @GetMapping("/{branchId}/{month}/{userId}")
+    @GetMapping("/{branchId}/{month}")
     @Operation(summary = "지점 스케줄 유저 별 조회 (월 단위)", description = "해당 매장의 특정 유저 스케줄을 월 단위로 조회한다.")
     public ResponseEntity<List<Schedule>> getSchedulesByBranchIdAndUserId(
             @PathVariable Integer branchId,
             @PathVariable Integer month,
-            @PathVariable Integer userId) {
-        List<Schedule> schedules = scheduleService.getSchedulesByBranchIdAndUserId(branchId, month, userId);
+            @RequestHeader("X-Authenticated-User-Id") String userId) {
+        List<Schedule> schedules = scheduleService.getSchedulesByBranchIdAndUserId(branchId, month, Integer.valueOf(userId));
         return ResponseEntity.ok(schedules);
     }
 
     // 내 스케줄 등록
-    @PostMapping("/{branchId}/{userId}")
+    @PostMapping("/{branchId}")
     @Operation(summary = "내 스케줄 등록", description = "현재 사용자의 스케줄을 등록한다.")
     public ResponseEntity<Schedule> registerSchedule(
             @PathVariable Integer branchId,
-            @PathVariable Integer userId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody Schedule schedule) {
         schedule.setBranchId(branchId);
-        schedule.setWorkerId(userId);
+        schedule.setWorkerId(Integer.valueOf(userId));
         Schedule newSchedule = scheduleService.createSchedule(schedule);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
     }
 
     // 내 스케줄 수정
-    @PutMapping("/{branchId}/{userId}/{scheduleId}")
+    @PutMapping("/{branchId}/{scheduleId}")
     @Operation(summary = "내 스케줄 수정", description = "현재 사용자의 특정 스케줄을 수정한다.")
     public ResponseEntity<Schedule> updateSchedule(
             @PathVariable Integer branchId,
-            @PathVariable Integer userId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer scheduleId,
             @RequestBody Schedule schedule) {
         schedule.setBranchId(branchId);
-        schedule.setWorkerId(userId);
+        schedule.setWorkerId(Integer.valueOf(userId));
         Schedule updatedSchedule = scheduleService.updateSchedule(scheduleId, schedule);
         return ResponseEntity.ok(updatedSchedule);
     }
 
     // 내 스케줄 삭제
-    @DeleteMapping("/{branchId}/{userId}/{scheduleId}")
-    @Operation(summary = "내 스케줄 삭제", description = "현재 사용자의 특정 스케줄을 삭제한다.")
+    @DeleteMapping("/{scheduleId}")
+    @Operation(summary = "스케줄 삭제", description = "특정 스케줄을 삭제한다.")
     public ResponseEntity<Void> deleteSchedule(
-            @PathVariable Integer branchId,
-            @PathVariable Integer userId,
-            @PathVariable Integer scheduleId) {
+            @RequestHeader("X-Authenticated-User-Id") String userIdHeader,
+            @PathVariable Integer scheduleId) throws IllegalAccessException {
+        int userId;
+        try {
+            userId = Integer.parseInt(userIdHeader);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid user ID format in header.");
+        }
+
+        // 해당 스케줄이 현재 유저의 스케줄인지 검증
+        if (!scheduleService.isUserSchedule(scheduleId, userId)) {
+            throw new IllegalAccessException("Unauthorized: The schedule does not belong to the authenticated user.");
+        }
         scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.noContent().build();
     }
 
     // 대타 요청
-    @PostMapping("/{branchId}/{userId}/request-shift")
-    @Operation(summary = "대타 요청", description = "현재 사용자가 대타를 요청한다.")
+    @PostMapping("/{branchId}/request-shift")
+    @Operation(summary = "대타 요청", description = "대타를 요청한다.")
     public ResponseEntity<ShiftRequest> requestShift(
             @PathVariable Integer branchId,
-            @PathVariable Integer userId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody ShiftRequest shiftRequest) {
         shiftRequest.setBranchId(branchId);
-        shiftRequest.setWorkerId(userId.toString());
+        shiftRequest.setWorkerId(userId);
         ShiftRequest newRequest = shiftRequestService.createShiftRequest(shiftRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(newRequest);
     }
 
     // 대타 수락
-    @PutMapping("/{branchId}/{userId}/request-shift/{reqShiftId}")
+    @PutMapping("/request-shift/{reqShiftId}")
     @Operation(summary = "대타 수락", description = "현재 사용자가 특정 대타 요청을 수락한다.")
     public ResponseEntity<ShiftRequest> acceptShiftRequest(
-            @PathVariable Integer branchId,
-            @PathVariable Integer userId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer reqShiftId) {
-        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, userId.toString());
+        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, userId);
         return ResponseEntity.ok(updatedRequest);
     }
 
     // 대타 삭제
-    @DeleteMapping("/{branchId}/{userId}/request-shift/{reqShiftId}")
-    @Operation(summary = "대타 삭제", description = "현재 사용자가 특정 대타 요청을 삭제한다.")
+    @DeleteMapping("/request-shift/{reqShiftId}")
+    @Operation(summary = "대타 삭제", description = "특정 대타 요청을 삭제한다.")
     public ResponseEntity<Void> deleteShiftRequest(
-            @PathVariable Integer branchId,
-            @PathVariable Integer userId,
-            @PathVariable Integer reqShiftId) {
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @PathVariable Integer reqShiftId) throws IllegalAccessException {
+        // 검증: 요청한 유저가 해당 대타 요청의 작성자인지 확인
+        if (!shiftRequestService.isUserShiftRequest(reqShiftId, userId)) {
+            throw new IllegalAccessException("Unauthorized: This shift request does not belong to the authenticated user.");
+        }
         shiftRequestService.deleteShiftRequest(reqShiftId);
         return ResponseEntity.noContent().build();
     }
