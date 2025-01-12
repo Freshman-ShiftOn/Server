@@ -72,6 +72,7 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
         run: ./gradlew clean build -x test
         
       - name: Build user-service
@@ -127,14 +128,14 @@ jobs:
           chmod 600 epicode_key.pem
 
           # Copy Docker images, compose file, and .env to EC2
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no discovery-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no calendar-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no user-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no branch-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no discovery-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no calendar-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no user-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no branch-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
 
           # Deploy with Docker Compose
           ssh -i epicode_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} << EOF
@@ -144,7 +145,7 @@ jobs:
             docker load -i calendar-service.tar
             docker load -i user-service.tar
             docker load -i branch-service.tar
-            cd /home/ubuntu/
+            cd /home/ubuntu/deploy
             docker-compose down || true
             docker-compose up -d
           EOF
