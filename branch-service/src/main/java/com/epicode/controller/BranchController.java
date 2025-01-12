@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 @RequestMapping({"/api/branch"})
 @Tag(
         name = "branch-service-controller",
@@ -27,21 +26,17 @@ public class BranchController {
     private final BranchService branchService;
     private final UserRepository userRepository;
 
-
     @GetMapping({"/list"})
     @Operation(
             summary = "사용자 지점 가입 목록 조회",
-            description = "사용자가 가입한 매장 목록을 조회한다."
+            description = "사용자가 가입한 매장 목록을 조회합니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI...")
+            }
     )
     public List<String> getBranchNames(
-            @Parameter(
-                    name = "X-Branch-Ids",
-                    description = "사용자의 지점 가입 정보",
-                    required = true,
-                    example = "[101,202]"
-            )
-            @RequestHeader("X-Authenticated-User") String email,
-            @RequestHeader("X-Branch-Ids") String branches // 문자열로 받음
+            @RequestHeader("X-Authenticated-User") String email, // 명세에서 제외
+            @RequestHeader("X-Branch-Ids") String branches // 명세에서 제외
     ) {
         // 사용자 검증
         User user = userRepository.findIdByEmail(email);
@@ -49,9 +44,8 @@ public class BranchController {
         if (user == null) {
             throw new IllegalArgumentException("해당하는 사용자가 없습니다.");
         } else {
-            //List<String> branchNames = branchService.getBranchNamesByUserId(userId);
-            Long[] branchIds = Arrays.stream(branches.split(",")) // ','로 분리
-                    .map(Long::valueOf) // Long으로 변환
+            Long[] branchIds = Arrays.stream(branches.split(","))
+                    .map(Long::valueOf)
                     .toArray(Long[]::new);
             branchNames = branchService.getBranchNamesByUserIds(branchIds);
             if (branchNames == null || branchNames.isEmpty()) {
@@ -64,19 +58,17 @@ public class BranchController {
     @GetMapping({"/{branchName}"})
     @Operation(
             summary = "특정 매장 조회",
-            description = "해당 매장 이름을 선택하면 branchId가 리턴된다."
+            description = "해당 매장 이름을 선택하면 branchId가 반환됩니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
+                    @Parameter(name = "branchName", description = "조회할 매장의 이름", required = true, example = "Main Branch")
+            }
     )
     public Long getBranchIdByName(
-            @Parameter(
-                    name = "branchName",
-                    description = "조회할 매장의 이름",
-                    required = true,
-                    example = "Main Branch"
-            )
             @PathVariable String branchName
     ) {
         if (branchName == null) {
-            throw new IllegalArgumentException("Branch name is required.");
+            throw new IllegalArgumentException("해당하는 브랜치명이 없습니다.");
         } else {
             return branchService.getBranchIdByName(branchName);
         }
@@ -85,20 +77,14 @@ public class BranchController {
     @PostMapping({"/create"})
     @Operation(
             summary = "지점 추가",
-            description = "매장을 새로 생성한다."
+            description = "새로운 매장을 생성합니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
+                    @Parameter(name = "branch", description = "생성할 매장의 정보", required = true)
+            }
     )
     public ResponseEntity<Void> createBranch(
-            @Parameter(
-                    description = "생성할 매장의 정보",
-                    required = true
-            )
             @RequestBody Branch branch,
-            @Parameter(
-                    name = "X-Authenticated-User",
-                    description = "사용자의 인증된 이메일 주소",
-                    required = true,
-                    example = "user@example.com"
-            )
             @RequestHeader("X-Authenticated-User") String email
     ) {
         Long userId = userRepository.findIdByEmail(email).getId();
