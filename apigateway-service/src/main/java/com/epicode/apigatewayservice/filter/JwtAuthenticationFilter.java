@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
@@ -55,8 +56,11 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
                 String email = claims.getSubject();
                 List<Integer> branchIdsList = claims.get("branchIds", List.class); // List<Integer>로 받음
+                Long userId = claims.get("userId",Long.class);
 
-
+                if(userId<0 || userId==0){
+                    return onError(exchange, "JWT 토큰에 userId가 없습니다.", HttpStatus.UNAUTHORIZED);
+                }
                 if (email == null || email.isEmpty()) {
                     return onError(exchange, "JWT 토큰에 email이 없습니다.", HttpStatus.UNAUTHORIZED);
                 }
@@ -64,18 +68,13 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                     return onError(exchange, "JWT 토큰에 branchIds가 없습니다.", HttpStatus.UNAUTHORIZED);
                 }
 
-                // List<Integer> -> Long[] 변환
-                Long[] branchIds = branchIdsList.stream()
-                        .map(Long::valueOf) // Integer를 Long으로 변환
-                        .toArray(Long[]::new);
-
-
                 // 기존 요청에 사용자 정보를 추가하여 새로운 요청 생성
                 ServerHttpRequest modifiedRequest = request.mutate()
+                        .header("X-Authenticated-User-Id", String.valueOf(userId))
                         .header("X-Authenticated-User", email)
-                        .header("X-Branch-Ids", String.join(",", Arrays.stream(branchIds)
-                                .map(String::valueOf)
-                                .toArray(String[]::new))) // Long[] -> 쉼표로 구분된 String
+                        .header("X-Branch-Ids", branchIdsList.stream()
+                                .map(String::valueOf) // Integer를 String으로 변환
+                                .collect(Collectors.joining(","))) // 쉼표로 구분된 String 생성
                         .build();
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());
             } catch (ExpiredJwtException e) {

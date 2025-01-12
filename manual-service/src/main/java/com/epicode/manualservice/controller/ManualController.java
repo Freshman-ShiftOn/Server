@@ -38,7 +38,6 @@ public class ManualController {
             }
     )
     public ResponseEntity<List<ManualDTO>> getManualsByBranchId(
-            @RequestHeader("Authorization") String token,
             @RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId) {
         manualService.validateBranchAccess(branches, branchId);
@@ -58,7 +57,6 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> getManualWithTasks(
-            @RequestHeader("Authorization") String token,
             @RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId,
             @PathVariable Integer id) {
@@ -80,7 +78,6 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> createManual(
-            @RequestHeader("Authorization") String token,
             @RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId,
             @RequestBody ManualDTO manualDTO) {
@@ -101,7 +98,6 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> updateManual(
-            @RequestHeader("Authorization") String token,
             @RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId,
             @PathVariable Integer id,
@@ -123,7 +119,6 @@ public class ManualController {
             }
     )
     public ResponseEntity<Void> deleteManual(
-            @RequestHeader("Authorization") String token,
             @RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId,
             @PathVariable Integer id) {
