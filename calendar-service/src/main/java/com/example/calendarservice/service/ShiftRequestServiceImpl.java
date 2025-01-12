@@ -48,6 +48,11 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
+    public boolean isUserShiftRequest(Integer reqShiftId, String workerId) {
+        return shiftRequestRepository.existsByIdAndWorkerId(reqShiftId, workerId);
+    }
+
+    @Override
     public ShiftRequest acceptShiftRequest(Integer shiftRequestId, String acceptId) {
         // 대타 요청 확인
         ShiftRequest existingShiftRequest = shiftRequestRepository.findById(shiftRequestId)

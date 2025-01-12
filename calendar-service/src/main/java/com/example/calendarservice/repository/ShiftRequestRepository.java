@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Integer> {
+    boolean existsByIdAndWorkerId(Integer id, String workerId);
 }

@@ -49,4 +49,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<Schedule> getSchedulesByBranchIdAndUserId(Integer branchId, Integer month, Integer userId) {
         return scheduleRepository.findByBranchIdAndMonthAndUserId(branchId, month, userId);
     }
+
+    public boolean isUserSchedule(Integer scheduleId, int userId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found with ID: " + scheduleId));
+        return schedule.getWorkerId().equals(userId);
+    }
 }

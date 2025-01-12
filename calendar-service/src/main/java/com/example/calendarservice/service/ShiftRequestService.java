@@ -6,5 +6,8 @@ public interface ShiftRequestService {
     ShiftRequest createShiftRequest(ShiftRequest shiftRequest);
     ShiftRequest updateShiftRequest(Integer shiftRequestId, ShiftRequest shiftRequest);
     void deleteShiftRequest(Integer shiftRequestId);
+
+    boolean isUserShiftRequest(Integer reqShiftId, String workerId);
+
     ShiftRequest acceptShiftRequest(Integer shiftRequestId, String acceptId);
 }

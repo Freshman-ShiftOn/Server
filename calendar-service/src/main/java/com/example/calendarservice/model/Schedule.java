@@ -47,4 +47,5 @@ public class Schedule {
     @JsonIgnore
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ShiftRequest> shiftRequests = new ArrayList<>();
+
 }

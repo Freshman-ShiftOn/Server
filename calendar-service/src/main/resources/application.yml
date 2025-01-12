@@ -34,32 +34,3 @@ spring:
       connection-timeout: 20000
       connection-test-query: SELECT 1
       leak-detection-threshold: 60000
-#  cache:
-#    type: redis
-#    data:
-#      redis:
-#        host: my-redis #localhost #컨테이너 이름
-#        port: 6379
-#        password: "0000"
-#        database: 0
-#        timeout: 2000ms
-#        time-to-live:
-#          crawledEduContents: 600s # 10분
-#        lettuce:
-#          pool:
-#            max-size: 8
-#            max-idle: 8
-#            min-idle: 0
-#          shutdown-timeout: 100
-#
-#  logging:
-#    level:
-#      root: INFO
-#      org.springframework: DEBUG
-#      org.hibernate.SQL: DEBUG
-#      org.hibernate.type.descriptor.sql: TRACE
-#      org.springframework.data.redis: TRACE
-#      org.springframework.cache: DEBUG       # Spring Cache 관련 로그
-#      org.springframework.cache.redis: DEBUG # Redis 캐시 관련 로그
-#    file:
-#      name: logs/application.log
