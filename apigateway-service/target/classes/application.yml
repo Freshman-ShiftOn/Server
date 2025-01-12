@@ -48,6 +48,13 @@ spring:
             - Path=/api/manuals/**
           filters:
             - JwtAuthenticationFilter
+
+        - id: calendar-service
+          uri: lb://CALENDAR-SERVICE
+          predicates:
+            - Path=/api/calendar/**
+          filters:
+            - JwtAuthenticationFilter
 jwt:
   secret-key: ${JWT_KEY}
 

@@ -1,14 +1,8 @@
 server:
   port: 13002
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
 spring:
   application:
     name: calendar-service
-  security:
-    enabled: false
   jpa:
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -34,3 +28,11 @@ spring:
       connection-timeout: 20000
       connection-test-query: SELECT 1
       leak-detection-threshold: 60000
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER}
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
