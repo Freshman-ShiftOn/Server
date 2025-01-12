@@ -57,7 +57,7 @@ services:
     ports:
       - "13002:13002"
     environment:
-      DB_USERNAME: ${DB_USERANAME}
+      DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_URL: ${DB_URL}
       EUREKA_SERVER: ${EUREKA_SERVER}
