@@ -35,17 +35,17 @@ spring:
           predicates:
             - Path=/api/auth/**
 
-        - id: manual-service
-          uri: lb://MANUAL-SERVICE
-          predicates:
-            - Path=/api/manuals/**
-          filters:
-            - JwtAuthenticationFilter
-
         - id: branch-service
           uri: lb://BRANCH-SERVICE
           predicates:
             - Path=/api/branch/**
+          filters:
+            - JwtAuthenticationFilter
+
+        - id: manual-service
+          uri: lb://MANUAL-SERVICE
+          predicates:
+            - Path=/api/manuals/**
           filters:
             - JwtAuthenticationFilter
 jwt:
@@ -54,3 +54,4 @@ jwt:
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
+

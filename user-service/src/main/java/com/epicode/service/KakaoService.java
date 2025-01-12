@@ -1,5 +1,6 @@
 package com.epicode.service;
 import com.epicode.domain.User;
+import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class KakaoService {
     private final RestTemplate restTemplate; // RestTemplate Bean 주입
     private final Environment env;
     private final UserRepository userRepository;
+    private final UserBranchRepository userBranchRepository;
     private final JwtUtil jwtUtil;
 
     public String authenticateWithKakao(String code) {
@@ -36,8 +38,10 @@ public class KakaoService {
             if (!userRepository.existsByEmail(userEmail)) {
                 saveNewUser(userEmail);//저장
             }
+            Long userId = userRepository.findByEmail(userEmail).getId();
+            Long[] branches = userBranchRepository.findBranchIdsByUserId(userId);
 
-            return jwtUtil.generateToken(userEmail);
+            return jwtUtil.generateToken(userEmail,branches);
         } catch (Exception e) {
             throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함.  " + e.getMessage(), e);
         }
