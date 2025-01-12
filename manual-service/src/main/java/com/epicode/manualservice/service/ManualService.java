@@ -2,6 +2,7 @@ package com.epicode.manualservice.service;
 
 import com.epicode.manualservice.dto.ManualDTO;
 import com.epicode.manualservice.dto.ManualTaskDTO;
+import com.epicode.manualservice.exception.BranchAuthorizeException;
 import com.epicode.manualservice.model.Manual;
 import com.epicode.manualservice.repository.ManualRepository;
 import com.epicode.manualservice.exception.ManualNotFoundException;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
@@ -17,6 +19,17 @@ import java.util.stream.Collectors;
 public class ManualService {
     private final ManualRepository manualRepository;
     private final ManualTaskService manualTaskService;
+
+    public void validateBranchAccess(String branches, Integer branchId) {
+        List<Integer> branchIdList = Arrays.stream(branches.split(","))
+                .map(Integer::valueOf) // 문자열을 Integer로 변환
+                .toList();
+
+        if (!branchIdList.contains(branchId)) {
+            throw new BranchAuthorizeException("해당 매장에 접근 권한이 없습니다.");
+        }
+    }
+
 
     // 매뉴얼 목록 조회
     @Transactional(readOnly = true)
@@ -29,7 +42,7 @@ public class ManualService {
     // 매뉴얼 상세 조회(태스크 포함)
     @Transactional(readOnly = true)
     public ManualDTO getManualByIdAndBranchId(Integer id, Integer branchId) {
-        Manual manual = manualRepository.findById(id)
+        Manual manual = manualRepository.findById(id)//매뉴얼Id
                 .orElseThrow(() -> new ManualNotFoundException("해당 ID(" + id + ")에 해당하는 메뉴얼이 존재하지 않습니다."));
         if (!manual.getBranchId().equals(branchId)) {
             throw new ManualNotFoundException("ID(" + id + ")에 해당하는 메뉴얼이 branchId(" + branchId + ")와 일치하지 않습니다.");
