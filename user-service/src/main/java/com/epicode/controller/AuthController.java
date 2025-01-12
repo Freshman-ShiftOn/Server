@@ -56,33 +56,33 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("콜백url 오류: " + e.getMessage());
         }
     }
-
-    @GetMapping("/info")
-    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
-        try {
-            if (token == null || !token.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
-            }
-
-            token = token.substring(7);
-            String email = jwtUtil.getEmailFromToken(token);
-
-            User user = userRepository.findByEmail(email);
-            //애플리케이션 레벨에서도 데이터 검증
-            if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                throw new IllegalStateException("Email must not be null or empty");
-            }
-
-            Map<String, Object> response = Map.of(
-                    "X-User-Id", user.getId(),//유저 고유id 반환
-                    "X-Authenticated-User", user.getEmail()
-            );
-
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token validation failed: " + e.getMessage());
-        }
-    }
+//
+//    @GetMapping("/info")
+//    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
+//        try {
+//            if (token == null || !token.startsWith("Bearer ")) {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+//            }
+//
+//            token = token.substring(7);
+//            String email = jwtUtil.getEmailFromToken(token);
+//
+//            User user = userRepository.findByEmail(email);
+//            //애플리케이션 레벨에서도 데이터 검증
+//            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+//                throw new IllegalStateException("Email must not be null or empty");
+//            }
+//
+//            Map<String, Object> response = Map.of(
+//                    "X-User-Id", user.getId(),//유저 고유id 반환
+//                    "X-Authenticated-User", user.getEmail()
+//            );
+//
+//            return ResponseEntity.ok(response);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token validation failed: " + e.getMessage());
+//        }
+//    }
 
 }
