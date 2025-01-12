@@ -8,7 +8,7 @@ services:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} # MySQL root 비밀번호
-      MYSQL_DATABASE: "manual_db" # 생성할 데이터베이스 이름
+      MYSQL_DATABASE: "crewezy_db" # 생성할 데이터베이스 이름
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -27,6 +27,9 @@ services:
     image: apigateway-service
     ports:
       - "11000:11000"
+    environment:
+      EUREKA_SERVER: ${EUREKA_SERVER}
+      JWT_KEY: ${JWT_KEY}
     networks:
       - app-network
     depends_on:
@@ -38,14 +41,69 @@ services:
     ports:
       - "13001:13001"
     environment:
-      DB_USERNAME: ${DB_USERANAME}
+      DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      EUREKA_SERVER: ${EUREKA_SERVER}
     networks:
       - app-network
     depends_on:
       - discovery-service
       - apigateway-service
       - mysql
+
+  calendar-service:
+    image: calendar-service
+    ports:
+      - "13002:13002"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      EUREKA_SERVER: ${EUREKA_SERVER}
+    networks:
+      - app-network
+    depends_on:
+      - discovery-service
+      - apigateway-service
+      - mysql
+      
+  branch-service:
+    image: branch-service
+    ports:
+      - "13003:13003"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      EUREKA_SERVER: ${EUREKA_SERVER}
+    networks:
+      - app-network
+    depends_on:
+      - discovery-service
+      - apigateway-service
+      - mysql
+
+  user-service:
+    image: user-service
+    ports:
+      - "13004:13004"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      EUREKA_SERVER: ${EUREKA_SERVER}
+      KAKAO_RESTAPI: ${KAKAO_RESTAPI}
+      BASE_URL: ${BASE_URL}
+      JWT_KEY: ${JWT_KEY}
+      
+    networks:
+      - app-network
+    depends_on:
+      - discovery-service
+      - apigateway-service
+      - mysql
+
 
 networks:
   app-network:

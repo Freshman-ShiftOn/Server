@@ -25,12 +25,22 @@ jobs:
         run: |
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "EUREKA_SERVER=${{ secrets.EUREKA_SERVER }}" >> .env
+          echo "DB_URL=${{ secrets.DB_URL }}" >> .env
+          echo "KAKAO_RESTAPI=${{ secrets.KAKAO_RESTAPI }}" >> .env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
 
       - name: Build manual-service
         working-directory: manual-service
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
         run: ./gradlew clean build -x test
 
       - name: Build apigateway-service
@@ -38,6 +48,11 @@ jobs:
         env:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
         run: |
           chmod +x mvnw
           ./mvnw clean compile package
@@ -50,18 +65,54 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw clean compile package
+          
+      - name: Build calendar-service
+        working-directory: calendar-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+        run: ./gradlew clean build -x test
+        
+      - name: Build user-service
+        working-directory: user-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+        run: ./gradlew clean build -x test
+
+      - name: Build branch-service
+        working-directory: branch-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+        run: ./gradlew clean build -x test
 
       - name: Build Docker images
         run: |
           docker build -t manual-service:latest ./manual-service
           docker build -t apigateway-service:latest ./apigateway-service
           docker build -t discovery-service:latest ./discovery-service
+          docker build -t calendar-service:latest ./calendar-service
+          docker build -t user-service:latest ./user-service
+          docker build -t branch-service:latest ./branch-service
 
       - name: Save Docker images to files
         run: |
           docker save manual-service:latest -o manual-service.tar
           docker save apigateway-service:latest -o apigateway-service.tar
           docker save discovery-service:latest -o discovery-service.tar
+          docker save calendar-service:latest -o calendar-service.tar
+          docker save user-service:latest -o user-service.tar
+          docker save branch-service:latest -o branch-service.tar
           
       - name: Verify .tar files
         run: |
@@ -77,18 +128,24 @@ jobs:
           chmod 600 epicode_key.pem
 
           # Copy Docker images, compose file, and .env to EC2
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no discovery-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
-          scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no manual-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no apigateway-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no discovery-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no calendar-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no user-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no branch-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
 
           # Deploy with Docker Compose
           ssh -i epicode_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_IP }} << EOF
+            cd /home/ubuntu/deploy
             docker load -i manual-service.tar
             docker load -i apigateway-service.tar
             docker load -i discovery-service.tar
-            cd /home/ubuntu/
+            docker load -i calendar-service.tar
+            docker load -i user-service.tar
+            docker load -i branch-service.tar
             docker-compose down || true
             docker-compose up -d
           EOF

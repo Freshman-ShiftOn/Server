@@ -1,5 +1,5 @@
 server:
-  port: 13002
+  port: 13004
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -35,7 +35,7 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true

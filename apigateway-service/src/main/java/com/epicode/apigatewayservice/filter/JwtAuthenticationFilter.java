@@ -14,7 +14,9 @@ import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
@@ -52,14 +54,29 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                         .getBody();
 
                 String email = claims.getSubject();
+                List<Integer> branchIdsList = claims.get("branchIds", List.class); // List<Integer>로 받음
+
+
                 if (email == null || email.isEmpty()) {
                     return onError(exchange, "JWT 토큰에 email이 없습니다.", HttpStatus.UNAUTHORIZED);
                 }
+                if (branchIdsList == null || branchIdsList.isEmpty()) {
+                    return onError(exchange, "JWT 토큰에 branchIds가 없습니다.", HttpStatus.UNAUTHORIZED);
+                }
 
+                // List<Integer> -> Long[] 변환
+                Long[] branchIds = branchIdsList.stream()
+                        .map(Long::valueOf) // Integer를 Long으로 변환
+                        .toArray(Long[]::new);
+
+
+                // 기존 요청에 사용자 정보를 추가하여 새로운 요청 생성
                 ServerHttpRequest modifiedRequest = request.mutate()
                         .header("X-Authenticated-User", email)
+                        .header("X-Branch-Ids", String.join(",", Arrays.stream(branchIds)
+                                .map(String::valueOf)
+                                .toArray(String[]::new))) // Long[] -> 쉼표로 구분된 String
                         .build();
-
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());
             } catch (ExpiredJwtException e) {
                 return onError(exchange, "JWT 토큰이 만료되었습니다: " + e.getMessage(), HttpStatus.UNAUTHORIZED);

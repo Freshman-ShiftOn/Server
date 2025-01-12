@@ -35,22 +35,23 @@ spring:
           predicates:
             - Path=/api/auth/**
 
+        - id: branch-service
+          uri: lb://BRANCH-SERVICE
+          predicates:
+            - Path=/api/branch/**
+          filters:
+            - JwtAuthenticationFilter
+
         - id: manual-service
           uri: lb://MANUAL-SERVICE
           predicates:
             - Path=/api/manuals/**
           filters:
-            - name: JwtAuthenticationFilter
-
-        - id: second-service
-          uri: lb://SECOND-SERVICE #192.168.45.104
-          predicates:
-            - Path=/second-service/**
-          filters:
-            - CustomFilter
+            - JwtAuthenticationFilter
 jwt:
   secret-key: ${JWT_KEY}
 
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
+
