@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
     @Query("SELECT ub.branch.id FROM UserBranch ub WHERE ub.user.id = :userId")
     Long[] findBranchIdsByUserId(@Param("userId") Long userId);
+
 }

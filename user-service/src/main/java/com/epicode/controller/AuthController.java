@@ -21,8 +21,8 @@ import java.util.Map;
 public class AuthController {
     private final Environment env;
     private final KakaoService kakaoService;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
+//    private final UserRepository userRepository;
+//    private final JwtUtil jwtUtil;
 
     @GetMapping("/kakao/login")
     public String redirectToKakao() {

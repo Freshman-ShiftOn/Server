@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
-        info = @Info(title = "Auth Service API 명세서",
-                     description = "Crewezy OAuth2.0 Service RESTful API 명세서",
+        info = @Info(title = "User Service API 명세서",
+                     description = "Crewezy User Service RESTful API 명세서",
                      version ="v1.0.0")
 )
 @Configuration
@@ -17,10 +17,10 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
     @Bean
     public GroupedOpenApi customTestOpenAPI() {
-        String[] paths = {"/api/manuals/**"};
+        String[] paths = {"/api/salaries/**"};
 
         return GroupedOpenApi.builder()
-                .group("인증 service 위한 API")
+                .group("Salary service 위한 API")
                 .pathsToMatch(paths)
                 .build();
     }
