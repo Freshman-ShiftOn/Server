@@ -35,6 +35,13 @@ spring:
           predicates:
             - Path=/api/auth/**
 
+        - id: user-service-salaries
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/salaries/**
+          filters:
+            - JwtAuthenticationFilter
+
         - id: branch-service
           uri: lb://BRANCH-SERVICE
           predicates:

@@ -58,15 +58,15 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                 List<Integer> branchIdsList = claims.get("branchIds", List.class); // List<Integer>로 받음
                 Long userId = claims.get("userId",Long.class);
 
-                if(userId<0 || userId==0){
+                if(userId<0 || userId == null){
                     return onError(exchange, "JWT 토큰에 userId가 없습니다.", HttpStatus.UNAUTHORIZED);
                 }
                 if (email == null || email.isEmpty()) {
                     return onError(exchange, "JWT 토큰에 email이 없습니다.", HttpStatus.UNAUTHORIZED);
                 }
-                if (branchIdsList == null || branchIdsList.isEmpty()) {
-                    return onError(exchange, "JWT 토큰에 branchIds가 없습니다.", HttpStatus.UNAUTHORIZED);
-                }
+//                if (branchIdsList == null || branchIdsList.isEmpty()) {
+//                    return onError(exchange, "JWT 토큰에 branchIds가 없습니다.", HttpStatus.UNAUTHORIZED);
+//                }
 
                 // 기존 요청에 사용자 정보를 추가하여 새로운 요청 생성
                 ServerHttpRequest modifiedRequest = request.mutate()
