@@ -4,6 +4,7 @@ import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
 import com.epicode.service.KakaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -25,35 +26,51 @@ public class AuthController {
 //    private final JwtUtil jwtUtil;
 
     @GetMapping("/kakao/login")
-    public String redirectToKakao() {
+    public ResponseEntity<Void> redirectToKakao(HttpServletResponse response) {
         try {
+            // 환경 변수에서 clientId와 redirectUri 가져오기
             String clientId = env.getProperty("spring.security.oauth2.client.registration.kakao.client-id");
             String redirectUri = env.getProperty("spring.security.oauth2.client.registration.kakao.redirect-uri");
+
             if (clientId == null || redirectUri == null) {
-                throw new IllegalStateException("url error! yml 파일 확인 요망");
+                throw new IllegalStateException("Kakao OAuth 환경 변수가 누락되었습니다. application.yml 파일을 확인하세요.");
             }
 
+            // 카카오 인증 URL 생성
             String kakaoAuthUrl = String.format(
                     "https://kauth.kakao.com/oauth/authorize?client_id=%s&redirect_uri=%s&response_type=code",
                     clientId, redirectUri);
-            return "redirect:" + kakaoAuthUrl;
+
+            // 클라이언트 브라우저를 카카오 인증 페이지로 리다이렉트
+            response.sendRedirect(kakaoAuthUrl);
+            return ResponseEntity.status(HttpStatus.FOUND).build();
 
         } catch (Exception e) {
-            System.err.println("Error Kakao OAuth URL: " + e.getMessage());
-            return "error/redirect-error";
+            log.error("카카오 리다이렉트 URL 생성 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/kakao/callback")
     public ResponseEntity<String> handleKakaoCallback(@RequestParam String code) {
-        log.info("Request Parameters: {}", code);
+        log.info("Received Kakao authorization code: {}", code);
 
         try {
+            // KakaoService를 통해 JWT 토큰 발급
             String jwtToken = kakaoService.authenticateWithKakao(code);
+
+            // JWT 토큰 반환
             return ResponseEntity.ok(jwtToken);
+
+        } catch (IllegalStateException e) {
+            log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("카카오 콜백 처리 중 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("카카오 콜백 오류(JWT발급 실패): " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("콜백url 오류: " + e.getMessage());
+            log.error("예상치 못한 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
         }
     }
 //
