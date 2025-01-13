@@ -37,7 +37,7 @@ public class CalendarController {
     }
 
     // 지점 스케줄 유저 별 조회 (월 단위)
-    @GetMapping("/{branchId}/{month}")
+    @GetMapping("/{branchId}/{month}/user")
     @Operation(summary = "지점 스케줄 유저 별 조회 (월 단위)", description = "해당 매장의 특정 유저 스케줄을 월 단위로 조회한다.")
     public ResponseEntity<List<Schedule>> getSchedulesByBranchIdAndUserId(
             @PathVariable Integer branchId,
