@@ -74,7 +74,7 @@ public class ManualController {
     // 매뉴얼 생성
     @PostMapping("/{branchId}")
     @Operation(
-            summary = "매뉴얼 생성",
+            summary = "매뉴얼 생성(지점ID,유저ID는 manualDTO 요청 시 제외하기)",
             description = "사용자가 접근 권한이 있는 매장에 새로운 매뉴얼을 생성합니다.",
             parameters = {
                     @Parameter(name = "branchId", description = "매장의 ID", required = true, example = "101"),
@@ -89,7 +89,6 @@ public class ManualController {
         manualService.validateBranchAccess(branches, branchId);
         manualDTO.setBranchId(branchId);
         manualDTO.setWorkerId(Integer.valueOf(userId));
-        System.out.println(manualDTO);
         ManualDTO createdManual = manualService.createManual(manualDTO);
         return ResponseEntity.ok(createdManual);
     }
@@ -97,7 +96,7 @@ public class ManualController {
     // 매뉴얼 수정
     @PutMapping("/{branchId}/{id}")
     @Operation(
-            summary = "매뉴얼 수정",
+            summary = "매뉴얼 수정(지점ID,유저ID는 manualDTO 요청 시 제외하기)",
             description = "사용자가 접근 권한이 있는 매장에서 특정 매뉴얼을 수정합니다.",
             parameters = {
                     @Parameter(name = "branchId", description = "매장의 ID", required = true, example = "101"),
@@ -107,10 +106,13 @@ public class ManualController {
     )
     public ResponseEntity<ManualDTO> updateManual(
             @RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer branchId,
             @PathVariable Integer id,
             @RequestBody ManualDTO manualDTO) {
         manualService.validateBranchAccess(branches, branchId);
+        manualDTO.setBranchId(branchId);
+        manualDTO.setWorkerId(Integer.valueOf(userId));
         ManualDTO updatedManual = manualService.updateManual(id, manualDTO);
         return ResponseEntity.ok(updatedManual);
     }
