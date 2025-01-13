@@ -3,6 +3,7 @@ import com.epicode.domain.User;
 import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -38,22 +39,43 @@ public class KakaoService {
             }
 
             if (!userRepository.existsByEmail(userEmail)) {
-                saveNewUser(userEmail);//저장
+                saveNewUser(userEmail); // 사용자 정보 저장
             }
+
             Long userId = userRepository.findByEmail(userEmail).getId();
             List<Long> branches = userBranchRepository.findBranchIdsByUserId(userId);
 
-            return jwtUtil.generateToken(userEmail,branches,userId);
+            return jwtUtil.generateToken(userEmail, branches, userId); // JWT 토큰 생성
         } catch (Exception e) {
-            throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함.  " + e.getMessage(), e);
+            throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함: " + e.getMessage(), e);
         }
     }
+
     private void saveNewUser(String email) {
         User user = new User();
         user.setEmail(email);
         user.setName("김크루");//임시 지정
         System.out.println(user);
         userRepository.save(user);
+    }
+    public void redirectToKakao(HttpServletResponse response) {
+        try {
+            String clientId = env.getProperty("spring.security.oauth2.client.registration.kakao.client-id");
+            String redirectUri = env.getProperty("spring.security.oauth2.client.registration.kakao.redirect-uri");
+
+            if (clientId == null || redirectUri == null) {
+                throw new IllegalStateException("카카오 로그인에 필요한 환경 변수가 설정되지 않았습니다.");
+            }
+
+            String kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize"
+                    + "?client_id=" + clientId
+                    + "&redirect_uri=" + redirectUri
+                    + "&response_type=code";
+
+            response.sendRedirect(kakaoLoginUrl);
+        } catch (Exception e) {
+            throw new RuntimeException("카카오 리다이렉트 처리 중 오류: " + e.getMessage(), e);
+        }
     }
 
     private String getAccessTokenFromKakao(String code) {
