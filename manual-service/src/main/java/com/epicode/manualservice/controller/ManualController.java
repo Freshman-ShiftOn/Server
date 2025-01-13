@@ -83,9 +83,13 @@ public class ManualController {
     )
     public ResponseEntity<ManualDTO> createManual(
             @RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer branchId,
             @RequestBody ManualDTO manualDTO) {
         manualService.validateBranchAccess(branches, branchId);
+        manualDTO.setBranchId(branchId);
+        manualDTO.setWorkerId(Integer.valueOf(userId));
+        System.out.println(manualDTO);
         ManualDTO createdManual = manualService.createManual(manualDTO);
         return ResponseEntity.ok(createdManual);
     }

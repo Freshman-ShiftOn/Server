@@ -6,11 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ManualDTO {
@@ -21,23 +23,37 @@ public class ManualDTO {
     private Date lastUpdated;
     private List<ManualTaskDTO> tasks;
 
-    public static ManualDTO fromEntity(Manual manual) {
+    // DTO 변환 메서드
+    public ManualDTO toManualDTO(Manual manual) {
         return ManualDTO.builder()
                 .id(manual.getId())
                 .branchId(manual.getBranchId())
                 .title(manual.getTitle())
                 .workerId(manual.getWorkerId())
                 .lastUpdated(manual.getLastUpdated())
+                .tasks(manual.getTasks() != null ?
+                        manual.getTasks().stream()
+                                .map(task -> new ManualTaskDTO().toTaskDTO(task)) // 인스턴스를 생성해서 호출, ManualTask → ManualTaskDTO 변환
+                                .collect(Collectors.toList()) : new ArrayList<>())
                 .build();
     }
 
-    public static Manual toEntity(ManualDTO dto) {
-        Manual manual = new Manual();
-        manual.setId(dto.getId());
-        manual.setBranchId(dto.getBranchId());
-        manual.setTitle(dto.getTitle());
-        manual.setWorkerId(dto.getWorkerId());
-        manual.setLastUpdated(dto.getLastUpdated());
+    // ManualDTO → Manual 변환
+    public Manual toManualEntity() {
+        Manual manual = Manual.builder()
+                .id(this.id)
+                .branchId(this.branchId)
+                .title(this.title)
+                .workerId(this.workerId)
+                .lastUpdated(this.lastUpdated)
+                .build();
+
+        if (this.tasks != null) {
+            manual.setTasks(this.tasks.stream()
+                    .map(taskDTO -> taskDTO.toTaskEntity(taskDTO, manual)) // ManualTaskDTO → ManualTask 변환
+                    .collect(Collectors.toList()));
+        }
+
         return manual;
     }
 }

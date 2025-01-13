@@ -1,5 +1,6 @@
 package com.epicode.manualservice.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,17 @@ public class Manual {
     @Column(name = "last_updated", nullable = false)
     private Date lastUpdated;
 
+    @JsonManagedReference
+
     @OneToMany(mappedBy = "manual", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ManualTask> tasks = new ArrayList<>();
+    private List<ManualTask> tasks;
+
+    @Override
+    public String toString() {
+        return "Manual{" +
+                "id=" + id +
+                ", branchId=" + branchId +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }
