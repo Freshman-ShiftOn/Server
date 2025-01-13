@@ -6,7 +6,6 @@ import com.example.calendarservice.service.ScheduleService;
 import com.example.calendarservice.service.ShiftRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -65,12 +64,32 @@ public class CalendarController {
     @Operation(summary = "내 스케줄 수정", description = "현재 사용자의 특정 스케줄을 수정한다.")
     public ResponseEntity<Schedule> updateSchedule(
             @PathVariable Integer branchId,
-            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestHeader("X-Authenticated-User-Id") String userIdHeader,
             @PathVariable Integer scheduleId,
             @RequestBody Schedule schedule) {
+
+        // 1. 유저 ID 파싱
+        int userId;
+        try {
+            userId = Integer.parseInt(userIdHeader);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid user ID format in header.");
+        }
+
+        // 2. 스케줄 소유권 및 브랜치 일치 확인
+        if (!scheduleService.isUserSchedule(scheduleId, userId)) {
+            throw new IllegalArgumentException("Unauthorized: The schedule does not belong to the authenticated user.");
+        }
+
+        if (!scheduleService.isScheduleInBranch(scheduleId, branchId)) {
+            throw new IllegalArgumentException("Invalid branch ID: The schedule does not belong to this branch.");
+        }
+
+        // 3. 수정 로직
         schedule.setBranchId(branchId);
-        schedule.setWorkerId(Integer.valueOf(userId));
+        schedule.setWorkerId(userId);
         Schedule updatedSchedule = scheduleService.updateSchedule(scheduleId, schedule);
+
         return ResponseEntity.ok(updatedSchedule);
     }
 
@@ -130,5 +149,25 @@ public class CalendarController {
         }
         shiftRequestService.deleteShiftRequest(reqShiftId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 대타 요청 내역 조회 (마이페이지용)
+    @GetMapping("/request-shift")
+    @Operation(summary = "대타 요청 내역 조회 (마이페이지용)", description = "특정한 유저의 대타 요청 내역을 조회한다.")
+    public ResponseEntity<List<ShiftRequest>> getShiftRequestsByUser(
+            @RequestHeader("X-Authenticated-User-Id") String userId) {
+        // 해당 유저의 대타 요청 내역 조회
+        List<ShiftRequest> shiftRequests = shiftRequestService.getShiftRequestsByUser(userId);
+        return ResponseEntity.ok(shiftRequests);
+    }
+
+    // 대타 수락 내역 조회 (마이페이지용)
+    @GetMapping("/accepted-shift")
+    @Operation(summary = "대타 수락 내역 조회 (마이페이지용)", description = "특정 유저가 수락한 대타 요청 내역을 조회한다.")
+    public ResponseEntity<List<ShiftRequest>> getAcceptedShiftRequestsByUser(
+            @RequestHeader("X-Authenticated-User-Id") String userId) {
+        // 해당 유저의 대타 수락 내역 조회
+        List<ShiftRequest> acceptedShiftRequests = shiftRequestService.getAcceptedShiftRequestsByUser(userId);
+        return ResponseEntity.ok(acceptedShiftRequests);
     }
 }

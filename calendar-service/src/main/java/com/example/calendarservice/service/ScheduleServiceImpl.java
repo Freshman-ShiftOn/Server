@@ -55,4 +55,10 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .orElseThrow(() -> new IllegalArgumentException("Schedule not found with ID: " + scheduleId));
         return schedule.getWorkerId().equals(userId);
     }
+
+    public boolean isScheduleInBranch(Integer scheduleId, Integer branchId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
+        return schedule.getBranchId().equals(branchId);
+    }
 }
