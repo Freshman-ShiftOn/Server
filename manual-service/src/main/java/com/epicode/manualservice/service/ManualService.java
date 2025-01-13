@@ -76,13 +76,26 @@ public class ManualService {
         Manual existingManual = manualRepository.findById(manualId)
                 .orElseThrow(() -> new ManualNotFoundException("해당하는 매뉴얼이 없습니다. 매뉴얼ID: " + manualId));
 
-        // 기존 Manual 엔티티의 값 업데이트
+        // 기존 필드 업데이트
         existingManual.setBranchId(manualDTO.getBranchId());
         existingManual.setTitle(manualDTO.getTitle());
         existingManual.setWorkerId(manualDTO.getWorkerId());
 
+        // 기존 tasks 제거 및 새 tasks 추가, 부모 엔티티를 저장하면 연관된 자식 엔티티도 자동으로 저장
+        if (manualDTO.getTasks() != null) {
+            existingManual.getTasks().clear();
+
+            // 새로 전달된 tasks를 추가
+            List<ManualTask> updatedTasks = manualDTO.getTasks().stream()
+                    .map(taskDTO -> taskDTO.toTaskEntity(taskDTO, existingManual)) // DTO → Entity 변환
+                    .collect(Collectors.toList());
+
+            existingManual.getTasks().addAll(updatedTasks);
+        }
+
+        // Manual 저장
         Manual updatedManual = manualRepository.save(existingManual);
-        return new ManualDTO().toManualDTO(updatedManual); // Manual → ManualDTO 변환
+        return new ManualDTO().toManualDTO(updatedManual); // Entity → DTO 변환
     }
 
     // 매뉴얼 삭제
