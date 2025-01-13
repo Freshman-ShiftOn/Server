@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtUtil {
@@ -22,7 +23,7 @@ public class JwtUtil {
         this.SECRET_KEY = Keys.hmacShaKeyFor(decodedKey);
     }
 
-    public String generateToken(String email,Long[] branchIds,Long userId) {
+    public String generateToken(String email, List<Long> branchIds, Long userId) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("userId", userId)

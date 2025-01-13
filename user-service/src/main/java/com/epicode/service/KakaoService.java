@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -39,7 +41,7 @@ public class KakaoService {
                 saveNewUser(userEmail);//저장
             }
             Long userId = userRepository.findByEmail(userEmail).getId();
-            Long[] branches = userBranchRepository.findBranchIdsByUserId(userId);
+            List<Long> branches = userBranchRepository.findBranchIdsByUserId(userId);
 
             return jwtUtil.generateToken(userEmail,branches,userId);
         } catch (Exception e) {
