@@ -13,5 +13,4 @@ import java.util.List;
 public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
     @Query("SELECT ub.branch.id FROM UserBranch ub WHERE ub.user.id = :userId")
     List<Long> findBranchIdsByUserId(@Param("userId") Long userId);
-
 }

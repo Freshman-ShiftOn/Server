@@ -24,11 +24,11 @@ public class ManualService {
 
     public void validateBranchAccess(String branches, Integer branchId) {
 
-        System.out.println("validate branchId: " + branchId+", branches: "+branches);
+        //System.out.println("validate branchId: " + branchId+", branches: "+branches);
         List<Integer> branchIdList = Arrays.stream(branches.split(","))
                 .map(Integer::valueOf) // 문자열을 Integer로 변환
                 .toList();
-        System.out.println("list branchIds: "+branchIdList.toString());
+        //System.out.println("list branchIds: "+branchIdList.toString());
         if (!branchIdList.contains(branchId)) {
             throw new BranchAuthorizeException("해당 매장에 접근 권한이 없습니다.");
         }
