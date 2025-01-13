@@ -39,7 +39,6 @@ public class Manual {
     private Date lastUpdated;
 
     @JsonManagedReference
-
     @OneToMany(mappedBy = "manual", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ManualTask> tasks;
 
