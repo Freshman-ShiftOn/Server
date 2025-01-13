@@ -40,6 +40,10 @@ public class ManualController {
     public ResponseEntity<List<ManualDTO>> getManualsByBranchId(
             @RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId) {
+        System.out.println("Service received branchId: " + branchId);
+        if (branchId == null) {
+            throw new IllegalArgumentException("branchId is required and must be a number.");
+        }
         manualService.validateBranchAccess(branches, branchId);
         List<ManualDTO> manuals = manualService.getManualsByBranchId(branchId);
         return ResponseEntity.ok(manuals);

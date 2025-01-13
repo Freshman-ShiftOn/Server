@@ -7,6 +7,7 @@ import com.epicode.manualservice.model.Manual;
 import com.epicode.manualservice.repository.ManualRepository;
 import com.epicode.manualservice.exception.ManualNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,15 +17,18 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class ManualService {
     private final ManualRepository manualRepository;
     private final ManualTaskService manualTaskService;
 
     public void validateBranchAccess(String branches, Integer branchId) {
+
+        //System.out.println("validate branchId: " + branchId+", branches: "+branches);
         List<Integer> branchIdList = Arrays.stream(branches.split(","))
                 .map(Integer::valueOf) // 문자열을 Integer로 변환
                 .toList();
-
+        //System.out.println("list branchIds: "+branchIdList.toString());
         if (!branchIdList.contains(branchId)) {
             throw new BranchAuthorizeException("해당 매장에 접근 권한이 없습니다.");
         }
