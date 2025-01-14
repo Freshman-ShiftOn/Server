@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
 @RequestMapping({"/api/branch"})
 @Tag(
         name = "branch-service-controller",
@@ -35,25 +37,28 @@ public class BranchController {
             }
     )
     public List<String> getBranchNames(
-            @RequestHeader("X-Authenticated-User") String email, // 명세에서 제외
-            @RequestHeader("X-Branch-Ids") String branches // 명세에서 제외
+            @RequestHeader("X-Authenticated-User") String email,
+            @RequestHeader("X-Authenticated-User-Id") String userId
     ) {
-        // 사용자 검증
-        User user = userRepository.findIdByEmail(email);
-        List<String> branchNames = new ArrayList<>();
-        if (user == null) {
-            throw new IllegalArgumentException("해당하는 사용자가 없습니다.");
-        } else {
-            Long[] branchIds = Arrays.stream(branches.split(","))
-                    .map(Long::valueOf)
-                    .toArray(Long[]::new);
-            branchNames = branchService.getBranchNamesByUserIds(branchIds);
-            if (branchNames == null || branchNames.isEmpty()) {
-                //throw new NoBranchFoundException("가입된 지점이 없습니다.");
-                return new ArrayList<>();
-            }
-        }
-        return branchNames;
+        // 사용자의 Branch 정보를 가져오기
+        List<String> branchNames = branchService.getBranchNamesByUserId(Long.valueOf(userId));
+        return branchNames != null ? branchNames : List.of();
+//        // 사용자 검증
+//        User user = userRepository.findIdByEmail(email);
+//        List<String> branchNames = new ArrayList<>();
+//        if (user == null) {
+//            throw new IllegalArgumentException("해당하는 사용자가 없습니다.");
+//        } else {
+//            Long[] branchIds = Arrays.stream(branches.split(","))
+//                    .map(Long::valueOf)
+//                    .toArray(Long[]::new);
+//            branchNames = branchService.getBranchNamesByUserIds(branchIds);
+//            if (branchNames == null || branchNames.isEmpty()) {
+//                //throw new NoBranchFoundException("가입된 지점이 없습니다.");
+//                return new ArrayList<>();
+//            }
+//        }
+//        return branchNames;
     }
 
     @GetMapping({"/{branchName}"})
