@@ -1,5 +1,7 @@
 package com.epicode.repository;
 
+import com.epicode.dto.WorkerProjection;
+import com.epicode.model.User;
 import com.epicode.model.UserBranch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +14,9 @@ import java.util.List;
 public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
     @Query("SELECT ub.branch.id FROM UserBranch ub WHERE ub.user.id = :userId")
     List<Long> findBranchIdsByUserId(@Param("userId") Long userId);
-    @Query("SELECT b.name FROM Branch b WHERE b.id IN :branchIds")
-    List<String> findBranchNamesByIds(@Param("branchIds") List<Long> branchIds);
+//    @Query("SELECT b.name FROM Branch b WHERE b.id IN :branchIds")
+//    List<String> findBranchNamesByIds(@Param("branchIds") List<Long> branchIds);
+    @Query("SELECT u.id AS id, u.name AS name " +
+            "FROM UserBranch ub JOIN ub.user u WHERE ub.branch.id = :branchId")
+    List<WorkerProjection> findWorkersByBranchId(Long branchId);
 }

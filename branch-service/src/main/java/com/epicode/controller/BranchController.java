@@ -1,5 +1,6 @@
 package com.epicode.controller;
 
+import com.epicode.dto.WorkerProjection;
 import com.epicode.exception.NoBranchFoundException;
 import com.epicode.model.Branch;
 import com.epicode.model.User;
@@ -96,5 +97,19 @@ public class BranchController {
         Long userId = userRepository.findIdByEmail(email).getId();
         branchService.createBranch(branch, userId, email);
         return ResponseEntity.ok().build();
+    }
+
+
+    @Operation(
+            summary = "매장 근무 동료들 조회",
+            description = "해당 매장에 근무하는 근무자의 id,name이 반환됩니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
+                    @Parameter(name = "branchId", description = "조회할 매장Id", required = true, example = "101")
+            }
+    )
+    @GetMapping("/{branchId}/workers")
+    public List<WorkerProjection> getWorkersByBranchId(@PathVariable Long branchId) {
+        return branchService.getWorkersByBranchId(branchId);
     }
 }
