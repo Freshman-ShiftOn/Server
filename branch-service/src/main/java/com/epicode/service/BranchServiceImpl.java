@@ -1,4 +1,5 @@
 package com.epicode.service;
+import com.epicode.dto.WorkerProjection;
 import com.epicode.model.Branch;
 import com.epicode.model.User;
 import com.epicode.model.UserBranch;
@@ -55,5 +56,12 @@ public class BranchServiceImpl implements BranchService {
 
         //UserBranch 저장
         userBranchRepository.save(userBranch);
+    }
+
+    public List<WorkerProjection> getWorkersByBranchId(Long branchId) {
+        if (branchId == null) {
+            throw new IllegalArgumentException("Branch ID must not be null");
+        }
+        return userBranchRepository.findWorkersByBranchId(branchId);
     }
 }
