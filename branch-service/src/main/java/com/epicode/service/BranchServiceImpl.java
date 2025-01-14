@@ -1,5 +1,7 @@
 package com.epicode.service;
 import com.epicode.dto.WorkerProjection;
+import com.epicode.exception.CustomException;
+import com.epicode.exception.ErrorCode;
 import com.epicode.model.Branch;
 import com.epicode.model.User;
 import com.epicode.model.UserBranch;
@@ -43,7 +45,7 @@ public class BranchServiceImpl implements BranchService {
         User user = userRepository.findIdByEmail(email);
 
         if (user == null || !user.getId().equals(userId)) {
-            throw new IllegalArgumentException("헤더값을 확인하세요.");
+            throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
         }
 
         //Branch 저장
@@ -60,7 +62,7 @@ public class BranchServiceImpl implements BranchService {
 
     public List<WorkerProjection> getWorkersByBranchId(Long branchId) {
         if (branchId == null) {
-            throw new IllegalArgumentException("Branch ID must not be null");
+            throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
         }
         return userBranchRepository.findWorkersByBranchId(branchId);
     }
