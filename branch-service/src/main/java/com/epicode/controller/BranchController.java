@@ -1,7 +1,8 @@
 package com.epicode.controller;
 
 import com.epicode.dto.WorkerProjection;
-import com.epicode.exception.NoBranchFoundException;
+import com.epicode.exception.CustomException;
+import com.epicode.exception.ErrorCode;
 import com.epicode.model.Branch;
 import com.epicode.model.User;
 import com.epicode.repository.UserRepository;
@@ -38,7 +39,6 @@ public class BranchController {
             }
     )
     public List<String> getBranchNames(
-            @RequestHeader("X-Authenticated-User") String email,
             @RequestHeader("X-Authenticated-User-Id") String userId
     ) {
         // 사용자의 Branch 정보를 가져오기
@@ -75,7 +75,7 @@ public class BranchController {
             @PathVariable String branchName
     ) {
         if (branchName == null) {
-            throw new IllegalArgumentException("해당하는 브랜치명이 없습니다.");
+            throw new CustomException(ErrorCode.INVALID_BRANCH_NAME);
         } else {
             return branchService.getBranchIdByName(branchName);
         }
