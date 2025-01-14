@@ -49,7 +49,8 @@ public class BranchController {
                     .toArray(Long[]::new);
             branchNames = branchService.getBranchNamesByUserIds(branchIds);
             if (branchNames == null || branchNames.isEmpty()) {
-                throw new NoBranchFoundException("가입된 지점이 없습니다.");
+                //throw new NoBranchFoundException("가입된 지점이 없습니다.");
+                return new ArrayList<>();
             }
         }
         return branchNames;
