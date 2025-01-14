@@ -20,4 +20,6 @@ public interface SalaryRepository extends JpaRepository<Salary, SalaryId> {
     // userId + BranchId로 특별 시급만 조회
     @Query("SELECT s FROM Salary s JOIN s.specificTimeSalaries sts WHERE s.branchId = :branchId AND s.userId = :userId")
     List<Salary> findSpecificTimeSalariesByBranchIdAndUserId(@Param("branchId") Long branchId, @Param("userId") Long userId);
+
+    boolean existsByUserIdAndBranchId(Long userId, Long branchId);
 }
