@@ -36,7 +36,3 @@ eureka:
       defaultZone: ${EUREKA_SERVER}
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-aws:
-  region: ap-northeast-2
-  s3:
-    bucket-name: epicode
