@@ -1,16 +1,15 @@
 package com.epicode.service;
-
-import com.epicode.domain.Salary;
 import com.epicode.dto.SalaryRequestDTO;
 import com.epicode.dto.SalaryResponseDTO;
+import com.epicode.dto.SpecificTimeSalaryResponseDTO;
 
 import java.util.List;
 
 public interface SalaryService {
-    void createOrUpdateSalary(Long userId, SalaryRequestDTO salaryRequestDTO);
-//    Salary createSalary(Long userId,SalaryRequestDTO salaryRequestDTO);
-//    void updateSalary(Long userId, Long branchId, SalaryRequestDTO salaryRequestDTO);
-    Salary getSalaryByUserAndBranch(Long userId, Long branchId);// 사용자와 매장에 따른 Salary 조회
-    List<SalaryResponseDTO> getSalariesByBranch(Long branchId); // 특정 Branch의 Salary 리스트 조회
-    void deleteSalary(Long salaryId, Long userId);
+    SalaryResponseDTO createOrUpdateSalary(Long userId, SalaryRequestDTO salaryRequestDTO); // 기본 및 특별 시급 생성/수정
+    SalaryResponseDTO getSalaryByUserAndBranch(Long userId, Long branchId); // 기본 및 특별 시급 조회
+    void deleteSpecificTimeSalary(Long userId, Long branchId, Long specificTimeSalaryId);
+
+    SalaryResponseDTO getBasicSalary(Long userId, Long branchId); // 기본 시급 조회
+    List<SpecificTimeSalaryResponseDTO> getSpecificSalaries(Long userId, Long branchId); // 특별 시급 조회
 }

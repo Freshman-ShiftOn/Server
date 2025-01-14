@@ -2,150 +2,162 @@ package com.epicode.service;
 
 import com.epicode.domain.Branch;
 import com.epicode.domain.Salary;
-import com.epicode.domain.User;
+import com.epicode.domain.SpecificTimeSalary;
 import com.epicode.dto.SalaryRequestDTO;
 import com.epicode.dto.SalaryResponseDTO;
-import com.epicode.exception.SalaryException;
+import com.epicode.dto.SpecificTimeSalaryResponseDTO;
+import com.epicode.exception.CustomException;
+import com.epicode.exception.ErrorCode;
 import com.epicode.repository.BranchRepository;
 import com.epicode.repository.SalaryRepository;
-import com.epicode.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import com.epicode.repository.SpecificTimeSalaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class SalaryServiceImpl implements SalaryService {
+
     private final SalaryRepository salaryRepository;
-    private final UserRepository userRepository;
+    private final SpecificTimeSalaryRepository specificTimeSalaryRepository;
     private final BranchRepository branchRepository;
 
-    @Transactional
-    @Override
-    public void createOrUpdateSalary(Long userId, SalaryRequestDTO salaryRequestDTO) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new SalaryException("User not found with ID " + userId));
-        branchRepository.findById(salaryRequestDTO.getBranchId())
-                .orElseThrow(() -> new SalaryException("Branch not found with ID " + salaryRequestDTO.getBranchId()));
-
-        // 데이터 조회 및 업데이트/삽입 처리
-        salaryRepository.findByUserIdAndBranchId(userId, salaryRequestDTO.getBranchId()).ifPresentOrElse(
-                existingSalary -> {
-                    // 데이터가 존재하면 업데이트
-                    System.out.println("Existing salary found: " + existingSalary);
-                    existingSalary.setBasicSalary(salaryRequestDTO.getBasicSalary());
-                    existingSalary.setSpecificDays(salaryRequestDTO.getSpecificDays());
-                    existingSalary.setStartTime(salaryRequestDTO.getStartTime());
-                    existingSalary.setEndTime(salaryRequestDTO.getEndTime());
-                    existingSalary.setSpecificSalary(salaryRequestDTO.getSpecificSalary());
-                    existingSalary.setWeeklyAllowance(salaryRequestDTO.getWeeklyAllowance());
-                    existingSalary.setPaymentDate(salaryRequestDTO.getPaymentDate());
-                    salaryRepository.saveAndFlush(existingSalary); // 업데이트
-                },
-                () -> {
-                    // 데이터가 없으면 새로 생성
-                    Salary newSalary = Salary.builder()
-                            .userId(userId)
-                            .branchId(salaryRequestDTO.getBranchId())
-                            .basicSalary(salaryRequestDTO.getBasicSalary())
-                            .specificDays(salaryRequestDTO.getSpecificDays())
-                            .startTime(salaryRequestDTO.getStartTime())
-                            .endTime(salaryRequestDTO.getEndTime())
-                            .specificSalary(salaryRequestDTO.getSpecificSalary())
-                            .weeklyAllowance(salaryRequestDTO.getWeeklyAllowance())
-                            .paymentDate(salaryRequestDTO.getPaymentDate())
-                            .build();
-                    salaryRepository.saveAndFlush(newSalary); // 삽입
-                }
-        );
-    }
-
-    @Override
-    public Salary getSalaryByUserAndBranch(Long userId, Long branchId) {
-        // 특정 사용자와 Branch의 Salary 조회
-        return salaryRepository.findByUserIdAndBranchId(userId, branchId)
-                .orElseThrow(() -> new SalaryException("Salary not found for user ID " + userId + " and branch ID " + branchId));
-    }
-
-    @Override
-    public List<SalaryResponseDTO> getSalariesByBranch(Long branchId) {
-        return salaryRepository.findAllByBranchId(branchId).stream().map(salary -> {
-            SalaryResponseDTO dto = new SalaryResponseDTO();
-            dto.setUserId(salary.getUserId());
-            dto.setBranchId(salary.getBranchId());
-            dto.setBasicSalary(salary.getBasicSalary());
-            dto.setSpecificDays(salary.getSpecificDays());
-            dto.setStartTime(salary.getStartTime());
-            dto.setEndTime(salary.getEndTime());
-            dto.setSpecificSalary(salary.getSpecificSalary());
-            dto.setWeeklyAllowance(salary.getWeeklyAllowance());
-            return dto;
-        }).toList();
-    }
-
     @Override
     @Transactional
-    public void deleteSalary(Long branchId, Long userId) {
-        // Salary 조회
+    public SalaryResponseDTO createOrUpdateSalary(Long userId, SalaryRequestDTO salaryRequestDTO) {
+        // 브랜치 유효성 검사
+        Branch branch = branchRepository.findById(salaryRequestDTO.getBranchId())
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+
+        // 기본 시급 데이터 조회 또는 생성
+        Salary salary = salaryRepository.findByUserIdAndBranchId(userId, salaryRequestDTO.getBranchId())
+                .orElseGet(() -> Salary.builder()
+                        .userId(userId)
+                        .branchId(salaryRequestDTO.getBranchId())
+                        .build());
+
+        // 기본 시급 정보 업데이트
+        salary.setBasicSalary(salaryRequestDTO.getBasicSalary());
+        salary.setWeeklyAllowance(salaryRequestDTO.getWeeklyAllowance());
+        salary.setPaymentDate(salaryRequestDTO.getPaymentDate());
+        Salary savedSalary = salaryRepository.save(salary);
+
+        // 기존 특별 시급 삭제
+        List<SpecificTimeSalary> existingSpecificSalaries = specificTimeSalaryRepository.findByUserIdAndBranchId(userId, salaryRequestDTO.getBranchId());
+        specificTimeSalaryRepository.deleteAll(existingSpecificSalaries);
+
+        // 새로운 특별 시급 추가
+        List<SpecificTimeSalary> specificTimeSalaries = salaryRequestDTO.getSpecificTimeSalaries().stream()
+                .map(dto -> SpecificTimeSalary.builder()
+                        .salary(savedSalary)
+                        .specificDays(dto.getSpecificDays())
+                        .startTime(dto.getStartTime())
+                        .endTime(dto.getEndTime())
+                        .specificSalary(dto.getSpecificSalary())
+                        .build())
+                .collect(Collectors.toList());
+        specificTimeSalaryRepository.saveAll(specificTimeSalaries);
+
+        return toSalaryResponseDTO(savedSalary, branch.getName(), specificTimeSalaries);
+    }
+
+    @Override
+    public SalaryResponseDTO getSalaryByUserAndBranch(Long userId, Long branchId) {
+        // 기본 시급 조회
         Salary salary = salaryRepository.findByUserIdAndBranchId(userId, branchId)
-                .orElseThrow(() -> new SalaryException("해당하는 Salary가 없습니다. Branch ID: " + branchId + ", User ID: " + userId));
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
 
-        // 권한 확인
-        if (!salary.getUserId().equals(userId)) {
-            throw new SalaryException("Unauthorized: You cannot delete this salary.");
+        // 브랜치 정보 조회
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+
+        // 특별 시급 정보 조회
+        List<SpecificTimeSalary> specificTimeSalaries = specificTimeSalaryRepository.findByUserIdAndBranchId(userId, branchId);
+
+        return toSalaryResponseDTO(salary, branch.getName(), specificTimeSalaries);
+    }
+
+    private SalaryResponseDTO toSalaryResponseDTO(Salary salary, String branchName, List<SpecificTimeSalary> specificTimeSalaries) {
+        return SalaryResponseDTO.builder()
+                .userId(salary.getUserId())
+                .branchId(salary.getBranchId())
+                .branchName(branchName)
+                .basicSalary(salary.getBasicSalary())
+                .weeklyAllowance(salary.getWeeklyAllowance())
+                .specificTimeSalaries(specificTimeSalaries.stream()
+                        .map(s -> SpecificTimeSalaryResponseDTO.builder()
+                                .branchName(branchName)
+                                .specificDays(s.getSpecificDays())
+                                .startTime(s.getStartTime())
+                                .endTime(s.getEndTime())
+                                .specificSalary(s.getSpecificSalary())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    @Override
+    public SalaryResponseDTO getBasicSalary(Long userId, Long branchId) {
+        Salary salary = salaryRepository.findByUserIdAndBranchId(userId, branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+
+        return SalaryResponseDTO.builder()
+                .userId(salary.getUserId())
+                .branchId(salary.getBranchId())
+                .branchName(branch.getName())
+                .basicSalary(salary.getBasicSalary())
+                .weeklyAllowance(salary.getWeeklyAllowance())
+                .build();
+    }
+
+    @Override
+    public List<SpecificTimeSalaryResponseDTO> getSpecificSalaries(Long userId, Long branchId) {
+        // Branch 유효성 확인
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+
+        // 특정 사용자와 지점에 연결된 특별 시급 조회
+        List<SpecificTimeSalary> specificTimeSalaries = specificTimeSalaryRepository.findByUserIdAndBranchId(userId, branchId);
+
+        if (specificTimeSalaries.isEmpty()) {
+            throw new CustomException(ErrorCode.SALARY_NOT_FOUND);
         }
 
-        // Salary 삭제
-        salaryRepository.delete(salary);
+        return specificTimeSalaries.stream()
+                .map(s -> SpecificTimeSalaryResponseDTO.builder()
+                        .branchName(branch.getName())
+                        .specificDays(s.getSpecificDays())
+                        .startTime(s.getStartTime())
+                        .endTime(s.getEndTime())
+                        .specificSalary(s.getSpecificSalary())
+                        .build())
+                .collect(Collectors.toList());
     }
 
-//    @Override
-//    public Salary createSalary(Long userId,SalaryRequestDTO salaryRequestDTO) {
-//        // User와 Branch가 유효한지 확인
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new SalaryException("User not found with ID " + userId));
-//        Branch branch = branchRepository.findById(salaryRequestDTO.getBranchId())
-//                .orElseThrow(() -> new SalaryException("Branch not found with ID " + salaryRequestDTO.getBranchId()));
-//
-//        Salary salary = Salary.builder()
-//                .userId(userId)
-//                .branchId(salaryRequestDTO.getBranchId())
-//                .basicSalary(salaryRequestDTO.getBasicSalary())
-//                .specificDays(salaryRequestDTO.getSpecificDays())
-//                .startTime(salaryRequestDTO.getStartTime())
-//                .endTime(salaryRequestDTO.getEndTime())
-//                .specificSalary(salaryRequestDTO.getSpecificSalary())
-//                .weeklyAllowance(salaryRequestDTO.getWeeklyAllowance())
-//                .paymentDate(salaryRequestDTO.getPaymentDate())
-//                .build();
-//
-//        return salaryRepository.save(salary);
-//    }
-//    @Override
-//    public void updateSalary(Long userId, Long branchId, SalaryRequestDTO salaryRequestDTO) {
-//        // User와 Branch가 유효한지 확인
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new SalaryException("User not found with ID " + userId));
-//        Branch branch = branchRepository.findById(salaryRequestDTO.getBranchId())
-//                .orElseThrow(() -> new SalaryException("Branch not found with ID " + salaryRequestDTO.getBranchId()));
-//
-//        Salary salary = salaryRepository.findByUserIdAndBranchId(userId,branchId)
-//                .orElseThrow(() -> new SalaryException("Salary not found with userId, branchId" + userId + "," + branchId));
-//        // Salary 업데이트
-//        salary.setUserId(userId);
-//        salary.setBranchId(branchId);
-//        salary.setBasicSalary(salaryRequestDTO.getBasicSalary());
-//        salary.setSpecificDays(salaryRequestDTO.getSpecificDays());
-//        salary.setStartTime(salaryRequestDTO.getStartTime());
-//        salary.setEndTime(salaryRequestDTO.getEndTime());
-//        salary.setSpecificSalary(salaryRequestDTO.getSpecificSalary());
-//        salary.setWeeklyAllowance(salaryRequestDTO.getWeeklyAllowance());
-//        salary.setPaymentDate(salaryRequestDTO.getPaymentDate());
-//
-//        // 저장
-//        salaryRepository.save(salary);
-//    }
+    @Override
+    @Transactional
+    public void deleteSpecificTimeSalary(Long userId, Long branchId, Long specificTimeSalaryId) {
+        // 기본 시급 데이터 확인
+        Salary salary = salaryRepository.findByUserIdAndBranchId(userId, branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+
+        // 특별 시급 데이터 확인
+        SpecificTimeSalary specificTimeSalary = specificTimeSalaryRepository.findById(specificTimeSalaryId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SPECIFIC_SALARY_NOT_FOUND));
+
+        // 특정 특별 시급이 해당 Salary에 속하는지 확인
+        if (!specificTimeSalary.getSalary().equals(salary)) {
+            throw new CustomException(ErrorCode.SPECIFIC_SALARY_NOT_FOUND);
+        }
+
+        // 특별 시급 삭제
+        specificTimeSalaryRepository.delete(specificTimeSalary);
+    }
 }
