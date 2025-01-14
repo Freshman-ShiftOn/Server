@@ -17,7 +17,7 @@ public class Branch {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 2083)
+    @Column(length = 2083)
     private String images;
 
     @Column
