@@ -10,8 +10,8 @@ import java.util.List;
 
 @Repository
 public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
-//    @Query("SELECT ub.branch.id FROM UserBranch ub WHERE ub.user.id = :userId")
-//    List<Long> findBranchIdsByUserId(@Param("userId") Long userId);
+    @Query("SELECT ub.branch.id FROM UserBranch ub WHERE ub.user.id = :userId")
+    List<Long> findBranchIdsByUserId(@Param("userId") Long userId);
     @Query("SELECT b.name FROM Branch b WHERE b.id IN :branchIds")
     List<String> findBranchNamesByIds(@Param("branchIds") List<Long> branchIds);
 }
