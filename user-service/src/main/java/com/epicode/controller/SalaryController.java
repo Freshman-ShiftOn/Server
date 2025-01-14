@@ -4,6 +4,7 @@ import com.epicode.dto.SalaryRequestDTO;
 import com.epicode.dto.SalaryResponseDTO;
 import com.epicode.dto.SpecificTimeSalaryResponseDTO;
 import com.epicode.repository.BranchRepository;
+import com.epicode.repository.SalaryRepository;
 import com.epicode.service.SalaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +21,20 @@ import java.util.List;
 @Tag(name = "급여 관리 API", description = "사용자 기본 시급 및 특별 시급 관련 API를 제공합니다.")
 public class SalaryController {
     private final SalaryService salaryService;
+    private final SalaryRepository salaryRepository;
+    @Operation(
+            summary = "해당 매장에 사용자 급여 정보 존재 여부 확인",
+            description = "사용자의 급여 정보가 존재하는지 확인합니다.(true/false)",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT 토큰 (Bearer 형식)", required = true, example = "Bearer eyJhbGciOiJIUzI1Ni..."),
+                    @Parameter(name = "branchId", description = "조회할 지점 ID", required = true, example = "101")
+            }
+    )
+    @GetMapping("/{branchId}/check")
+    public boolean checkSalaryExists(@RequestHeader("X-Authenticated-User-Id") String userId, @PathVariable Long branchId) {
+        return salaryRepository.existsByUserIdAndBranchId(Long.valueOf(userId), branchId);
+    }
+
     @Operation(
             summary = "급여 생성/수정",
             description = "사용자의 기본 시급과 특별 시급 정보를 생성하거나 수정합니다.",
