@@ -100,8 +100,8 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
         response.setStatusCode(httpStatus);
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        // JSON 에러 메시지 생성
-        String errorMessage = String.format("{\"error\": \"%s\"}", error);
+        // JSON 에러 메시지 생성 (상태코드와 메시지 포함)
+        String errorMessage = String.format("{\"status\": %d, \"error\": \"%s\"}", httpStatus.value(), error);
         byte[] bytes = errorMessage.getBytes(StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
 
@@ -112,4 +112,5 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                     return Mono.empty();
                 }));
     }
+
 }
