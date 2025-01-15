@@ -88,6 +88,7 @@ public class SalaryServiceImpl implements SalaryService {
                 .branchName(branchName)
                 .basicSalary(salary.getBasicSalary())
                 .weeklyAllowance(salary.getWeeklyAllowance())
+                .paymentDate(salary.getPaymentDate())
                 .specificTimeSalaries(specificTimeSalaries.stream()
                         .map(s -> SpecificTimeSalaryResponseDTO.builder()
                                 .branchName(branchName)
@@ -113,6 +114,7 @@ public class SalaryServiceImpl implements SalaryService {
                 .branchId(salary.getBranchId())
                 .branchName(branch.getName())
                 .basicSalary(salary.getBasicSalary())
+                .paymentDate(salary.getPaymentDate())
                 .weeklyAllowance(salary.getWeeklyAllowance())
                 .build();
     }
