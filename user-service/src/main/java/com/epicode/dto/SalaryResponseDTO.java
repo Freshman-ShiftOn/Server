@@ -14,5 +14,6 @@ public class SalaryResponseDTO {
     private String branchName;
     private BigDecimal basicSalary;
     private Boolean weeklyAllowance;
+    private Integer paymentDate;
     private List<SpecificTimeSalaryResponseDTO> specificTimeSalaries;
 }

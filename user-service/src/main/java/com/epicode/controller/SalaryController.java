@@ -3,7 +3,6 @@ package com.epicode.controller;
 import com.epicode.dto.SalaryRequestDTO;
 import com.epicode.dto.SalaryResponseDTO;
 import com.epicode.dto.SpecificTimeSalaryResponseDTO;
-import com.epicode.repository.BranchRepository;
 import com.epicode.repository.SalaryRepository;
 import com.epicode.service.SalaryService;
 import io.swagger.v3.oas.annotations.Operation;
