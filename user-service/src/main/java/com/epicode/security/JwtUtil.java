@@ -17,7 +17,6 @@ public class JwtUtil {
     private final Key SECRET_KEY;
     private static final long EXPIRATION_TIME = 86400000; // 24 hours
 
-
     public JwtUtil(@Value("${jwt.secret-key}") String secretKey) {
         byte[] decodedKey = Base64.getDecoder().decode(secretKey);
         this.SECRET_KEY = Keys.hmacShaKeyFor(decodedKey);
@@ -47,8 +46,8 @@ public class JwtUtil {
 //                .setSigningKey(SECRET_KEY)
 //                .build()
 //                .parseClaimsJws(token)
-//                .getBody(); // Claims에서 userId 추출
-//        return claims.get("userId", Long.class); // userId를 Long 타입으로 반환
+//                .getBody();
+//        return claims.get("userId", Long.class);
 //    }
 //
 //    public Long[] getBranchIdsFromToken(String token) {
