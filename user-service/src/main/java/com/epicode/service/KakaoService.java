@@ -1,5 +1,7 @@
 package com.epicode.service;
 import com.epicode.domain.User;
+import com.epicode.exception.CustomException;
+import com.epicode.exception.ErrorCode;
 import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
@@ -30,16 +32,16 @@ public class KakaoService {
         try {
             String accessToken = getAccessTokenFromKakao(code);
             if (accessToken == null || accessToken.isEmpty()) {
-                throw new IllegalStateException("토큰이 비어있습니다.");
+                throw new CustomException(ErrorCode.TOKEN_ERROR);
             }
 
             String userEmail = getUserInfoFromKakao(accessToken);
             if (userEmail == null || userEmail.isEmpty()) {
-                throw new IllegalStateException("유저 정보가 비어있습니다.");
+                throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
             }
 
             if (!userRepository.existsByEmail(userEmail)) {
-                saveNewUser(userEmail); // 사용자 정보 저장
+
             }
 
             Long userId = userRepository.findByEmail(userEmail).getId();
@@ -51,12 +53,15 @@ public class KakaoService {
         }
     }
 
-    private void saveNewUser(String email) {
-        User user = new User();
-        user.setEmail(email);
-        user.setName("김크루");//임시 지정
-        System.out.println(user);
-        userRepository.save(user);
+     public void saveUser(String email,String name) {
+         User user = new User();
+         user.setEmail(email);
+         user.setName(name);
+         //System.out.println(user);
+         if(userRepository.existsByEmail(email)){
+             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
+         }
+         userRepository.save(user);
     }
     public void redirectToKakao(HttpServletResponse response) {
         try {
@@ -130,4 +135,5 @@ public class KakaoService {
             throw new RuntimeException("카카오 유저 정보 요청 중 오류: " + e.getMessage());
         }
     }
+
 }

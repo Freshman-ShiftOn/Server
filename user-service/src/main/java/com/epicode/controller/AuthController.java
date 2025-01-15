@@ -58,10 +58,8 @@ public class AuthController {
         try {
             // KakaoService를 통해 JWT 토큰 발급
             String jwtToken = kakaoService.authenticateWithKakao(code);
-
             // JWT 토큰 반환
             return ResponseEntity.ok(jwtToken);
-
         } catch (IllegalStateException e) {
             log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
@@ -72,6 +70,13 @@ public class AuthController {
             log.error("예상치 못한 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/join")
+    public ResponseEntity<?> joinUser(@RequestHeader("X-Authenticated-User") String email,
+                                         @RequestParam String name) {
+        kakaoService.saveUser(email,name);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 //
 //    @GetMapping("/info")
