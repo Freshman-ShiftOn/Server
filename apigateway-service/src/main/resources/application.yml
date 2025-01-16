@@ -49,6 +49,13 @@ spring:
           filters:
             - JwtAuthenticationFilter
 
+        - id: branch-service-invite
+          uri: lb://BRANCH-SERVICE
+          predicates:
+            - Path=/api/branch/invite/**
+          filters:
+            - InviteJwtAuthenticationFilter
+
         - id: manual-service
           uri: lb://MANUAL-SERVICE
           predicates:
