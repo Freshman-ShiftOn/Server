@@ -72,12 +72,12 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/join")
-    public ResponseEntity<?> joinUser(@RequestHeader("X-Authenticated-User") String email,
-                                         @RequestParam String name) {
-        kakaoService.saveUser(email,name);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
+//    @GetMapping("/join")
+//    public ResponseEntity<?> joinUser(@RequestHeader("X-Authenticated-User") String email,
+//                                         @RequestParam String name) {
+//        kakaoService.saveUser(email,name);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+//    }
 //
 //    @GetMapping("/info")
 //    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {

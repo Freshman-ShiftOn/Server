@@ -41,7 +41,7 @@ public class KakaoService {
             }
 
             if (!userRepository.existsByEmail(userEmail)) {
-
+                saveUser(userEmail);
             }
 
             Long userId = userRepository.findByEmail(userEmail).getId();
@@ -53,10 +53,10 @@ public class KakaoService {
         }
     }
 
-     public void saveUser(String email,String name) {
+     public void saveUser(String email) {//,String name
          User user = new User();
          user.setEmail(email);
-         user.setName(name);
+         user.setName("김크루");
          //System.out.println(user);
          if(userRepository.existsByEmail(email)){
              throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
