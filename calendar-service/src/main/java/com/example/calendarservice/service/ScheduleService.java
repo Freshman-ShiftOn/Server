@@ -11,4 +11,5 @@ public interface ScheduleService {
     List<Schedule> getSchedulesByBranchId(Integer branchId, Integer month);
     List<Schedule> getSchedulesByBranchIdAndUserId(Integer branchId, Integer month, Integer userId);
     boolean isUserSchedule(Integer scheduleId, int userId);
+    boolean isScheduleInBranch(Integer scheduleId, Integer branchId);
 }

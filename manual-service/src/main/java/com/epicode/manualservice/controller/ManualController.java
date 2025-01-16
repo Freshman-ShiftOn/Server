@@ -5,6 +5,7 @@ import com.epicode.manualservice.dto.ManualTaskDTO;
 import com.epicode.manualservice.exception.BranchAuthorizeException;
 import com.epicode.manualservice.service.ManualService;
 import com.epicode.manualservice.service.ManualTaskService;
+import com.epicode.manualservice.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,9 +13,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 @Slf4j
@@ -26,6 +30,7 @@ public class ManualController {
     private final Environment env;
     private final ManualService manualService;
     private final ManualTaskService manualTaskService;
+    private final S3Service s3Service;
 
     // 선택한 매장의 매뉴얼 목록 조회
     @GetMapping("/{branchId}")
@@ -135,5 +140,31 @@ public class ManualController {
         manualService.validateBranchAccess(branches, branchId);
         manualService.deleteManual(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/upload")
+    @Operation(summary = "이미지 업로드", description = "이미지를 S3에 업로드하고 URL을 반환합니다.")
+    public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile image) {
+        try {
+            // 파일 검증 (유형 및 크기 제한)
+            if (!image.getContentType().startsWith("image/")) {
+                return ResponseEntity.badRequest().body("Invalid file type. Only images are allowed.");
+            }
+            if (image.getSize() > 5 * 1024 * 1024) { // 5MB 제한
+                return ResponseEntity.badRequest().body("File size exceeds the 5MB limit.");
+            }
+
+            // S3 업로드 처리
+            String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+            File tempFile = File.createTempFile("upload-", fileName);
+            image.transferTo(tempFile);
+            String imageUrl = s3Service.uploadFile("manuals/" + fileName, tempFile);
+
+            // 성공적으로 업로드된 이미지 URL 반환
+            return ResponseEntity.ok(imageUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image upload failed.");
+        }
     }
 }

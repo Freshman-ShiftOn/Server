@@ -43,6 +43,10 @@ spring:
       connection-timeout: 20000
       connection-test-query: SELECT 1
       leak-detection-threshold: 60000
+aws:
+  region: ap-northeast-2
+  s3:
+    bucket-name: epicode
 eureka:
   client:
     register-with-eureka: true

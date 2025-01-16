@@ -53,3 +53,8 @@ eureka:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 jwt:
   secret-key: ${JWT_KEY}
+
+aws:
+  region: ap-northeast-2
+  s3:
+    bucket-name: epicode
