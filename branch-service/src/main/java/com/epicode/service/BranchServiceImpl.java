@@ -22,7 +22,9 @@ public class BranchServiceImpl implements BranchService {
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
 
+
     // userId 기반 branchName 조회
+    @Override
     public List<String> getBranchNamesByUserId(Long userId) {
         //UserBranch에서 branchId 목록 조회
         List<Long> branchIds = userBranchRepository.findBranchIdsByUserId(userId);
@@ -30,16 +32,19 @@ public class BranchServiceImpl implements BranchService {
         return branchRepository.findBranchNamesByIds(branchIds);
     }
     //branchIds기반 branchName 조회
+    @Override
     public List<String> getBranchNamesByUserIds(Long[] branchIds) {
         //branchIds -> branchName 목록 조회
         return branchRepository.findBranchNamesByIds(List.of(branchIds));
     }
     // branchName 기반 branchId 조회
+    @Override
     public Long getBranchIdByName(String name) {
         Branch b = branchRepository.findIdByName(name);
         return b.getId();
     }
 
+    @Override
     @Transactional
     public void createBranch(Branch branch, Long userId, String email) {
         User user = userRepository.findIdByEmail(email);
@@ -60,6 +65,7 @@ public class BranchServiceImpl implements BranchService {
         userBranchRepository.save(userBranch);
     }
 
+    @Override
     public List<WorkerProjection> getWorkersByBranchId(Long branchId) {
         if (branchId == null) {
             throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
