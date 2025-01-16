@@ -66,4 +66,10 @@ public class BranchServiceImpl implements BranchService {
         }
         return userBranchRepository.findWorkersByBranchId(branchId);
     }
+
+    @Override
+    public Branch getBranchProfile(Long branchId) {
+        return branchRepository.findById(branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BRANCH_NOT_FOUND));
+    }
 }

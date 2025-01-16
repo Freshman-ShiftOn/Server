@@ -11,4 +11,5 @@ public interface BranchService {
     Long getBranchIdByName(String name);
     void createBranch(Branch branch, Long userId, String email);
     List<WorkerProjection> getWorkersByBranchId(Long branchId);
+    Branch getBranchProfile(Long branchId);
 }

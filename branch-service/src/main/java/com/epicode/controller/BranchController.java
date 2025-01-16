@@ -112,4 +112,17 @@ public class BranchController {
     public List<WorkerProjection> getWorkersByBranchId(@PathVariable Long branchId) {
         return branchService.getWorkersByBranchId(branchId);
     }
+
+    @Operation(
+            summary = "특정 매장 프로필 조회",
+            description = "해당 매장의 프로필(이미지,지점 정보)이 리턴됩니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
+                    @Parameter(name = "branchId", description = "조회할 매장Id", required = true, example = "101")
+            }
+    )
+    public ResponseEntity<Branch> getBranchProfile(@PathVariable Long branchId) {
+        Branch branch = branchService.getBranchProfile(branchId);
+        return ResponseEntity.ok(branch);
+    }
 }
