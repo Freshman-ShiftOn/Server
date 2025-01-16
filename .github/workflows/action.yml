@@ -96,6 +96,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
           DB_URL: ${{ secrets.DB_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
         run: ./gradlew clean build -x test
 
       - name: Build Docker images
