@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_container
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} # MySQL root 비밀번호
-      MYSQL_DATABASE: "crewezy_db" # 생성할 데이터베이스 이름
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - app-network
 
   discovery-service:
     image: discovery-service
@@ -20,8 +8,6 @@ services:
       - "18761:18761"
     networks:
       - app-network
-    depends_on:
-      - mysql
 
   apigateway-service:
     image: apigateway-service
@@ -34,7 +20,6 @@ services:
       - app-network
     depends_on:
       - discovery-service
-      - mysql
 
   manual-service:
     image: manual-service
@@ -52,7 +37,6 @@ services:
     depends_on:
       - discovery-service
       - apigateway-service
-      - mysql
 
   calendar-service:
     image: calendar-service
@@ -68,7 +52,6 @@ services:
     depends_on:
       - discovery-service
       - apigateway-service
-      - mysql
       
   branch-service:
     image: branch-service
@@ -87,7 +70,6 @@ services:
     depends_on:
       - discovery-service
       - apigateway-service
-      - mysql
 
   user-service:
     image: user-service
@@ -107,7 +89,6 @@ services:
     depends_on:
       - discovery-service
       - apigateway-service
-      - mysql
 
 
 networks:
