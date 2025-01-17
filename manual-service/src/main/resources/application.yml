@@ -55,6 +55,9 @@ eureka:
       defaultZone: ${EUREKA_SERVER}
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+branch-service:
+  url: ${EPI_SERVER}
+
 #  cache:
 #    type: redis
 #    data:

@@ -42,16 +42,19 @@ public class ManualController {
             }
     )
     public ResponseEntity<List<ManualDTO>> getManualsByBranchId(
-            @RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestHeader("Authorization") String jwtToken,
             @PathVariable Integer branchId) {
         System.out.println("Service received branchId: " + branchId);
         if (branchId == null) {
             throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
         }
-        manualService.validateBranchAccess(branches, branchId);
-        List<ManualDTO> manuals = manualService.getManualsByBranchId(branchId);
+        //manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
+        List<ManualDTO> manuals = manualService.getManualsByBranchId(Long.valueOf(userId),branchId);
         return ResponseEntity.ok(manuals);
     }
+
 
     // 매뉴얼 상세 조회 및 태스크 포함
     @GetMapping("/{branchId}/{id}")
@@ -65,10 +68,10 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> getManualWithTasks(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId,
             @PathVariable Integer id) {
-        manualService.validateBranchAccess(branches, branchId);
+        //manualService.validateBranchAccess(branches, branchId);
         ManualDTO manual = manualService.getManualByIdAndBranchId(id, branchId);
         List<ManualTaskDTO> tasks = manualTaskService.getManualTasksByManualId(id);
         manual.setTasks(tasks);
@@ -86,11 +89,12 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> createManual(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("Authorization") String jwtToken,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer branchId,
             @RequestBody ManualDTO manualDTO) {
-        manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
         manualDTO.setBranchId(branchId);
         manualDTO.setWorkerId(Integer.valueOf(userId));
         ManualDTO createdManual = manualService.createManual(manualDTO);
@@ -109,12 +113,13 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> updateManual(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("Authorization") String jwtToken,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer branchId,
             @PathVariable Integer id,
             @RequestBody ManualDTO manualDTO) {
-        manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
         manualDTO.setBranchId(branchId);
         manualDTO.setWorkerId(Integer.valueOf(userId));
         ManualDTO updatedManual = manualService.updateManual(id, manualDTO);
@@ -133,10 +138,11 @@ public class ManualController {
             }
     )
     public ResponseEntity<Void> deleteManual(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("Authorization") String jwtToken,
             @PathVariable Integer branchId,
             @PathVariable Integer id) {
-        manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
         manualService.deleteManual(id);
         return ResponseEntity.noContent().build();
     }
@@ -165,5 +171,25 @@ public class ManualController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Image upload failed.");
         }
+    }
+
+    @PutMapping("/{branchId}/favorite")
+    @Operation(
+            summary = "즐겨찾기 상태 업데이트",
+            description = "특정 매뉴얼의 즐겨찾기 상태를 설정합니다. 불러온 현재 상태에 기반해서 true면 false전송, false면 true전송",
+            parameters = {
+                    @Parameter(name = "branchId", description = "지점 ID", required = true, example = "101"),
+                    @Parameter(name = "manualId", description = "매뉴얼 ID", required = true, example = "201"),
+                    @Parameter(name = "isFavorite", description = "즐겨찾기 여부", required = true, example = "true")
+            }
+    )
+    public ResponseEntity<Void> updateFavorite(
+            @RequestHeader("X-Authenticated-User-Id") Long userId,
+            @PathVariable Integer branchId,
+            @RequestParam Integer manualId,
+            @RequestParam boolean isFavorite
+    ) {
+        manualService.updateFavorite(userId, branchId, manualId, isFavorite);
+        return ResponseEntity.ok().build();
     }
 }
