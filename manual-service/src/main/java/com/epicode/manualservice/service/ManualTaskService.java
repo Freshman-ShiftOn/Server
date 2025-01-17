@@ -1,13 +1,13 @@
 package com.epicode.manualservice.service;
 
 import com.epicode.manualservice.dto.ManualTaskDTO;
-import com.epicode.manualservice.exception.ManualTaskNotFoundException;
+import com.epicode.manualservice.exception.CustomException;
+import com.epicode.manualservice.exception.ErrorCode;
 import com.epicode.manualservice.model.Manual;
 import com.epicode.manualservice.model.ManualTask;
 import com.epicode.manualservice.model.ManualTaskMapper;
 import com.epicode.manualservice.repository.ManualRepository;
 import com.epicode.manualservice.repository.ManualTaskRepository;
-import com.epicode.manualservice.exception.ManualNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +35,7 @@ public class ManualTaskService {
     // 매뉴얼 태스크 생성
     public ManualTaskDTO createManualTask(Integer manualId, ManualTaskDTO manualTaskDTO) {
         Manual manual = manualRepository.findById(manualId)
-                .orElseThrow(() -> new ManualNotFoundException("해당하는 매뉴얼이 없습니다. " + manualId));
+                .orElseThrow(() -> new CustomException(ErrorCode.MANUAL_NOT_FOUND));
 
         ManualTask manualTask = ManualTaskMapper.toEntity(manualTaskDTO, manual);
         ManualTask savedTask = manualTaskRepository.save(manualTask);
@@ -48,7 +48,7 @@ public class ManualTaskService {
     // 매뉴얼 태스크 수정
     public ManualTaskDTO updateManualTask(Integer manualId, Integer taskId, ManualTaskDTO manualTaskDTO) {
         ManualTask existingTask = manualTaskRepository.findById(taskId)
-                .orElseThrow(() -> new ManualTaskNotFoundException("해당하는 매뉴얼이 없습니다. " + taskId));
+                .orElseThrow(() -> new CustomException(ErrorCode.MANUAL_NOT_FOUND));
         if (!existingTask.getManual().getId().equals(manualId)) {
             throw new IllegalArgumentException("매뉴얼 수정을 실패했습니다. - 매뉴얼 ID 오류");
         }
@@ -69,7 +69,7 @@ public class ManualTaskService {
     // 매뉴얼 태스크 삭제
     public void deleteManualTask(Integer manualId, Integer taskId) {
         ManualTask task = manualTaskRepository.findById(taskId)
-                .orElseThrow(() -> new ManualTaskNotFoundException("해당하는 매뉴얼이 없습니다. " + taskId));
+                .orElseThrow(() -> new CustomException(ErrorCode.TASK_NOT_FOUND));
         if (!task.getManual().getId().equals(manualId)) {
             throw new IllegalArgumentException("매뉴얼 삭제를 실패했습니다. - 매뉴얼 ID 오류");
         }
