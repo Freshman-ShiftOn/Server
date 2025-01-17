@@ -17,7 +17,6 @@ public class User {
     @Column(nullable = false, length = 50)
     private String name;
 
-
     @Column(name = "created_at", updatable = false)
     private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();
 }

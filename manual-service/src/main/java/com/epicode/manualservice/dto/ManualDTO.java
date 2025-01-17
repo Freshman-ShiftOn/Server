@@ -22,6 +22,7 @@ public class ManualDTO {
     private Integer workerId;
     private Date lastUpdated;
     private List<ManualTaskDTO> tasks;
+    private boolean isFavorite;
 
     // DTO 변환 메서드
     public ManualDTO toManualDTO(Manual manual) {

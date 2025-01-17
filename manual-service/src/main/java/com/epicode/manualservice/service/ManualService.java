@@ -4,8 +4,10 @@ import com.epicode.manualservice.dto.ManualDTO;
 import com.epicode.manualservice.dto.ManualTaskDTO;
 import com.epicode.manualservice.exception.CustomException;
 import com.epicode.manualservice.exception.ErrorCode;
+import com.epicode.manualservice.model.Favorite;
 import com.epicode.manualservice.model.Manual;
 import com.epicode.manualservice.model.ManualTask;
+import com.epicode.manualservice.repository.FavoriteRepository;
 import com.epicode.manualservice.repository.ManualRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class ManualService {
     private final ManualRepository manualRepository;
     private final ManualTaskService manualTaskService;
+    private final FavoriteRepository favoriteRepository;
 
     public void validateBranchAccess(String branches, Integer branchId) {
 
@@ -37,16 +40,49 @@ public class ManualService {
     }
 
     // 매뉴얼 목록 조회
+//    @Transactional(readOnly = true)
+//    public List<ManualDTO> getManualsByBranchId(Integer branchId) {
+//        List<Manual> manuals = manualRepository.findByBranchId(branchId);
+//        if (manuals.isEmpty()) {
+//            //log.info("Branch ID {}에 대한 매뉴얼이 없습니다.", branchId);
+//            return Collections.emptyList();
+//        }
+//        return manuals.stream()
+//                .map(manual -> new ManualDTO().toManualDTO(manual))
+//                .collect(Collectors.toList());
+//    }
+    // 매뉴얼 목록 조회(즐겨찾기 상태 포함)
     @Transactional(readOnly = true)
-    public List<ManualDTO> getManualsByBranchId(Integer branchId) {
+    public List<ManualDTO> getManualsByBranchId(Long userId, Integer branchId) {
         List<Manual> manuals = manualRepository.findByBranchId(branchId);
+        List<Favorite> favorites = favoriteRepository.findByUserIdAndBranchId(userId, Long.valueOf(branchId));
+
         if (manuals.isEmpty()) {
-            //log.info("Branch ID {}에 대한 매뉴얼이 없습니다.", branchId);
             return Collections.emptyList();
         }
-        return manuals.stream()
-                .map(manual -> new ManualDTO().toManualDTO(manual))
+
+        // 즐겨찾기 상태를 매뉴얼에 매핑
+        List<Integer> favoriteManualIds = favorites.stream()
+                .filter(Favorite::isFavorite)
+                .map(Favorite::getManualId)
                 .collect(Collectors.toList());
+
+        return manuals.stream()
+                .map(manual -> {
+                    ManualDTO manualDTO = new ManualDTO().toManualDTO(manual);
+                    manualDTO.setFavorite(favoriteManualIds.contains(manual.getId()));
+                    return manualDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
+    //즐겨찾기 업데이트
+    @Transactional
+    public void updateFavorite(Long userId, Integer branchId, Integer manualId, boolean isFavorite) {
+        Favorite favorite = favoriteRepository.findByUserIdAndBranchIdAndManualId(userId, Long.valueOf(branchId), manualId)
+                .orElse(new Favorite(userId, Long.valueOf(branchId), manualId, false));
+        favorite.setFavorite(isFavorite);
+        favoriteRepository.save(favorite);
     }
 
     // 매뉴얼 상세 조회 (태스크 포함)
