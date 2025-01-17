@@ -195,7 +195,7 @@ public class BranchController {
                     @Parameter(name = "branchId", description = "초대 지점 ID", required = true, example = "101")
             }
     )
-    @PostMapping("/invite/generate")
+    @GetMapping("/invite/generate")
     public ResponseEntity<String> generateInviteToken(
             @RequestParam String inviterEmail,
             @RequestParam String inviteeEmail,
