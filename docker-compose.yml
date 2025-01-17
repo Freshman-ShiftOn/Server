@@ -32,6 +32,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_URL: ${DB_URL}
       EUREKA_SERVER: ${EUREKA_SERVER}
+      EPI_SERVER: ${EPI_SERVER}
     networks:
       - app-network
     depends_on:
