@@ -42,14 +42,15 @@ public class ManualController {
             }
     )
     public ResponseEntity<List<ManualDTO>> getManualsByBranchId(
-            @RequestHeader("X-Branch-Ids") String branches,
             @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestHeader("Authorization") String jwtToken,
             @PathVariable Integer branchId) {
         System.out.println("Service received branchId: " + branchId);
         if (branchId == null) {
             throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
         }
-        manualService.validateBranchAccess(branches, branchId);
+        //manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
         List<ManualDTO> manuals = manualService.getManualsByBranchId(Long.valueOf(userId),branchId);
         return ResponseEntity.ok(manuals);
     }
@@ -67,10 +68,10 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> getManualWithTasks(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
             @PathVariable Integer branchId,
             @PathVariable Integer id) {
-        manualService.validateBranchAccess(branches, branchId);
+        //manualService.validateBranchAccess(branches, branchId);
         ManualDTO manual = manualService.getManualByIdAndBranchId(id, branchId);
         List<ManualTaskDTO> tasks = manualTaskService.getManualTasksByManualId(id);
         manual.setTasks(tasks);
@@ -88,11 +89,12 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> createManual(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("Authorization") String jwtToken,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer branchId,
             @RequestBody ManualDTO manualDTO) {
-        manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
         manualDTO.setBranchId(branchId);
         manualDTO.setWorkerId(Integer.valueOf(userId));
         ManualDTO createdManual = manualService.createManual(manualDTO);
@@ -111,12 +113,13 @@ public class ManualController {
             }
     )
     public ResponseEntity<ManualDTO> updateManual(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("Authorization") String jwtToken,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer branchId,
             @PathVariable Integer id,
             @RequestBody ManualDTO manualDTO) {
-        manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
         manualDTO.setBranchId(branchId);
         manualDTO.setWorkerId(Integer.valueOf(userId));
         ManualDTO updatedManual = manualService.updateManual(id, manualDTO);
@@ -135,10 +138,11 @@ public class ManualController {
             }
     )
     public ResponseEntity<Void> deleteManual(
-            @RequestHeader("X-Branch-Ids") String branches,
+            //@RequestHeader("X-Branch-Ids") String branches,
+            @RequestHeader("Authorization") String jwtToken,
             @PathVariable Integer branchId,
             @PathVariable Integer id) {
-        manualService.validateBranchAccess(branches, branchId);
+        manualService.validateBranchAccess(jwtToken.replace("Bearer ", ""),branchId);
         manualService.deleteManual(id);
         return ResponseEntity.noContent().build();
     }

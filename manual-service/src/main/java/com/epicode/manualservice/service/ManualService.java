@@ -1,5 +1,6 @@
 package com.epicode.manualservice.service;
 
+import com.epicode.manualservice.config.BranchClient;
 import com.epicode.manualservice.dto.ManualDTO;
 import com.epicode.manualservice.dto.ManualTaskDTO;
 import com.epicode.manualservice.exception.CustomException;
@@ -26,17 +27,17 @@ public class ManualService {
     private final ManualRepository manualRepository;
     private final ManualTaskService manualTaskService;
     private final FavoriteRepository favoriteRepository;
+    private final BranchClient branchClient;
 
-    public void validateBranchAccess(String branches, Integer branchId) {
 
-        //System.out.println("validate branchId: " + branchId+", branches: "+branches);
-        List<Integer> branchIdList = Arrays.stream(branches.split(","))
-                .map(Integer::valueOf) // 문자열을 Integer로 변환
-                .toList();
-        //System.out.println("list branchIds: "+branchIdList.toString());
-        if (!branchIdList.contains(branchId)) {
+    public void validateBranchAccess(String jwtToken,Integer branchId) {
+        List<String> branchIdList = getBranchesForUser(jwtToken);
+        if (!branchIdList.contains(String.valueOf(branchId))) {
             throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);//404
         }
+    }
+    public List<String> getBranchesForUser(String jwtToken) {
+        return branchClient.getBranchList(jwtToken);
     }
 
     // 매뉴얼 목록 조회
@@ -145,4 +146,17 @@ public class ManualService {
                 .orElseThrow(() -> new CustomException(ErrorCode.MANUAL_NOT_FOUND));
         manualRepository.delete(manual);
     }
+
+    //인증 정보에서 branchList 받아온 버전 : 재로그인 이슈
+//    public void validateBranchAccess(String branches, Integer branchId) {
+//
+//        //System.out.println("validate branchId: " + branchId+", branches: "+branches);
+//        List<Integer> branchIdList = Arrays.stream(branches.split(","))
+//                .map(Integer::valueOf) // 문자열을 Integer로 변환
+//                .toList();
+//        //System.out.println("list branchIds: "+branchIdList.toString());
+//        if (!branchIdList.contains(branchId)) {
+//            throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);//404
+//        }
+//    }
 }
