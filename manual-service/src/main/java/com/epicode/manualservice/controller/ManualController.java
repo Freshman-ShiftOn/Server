@@ -2,14 +2,14 @@ package com.epicode.manualservice.controller;
 
 import com.epicode.manualservice.dto.ManualDTO;
 import com.epicode.manualservice.dto.ManualTaskDTO;
-import com.epicode.manualservice.exception.BranchAuthorizeException;
+import com.epicode.manualservice.exception.CustomException;
+import com.epicode.manualservice.exception.ErrorCode;
 import com.epicode.manualservice.service.ManualService;
 import com.epicode.manualservice.service.ManualTaskService;
 import com.epicode.manualservice.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 @Slf4j
 @RestController
@@ -47,7 +46,7 @@ public class ManualController {
             @PathVariable Integer branchId) {
         System.out.println("Service received branchId: " + branchId);
         if (branchId == null) {
-            throw new IllegalArgumentException("branchId is required and must be a number.");
+            throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
         }
         manualService.validateBranchAccess(branches, branchId);
         List<ManualDTO> manuals = manualService.getManualsByBranchId(branchId);

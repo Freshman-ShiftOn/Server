@@ -2,18 +2,18 @@ package com.epicode.manualservice.service;
 
 import com.epicode.manualservice.dto.ManualDTO;
 import com.epicode.manualservice.dto.ManualTaskDTO;
-import com.epicode.manualservice.exception.BranchAuthorizeException;
+import com.epicode.manualservice.exception.CustomException;
+import com.epicode.manualservice.exception.ErrorCode;
 import com.epicode.manualservice.model.Manual;
 import com.epicode.manualservice.model.ManualTask;
 import com.epicode.manualservice.repository.ManualRepository;
-import com.epicode.manualservice.exception.ManualNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
@@ -32,15 +32,20 @@ public class ManualService {
                 .toList();
         //System.out.println("list branchIds: "+branchIdList.toString());
         if (!branchIdList.contains(branchId)) {
-            throw new BranchAuthorizeException("해당 매장에 접근 권한이 없습니다.");
+            throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);//404
         }
     }
 
     // 매뉴얼 목록 조회
     @Transactional(readOnly = true)
     public List<ManualDTO> getManualsByBranchId(Integer branchId) {
-        return manualRepository.findByBranchId(branchId).stream()
-                .map(manual -> new ManualDTO().toManualDTO(manual)) // Manual → ManualDTO 변환
+        List<Manual> manuals = manualRepository.findByBranchId(branchId);
+        if (manuals.isEmpty()) {
+            //log.info("Branch ID {}에 대한 매뉴얼이 없습니다.", branchId);
+            return Collections.emptyList();
+        }
+        return manuals.stream()
+                .map(manual -> new ManualDTO().toManualDTO(manual))
                 .collect(Collectors.toList());
     }
 
@@ -48,10 +53,10 @@ public class ManualService {
     @Transactional(readOnly = true)
     public ManualDTO getManualByIdAndBranchId(Integer id, Integer branchId) {
         Manual manual = manualRepository.findById(id)
-                .orElseThrow(() -> new ManualNotFoundException("해당 ID(" + id + ")에 해당하는 메뉴얼이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.MANUAL_NOT_FOUND));
 
         if (!manual.getBranchId().equals(branchId)) {
-            throw new ManualNotFoundException("ID(" + id + ")에 해당하는 메뉴얼이 branchId(" + branchId + ")와 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.TASK_NOT_FOUND);
         }
 
         // ManualTaskDTO 리스트 생성
@@ -74,7 +79,7 @@ public class ManualService {
     // 매뉴얼 수정
     public ManualDTO updateManual(Integer manualId, ManualDTO manualDTO) {
         Manual existingManual = manualRepository.findById(manualId)
-                .orElseThrow(() -> new ManualNotFoundException("해당하는 매뉴얼이 없습니다. 매뉴얼ID: " + manualId));
+                .orElseThrow(() -> new CustomException(ErrorCode.MANUAL_NOT_FOUND));
 
         // 기존 필드 업데이트
         existingManual.setBranchId(manualDTO.getBranchId());
@@ -101,7 +106,7 @@ public class ManualService {
     // 매뉴얼 삭제
     public void deleteManual(Integer manualId) {
         Manual manual = manualRepository.findById(manualId)
-                .orElseThrow(() -> new ManualNotFoundException("해당하는 매뉴얼이 없습니다. 매뉴얼ID: " + manualId));
+                .orElseThrow(() -> new CustomException(ErrorCode.MANUAL_NOT_FOUND));
         manualRepository.delete(manual);
     }
 }
