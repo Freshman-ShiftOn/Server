@@ -32,6 +32,8 @@ jobs:
           echo "KAKAO_RESTAPI=${{ secrets.KAKAO_RESTAPI }}" >> .env
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
           echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
+          echo "EPI_SERVER=${{ secrets.EPI_SERVER }}" >> .env
+          
 
       - name: Build manual-service
         working-directory: manual-service
@@ -43,6 +45,7 @@ jobs:
           KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
           BASE_URL: ${{ secrets.BASE_URL }}
           JWT_KEY: ${{ secrets.JWT_KEY }}
+          EPI_SERVER: ${{ secrets.EPI_SERVER }}
         run: ./gradlew clean build -x test
 
       - name: Build apigateway-service
