@@ -90,6 +90,7 @@ services:
     depends_on:
       - discovery-service
       - apigateway-service
+      
   user-service-2:
     image: user-service
     ports:
