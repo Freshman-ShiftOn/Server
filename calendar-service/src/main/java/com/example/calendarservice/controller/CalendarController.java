@@ -1,5 +1,6 @@
 package com.example.calendarservice.controller;
 
+import com.example.calendarservice.dto.RepeatScheduleRequest;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
 import com.example.calendarservice.service.ScheduleService;
@@ -57,6 +58,23 @@ public class CalendarController {
         schedule.setWorkerId(Integer.valueOf(userId));
         Schedule newSchedule = scheduleService.createSchedule(schedule);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
+    }
+
+    // 반복 스케줄 등록
+    @PostMapping("/{branchId}/bulk")
+    @Operation(summary = "반복 스케줄 등록", description = "현재 사용자의 반복 스케줄을 등록한다.")
+    public ResponseEntity<List<Schedule>> registerSchedules(
+            @PathVariable Integer branchId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestBody RepeatScheduleRequest repeatScheduleRequest) {
+
+        // 요청 데이터에서 branchId와 userId 설정
+        repeatScheduleRequest.setBranchId(branchId);
+        repeatScheduleRequest.setUserId(Integer.valueOf(userId));
+
+        // 반복 스케줄 생성
+        List<Schedule> schedules = scheduleService.createRepeatSchedules(repeatScheduleRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(schedules);
     }
 
     // 내 스케줄 수정
