@@ -3,6 +3,7 @@ version: '3.8'
 services:
 
   discovery-service:
+    container_name: discovery-service
     image: discovery-service
     ports:
       - "18761:18761"
