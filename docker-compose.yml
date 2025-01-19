@@ -21,23 +21,6 @@ services:
     depends_on:
       - discovery-service
 
-  manual-service:
-    image: manual-service
-    ports:
-      - "13001:13001"
-    environment:
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_URL: ${DB_URL}
-      EUREKA_SERVER: ${EUREKA_SERVER}
-      EPI_SERVER: ${EPI_SERVER}
-    networks:
-      - app-network
-    depends_on:
-      - discovery-service
-      - apigateway-service
 
   calendar-service:
     image: calendar-service
@@ -71,6 +54,25 @@ services:
     depends_on:
       - discovery-service
       - apigateway-service
+
+  manual-service:
+    image: manual-service
+    ports:
+      - "13001:13001"
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      EUREKA_SERVER: ${EUREKA_SERVER}
+      EPI_SERVER: ${EPI_SERVER}
+    networks:
+      - app-network
+    depends_on:
+      - discovery-service
+      - apigateway-service
+      - branch-service
 
   user-service:
     image: user-service
