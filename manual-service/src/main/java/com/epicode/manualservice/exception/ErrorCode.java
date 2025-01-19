@@ -13,8 +13,8 @@ public enum ErrorCode {
     TASK_NOT_FOUND(HttpStatus.UNAUTHORIZED, "해당 매장에 해당 매뉴얼이 존재하지 않습니다."),
     USER_BRANCH_NOT_EXISTS(HttpStatus.NOT_FOUND, "사용자가 가입되어있지 않은 매장입니다."),
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "사용자가 인증되지 않았습니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "서비스에 가입되지 않은 사용자입니다."),
-    SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다.");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "서비스에 가입되지 않은 사용자입니다.");
+    //SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
