@@ -21,14 +21,5 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getErrorCode().getMessage());
         return new ResponseEntity<>(response, ex.getErrorCode().getHttpStatus());
     }
-//
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("timestamp", LocalDateTime.now());
-//        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-//        response.put("error", "Internal Server Error");
-//        response.put("message", "서버에서 문제가 발생했습니다.");
-//        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
+
 }
