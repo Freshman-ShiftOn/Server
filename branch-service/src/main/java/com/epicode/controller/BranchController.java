@@ -1,5 +1,6 @@
 package com.epicode.controller;
 
+import com.epicode.dto.BranchIdNameProjection;
 import com.epicode.dto.WorkerProjection;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
@@ -48,29 +49,36 @@ public class BranchController {
                     @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI...")
             }
     )
-    public List<String> getBranchNames(
+    public List<BranchIdNameProjection> getBranchNames(
             @RequestHeader("X-Authenticated-User-Id") String userId
     ) {
         // 사용자의 Branch 정보를 가져오기
-        List<String> branchNames = branchService.getBranchNamesByUserId(Long.valueOf(userId));
+        List<BranchIdNameProjection> branchNames = branchService.getBranchesByUserId(Long.valueOf(userId));
         return branchNames != null ? branchNames : List.of();
-//        // 사용자 검증
-//        User user = userRepository.findIdByEmail(email);
-//        List<String> branchNames = new ArrayList<>();
-//        if (user == null) {
-//            throw new IllegalArgumentException("해당하는 사용자가 없습니다.");
-//        } else {
-//            Long[] branchIds = Arrays.stream(branches.split(","))
-//                    .map(Long::valueOf)
-//                    .toArray(Long[]::new);
-//            branchNames = branchService.getBranchNamesByUserIds(branchIds);
-//            if (branchNames == null || branchNames.isEmpty()) {
-//                //throw new NoBranchFoundException("가입된 지점이 없습니다.");
-//                return new ArrayList<>();
-//            }
-//        }
-//        return branchNames;
     }
+//    public List<String> getBranchNames(
+//            @RequestHeader("X-Authenticated-User-Id") String userId
+//    ) {
+//        // 사용자의 Branch 정보를 가져오기
+//        List<String> branchNames = branchService.getBranchNamesByUserId(Long.valueOf(userId));
+//        return branchNames != null ? branchNames : List.of();
+////        // 사용자 검증
+////        User user = userRepository.findIdByEmail(email);
+////        List<String> branchNames = new ArrayList<>();
+////        if (user == null) {
+////            throw new IllegalArgumentException("해당하는 사용자가 없습니다.");
+////        } else {
+////            Long[] branchIds = Arrays.stream(branches.split(","))
+////                    .map(Long::valueOf)
+////                    .toArray(Long[]::new);
+////            branchNames = branchService.getBranchNamesByUserIds(branchIds);
+////            if (branchNames == null || branchNames.isEmpty()) {
+////                //throw new NoBranchFoundException("가입된 지점이 없습니다.");
+////                return new ArrayList<>();
+////            }
+////        }
+////        return branchNames;
+//    }
 
     @GetMapping({"/search/{branchName}"})
     @Operation(

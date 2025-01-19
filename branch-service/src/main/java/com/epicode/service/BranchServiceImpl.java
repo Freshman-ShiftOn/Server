@@ -1,4 +1,5 @@
 package com.epicode.service;
+import com.epicode.dto.BranchIdNameProjection;
 import com.epicode.dto.WorkerProjection;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
@@ -24,21 +25,26 @@ public class BranchServiceImpl implements BranchService {
 
 
     // userId 기반 branchName 조회
+//    @Override
+//    public List<String> getBranchNamesByUserId(Long userId) {
+//        System.out.println(userId + "유저의 브랜치를 불러옵니다!");
+//        //UserBranch에서 branchId 목록 조회
+//        List<Long> branchIds = userBranchRepository.findBranchIdsByUserId(userId);
+//        //Branch에서 branchName 목록 조회
+//        System.out.println(branchRepository.findBranchNamesByIds(branchIds));
+//        return branchRepository.findBranchNamesByIds(branchIds);
+//    }
     @Override
-    public List<String> getBranchNamesByUserId(Long userId) {
-        System.out.println(userId + "유저의 브랜치를 불러옵니다!");
-        //UserBranch에서 branchId 목록 조회
-        List<Long> branchIds = userBranchRepository.findBranchIdsByUserId(userId);
-        //Branch에서 branchName 목록 조회
-        System.out.println(branchRepository.findBranchNamesByIds(branchIds));
-        return branchRepository.findBranchNamesByIds(branchIds);
+    public List<BranchIdNameProjection> getBranchesByUserId(Long userId) {
+        return userBranchRepository.findBranchIdsAndNamesByUserId(userId);
     }
-    //branchIds기반 branchName 조회
-    @Override
-    public List<String> getBranchNamesByUserIds(Long[] branchIds) {
-        //branchIds -> branchName 목록 조회
-        return branchRepository.findBranchNamesByIds(List.of(branchIds));
-    }
+//
+//    //branchIds기반 branchName 조회
+//    @Override
+//    public List<String> getBranchNamesByUserIds(Long[] branchIds) {
+//        //branchIds -> branchName 목록 조회
+//        return branchRepository.findBranchNamesByIds(List.of(branchIds));
+//    }
     // branchName 기반 branchId 조회
     @Override
     public Long getBranchIdByName(String name) {
