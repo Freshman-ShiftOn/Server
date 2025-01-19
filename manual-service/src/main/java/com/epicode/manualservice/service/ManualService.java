@@ -32,6 +32,7 @@ public class ManualService {
 
     public void validateBranchAccess(String jwtToken,Integer branchId) {
         List<String> branchIdList = getBranchesForUser(jwtToken);
+
         if (!branchIdList.contains(String.valueOf(branchId))) {
             throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);//404
         }
@@ -56,11 +57,10 @@ public class ManualService {
     @Transactional(readOnly = true)
     public List<ManualDTO> getManualsByBranchId(Long userId, Integer branchId) {
         List<Manual> manuals = manualRepository.findByBranchId(branchId);
-        List<Favorite> favorites = favoriteRepository.findByUserIdAndBranchId(userId, Long.valueOf(branchId));
-
         if (manuals.isEmpty()) {
             return Collections.emptyList();
         }
+        List<Favorite> favorites = favoriteRepository.findByUserIdAndBranchId(userId, Long.valueOf(branchId));
 
         // 즐겨찾기 상태를 매뉴얼에 매핑
         List<Integer> favoriteManualIds = favorites.stream()

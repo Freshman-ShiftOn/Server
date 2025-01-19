@@ -45,7 +45,7 @@ public class ManualController {
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestHeader("Authorization") String jwtToken,
             @PathVariable Integer branchId) {
-        System.out.println("Service received branchId: " + branchId);
+        //System.out.println("Service received branchId: " + branchId);
         if (branchId == null) {
             throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
         }
