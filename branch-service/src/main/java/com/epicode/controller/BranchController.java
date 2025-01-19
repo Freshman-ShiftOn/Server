@@ -72,7 +72,7 @@ public class BranchController {
 //        return branchNames;
     }
 
-    @GetMapping({"/{branchName}"})
+    @GetMapping({"/search/{branchName}"})
     @Operation(
             summary = "특정 매장 조회",
             description = "해당 매장 이름을 선택하면 branchId가 반환됩니다.",
@@ -91,7 +91,7 @@ public class BranchController {
         }
     }
 
-    @PostMapping({"/create"})
+    @PostMapping({"/create-branch"})
     @Operation(
             summary = "지점 추가",
             description = "새로운 매장을 생성합니다.",

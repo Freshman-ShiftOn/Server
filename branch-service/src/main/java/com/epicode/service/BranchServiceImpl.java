@@ -26,9 +26,11 @@ public class BranchServiceImpl implements BranchService {
     // userId 기반 branchName 조회
     @Override
     public List<String> getBranchNamesByUserId(Long userId) {
+        System.out.println(userId + "유저의 브랜치를 불러옵니다!");
         //UserBranch에서 branchId 목록 조회
         List<Long> branchIds = userBranchRepository.findBranchIdsByUserId(userId);
         //Branch에서 branchName 목록 조회
+        System.out.println(branchRepository.findBranchNamesByIds(branchIds));
         return branchRepository.findBranchNamesByIds(branchIds);
     }
     //branchIds기반 branchName 조회
@@ -41,6 +43,9 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public Long getBranchIdByName(String name) {
         Branch b = branchRepository.findIdByName(name);
+        if(b==null){
+            throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
+        }
         return b.getId();
     }
 
@@ -54,6 +59,9 @@ public class BranchServiceImpl implements BranchService {
         }
 
         //Branch 저장
+        if(branchRepository.existsByName(branch.getName())){
+            throw new CustomException(ErrorCode.INVALID_BRANCH_NAME);
+        }
         Branch savedBranch = branchRepository.save(branch);
 
         UserBranch userBranch = new UserBranch();
