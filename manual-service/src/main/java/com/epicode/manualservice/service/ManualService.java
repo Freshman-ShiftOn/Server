@@ -32,7 +32,7 @@ public class ManualService {
 
     public void validateBranchAccess(String jwtToken,Integer branchId) {
         List<String> branchIdList = getBranchesForUser(jwtToken);
-        //System.out.println(branchIdList);
+        System.out.println(branchIdList);
         if (!branchIdList.contains(String.valueOf(branchId))) {
             throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);//404
         }
