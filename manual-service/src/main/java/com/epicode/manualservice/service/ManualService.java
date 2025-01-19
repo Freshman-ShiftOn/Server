@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 @Service
 @Transactional
@@ -31,13 +32,20 @@ public class ManualService {
 
 
     public void validateBranchAccess(String jwtToken,Integer branchId) {
-        List<String> branchIdList = getBranchesForUser(jwtToken);
-        System.out.println(branchIdList);
-        if (!branchIdList.contains(String.valueOf(branchId))) {
-            throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);//404
+        List<Map<String, Object>> branchList = getBranchesForUser(jwtToken);
+        // branchId가 존재하는지 확인
+        boolean branchExists = branchList.stream()
+                .anyMatch(branch -> branch.get("id") != null && branch.get("id").equals(branchId));
+
+        if (!branchExists) {
+            throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);  // 404
         }
+//        List<String> branchIdList = getBranchesForUser(jwtToken);
+//        if (!branchIdList.contains(String.valueOf(branchId))) {
+//            throw new CustomException(ErrorCode.USER_BRANCH_NOT_EXISTS);//404
+//        }
     }
-    public List<String> getBranchesForUser(String jwtToken) {
+    public List<Map<String, Object>> getBranchesForUser(String jwtToken) {
         return branchClient.getBranchList(jwtToken);
     }
 
