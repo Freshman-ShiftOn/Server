@@ -32,7 +32,7 @@ public class Schedule {
     private Integer branchId;
 
     @Column(name = "work_type", length = 10, nullable = false)
-    private String workType;
+    private List<String> workType;
 
     @Column(name = "start_time", nullable = false)
     private Date startTime;

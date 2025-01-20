@@ -14,7 +14,7 @@ public class RepeatScheduleRequest {
     private LocalTime startTime;
     private LocalTime endTime;
     private Repeat repeat;
-    private String workType;
+    private List<String> workType;
 
     @Data
     public static class Repeat {

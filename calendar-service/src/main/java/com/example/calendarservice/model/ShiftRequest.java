@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Time;
 import java.util.Date;
+import java.util.List;
 
 @Builder
 @Entity
@@ -37,7 +38,7 @@ public class ShiftRequest {
     private Time reqEndTime;
 
     @Column(name = "work_type", length = 10, nullable = false)
-    private String workType;
+    private List<String> workType;
 
     @Column(name = "worker_id", nullable = false)
     private String workerId;
