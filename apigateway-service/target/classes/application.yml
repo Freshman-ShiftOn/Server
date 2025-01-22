@@ -23,6 +23,12 @@ spring:
     name: apigateway-service
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"       # 모든 도메인 허용
+            allowedMethods: "*"       # 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
+            allowedHeaders: "*"       # 모든 헤더 허용
       default-filters:
         - name: GlobalFilter
           args:

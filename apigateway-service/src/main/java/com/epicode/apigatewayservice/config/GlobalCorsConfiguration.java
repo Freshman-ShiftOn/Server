@@ -15,7 +15,7 @@ public class GlobalCorsConfiguration {
         corsConfig.addAllowedOrigin("*"); // 필요한 경우 특정 도메인으로 제한
         corsConfig.addAllowedMethod("*"); // GET, POST, PUT, DELETE 등
         corsConfig.addAllowedHeader("*"); // 모든 헤더 허용
-        corsConfig.setAllowCredentials(true);
+        //corsConfig.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
