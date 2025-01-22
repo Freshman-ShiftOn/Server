@@ -26,7 +26,7 @@ public class AuthController {
 //    private final JwtUtil jwtUtil;
 
     @GetMapping("/kakao/login")
-    public ResponseEntity<Void> redirectToKakao(HttpServletResponse response) {
+    public ResponseEntity<String> redirectToKakao(HttpServletResponse response) {
         try {
             // 환경 변수에서 clientId와 redirectUri 가져오기
             String clientId = env.getProperty("spring.security.oauth2.client.registration.kakao.client-id");
@@ -42,8 +42,8 @@ public class AuthController {
                     clientId, redirectUri);
 
             // 클라이언트 브라우저를 카카오 인증 페이지로 리다이렉트
-            response.sendRedirect(kakaoAuthUrl);
-            return ResponseEntity.status(HttpStatus.FOUND).build();
+            //response.sendRedirect(kakaoAuthUrl);
+            return ResponseEntity.status(HttpStatus.OK).body(kakaoAuthUrl);//HttpStatus.FOUND
 
         } catch (Exception e) {
             log.error("카카오 리다이렉트 URL 생성 오류: {}", e.getMessage());
