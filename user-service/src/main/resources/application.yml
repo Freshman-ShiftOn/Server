@@ -58,6 +58,7 @@ spring:
       leak-detection-threshold: 60000
 jwt:
   secret-key: ${JWT_KEY}
+  expiration_time: 86400000
 eureka:
   client:
     register-with-eureka: true

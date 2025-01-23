@@ -15,11 +15,12 @@ import java.util.List;
 @Component
 public class JwtUtil {
     private final Key SECRET_KEY;
-    private static final long EXPIRATION_TIME = 86400000; // 24 hours //180000; // 3분
+    private final long EXPIRATION_TIME; // 24 hours //180000; // 3분
 
-    public JwtUtil(@Value("${jwt.secret-key}") String secretKey) {
+    public JwtUtil(@Value("${jwt.secret-key}") String secretKey, @Value("${jwt.expiration_time}") long expiration_time) {
         byte[] decodedKey = Base64.getDecoder().decode(secretKey);
         this.SECRET_KEY = Keys.hmacShaKeyFor(decodedKey);
+        this.EXPIRATION_TIME = expiration_time;
     }
 
     public String generateToken(String email, List<Long> branchIds, Long userId) {
