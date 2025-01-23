@@ -94,43 +94,43 @@ services:
       - discovery-service
       - apigateway-service
       
-  user-service-2:
-    image: user-service
-    ports:
-      - "23004:13004"
-    environment:
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_URL: ${DB_URL}
-      EUREKA_SERVER: ${EUREKA_SERVER}
-      KAKAO_RESTAPI: ${KAKAO_RESTAPI}
-      BASE_URL: ${BASE_URL}
-      JWT_KEY: ${JWT_KEY}
+  # user-service-2:
+  #   image: user-service
+  #   ports:
+  #     - "23004:13004"
+  #   environment:
+  #     DB_USERNAME: ${DB_USERNAME}
+  #     DB_PASSWORD: ${DB_PASSWORD}
+  #     DB_URL: ${DB_URL}
+  #     EUREKA_SERVER: ${EUREKA_SERVER}
+  #     KAKAO_RESTAPI: ${KAKAO_RESTAPI}
+  #     BASE_URL: ${BASE_URL}
+  #     JWT_KEY: ${JWT_KEY}
       
-    networks:
-      - app-network
-    depends_on:
-      - discovery-service
-      - apigateway-service
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - discovery-service
+  #     - apigateway-service
       
-  user-service-3:
-    image: user-service
-    ports:
-      - "24004:13004"
-    environment:
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_URL: ${DB_URL}
-      EUREKA_SERVER: ${EUREKA_SERVER}
-      KAKAO_RESTAPI: ${KAKAO_RESTAPI}
-      BASE_URL: ${BASE_URL}
-      JWT_KEY: ${JWT_KEY}
+  # user-service-3:
+  #   image: user-service
+  #   ports:
+  #     - "24004:13004"
+  #   environment:
+  #     DB_USERNAME: ${DB_USERNAME}
+  #     DB_PASSWORD: ${DB_PASSWORD}
+  #     DB_URL: ${DB_URL}
+  #     EUREKA_SERVER: ${EUREKA_SERVER}
+  #     KAKAO_RESTAPI: ${KAKAO_RESTAPI}
+  #     BASE_URL: ${BASE_URL}
+  #     JWT_KEY: ${JWT_KEY}
       
-    networks:
-      - app-network
-    depends_on:
-      - discovery-service
-      - apigateway-service
+  #   networks:
+  #     - app-network
+  #   depends_on:
+  #     - discovery-service
+  #     - apigateway-service
 
 
 
