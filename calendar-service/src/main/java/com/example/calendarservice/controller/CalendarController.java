@@ -78,10 +78,9 @@ public class CalendarController {
     }
 
     // 내 스케줄 수정
-    @PutMapping("/{branchId}/{scheduleId}")
+    @PutMapping("/{scheduleId}")
     @Operation(summary = "내 스케줄 수정", description = "현재 사용자의 특정 스케줄을 수정한다.")
     public ResponseEntity<Schedule> updateSchedule(
-            @PathVariable Integer branchId,
             @RequestHeader("X-Authenticated-User-Id") String userIdHeader,
             @PathVariable Integer scheduleId,
             @RequestBody Schedule schedule) {
@@ -99,12 +98,7 @@ public class CalendarController {
             throw new IllegalArgumentException("Unauthorized: The schedule does not belong to the authenticated user.");
         }
 
-        if (!scheduleService.isScheduleInBranch(scheduleId, branchId)) {
-            throw new IllegalArgumentException("Invalid branch ID: The schedule does not belong to this branch.");
-        }
-
         // 3. 수정 로직
-        schedule.setBranchId(branchId);
         schedule.setWorkerId(userId);
         Schedule updatedSchedule = scheduleService.updateSchedule(scheduleId, schedule);
 
