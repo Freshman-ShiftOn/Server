@@ -1,10 +1,13 @@
 package com.epicode.service;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
+import com.epicode.security.KakaoKeyProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.RSAKeyProvider;
+import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +33,38 @@ public class KakaoService {
     private final UserRepository userRepository;
     private final UserBranchRepository userBranchRepository;
     private final JwtUtil jwtUtil;
+
+//    public void redirectToKakao(HttpServletResponse response) {
+//        try {
+//            String clientId = env.getProperty("spring.security.oauth2.client.registration.kakao.client-id");
+//            String redirectUri = env.getProperty("spring.security.oauth2.client.registration.kakao.redirect-uri");
+//
+//            if (clientId == null || redirectUri == null) {
+//                throw new IllegalStateException("카카오 로그인에 필요한 환경 변수가 설정되지 않았습니다.");
+//            }
+//
+//            String kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize"
+//                    + "?client_id=" + clientId
+//                    + "&redirect_uri=" + redirectUri
+//                    + "&response_type=code";
+//
+//            response.sendRedirect(kakaoLoginUrl);
+//        } catch (Exception e) {
+//            throw new RuntimeException("카카오 리다이렉트 처리 중 오류: " + e.getMessage(), e);
+//        }
+//    }
+
+
+    public void saveUser(String email) {//,String name
+        User user = new User();
+        user.setEmail(email);
+        user.setName("김크루");
+        //System.out.println(user);
+        if(userRepository.existsByEmail(email)){
+            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
+        }
+        userRepository.save(user);
+    }
 
     public String authenticateWithKakao(String code) {
         try {
@@ -50,36 +88,6 @@ public class KakaoService {
             return jwtUtil.generateToken(userEmail, branches, userId); // JWT 토큰 생성
         } catch (Exception e) {
             throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함: " + e.getMessage(), e);
-        }
-    }
-
-     public void saveUser(String email) {//,String name
-         User user = new User();
-         user.setEmail(email);
-         user.setName("김크루");
-         //System.out.println(user);
-         if(userRepository.existsByEmail(email)){
-             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
-         }
-         userRepository.save(user);
-    }
-    public void redirectToKakao(HttpServletResponse response) {
-        try {
-            String clientId = env.getProperty("spring.security.oauth2.client.registration.kakao.client-id");
-            String redirectUri = env.getProperty("spring.security.oauth2.client.registration.kakao.redirect-uri");
-
-            if (clientId == null || redirectUri == null) {
-                throw new IllegalStateException("카카오 로그인에 필요한 환경 변수가 설정되지 않았습니다.");
-            }
-
-            String kakaoLoginUrl = "https://kauth.kakao.com/oauth/authorize"
-                    + "?client_id=" + clientId
-                    + "&redirect_uri=" + redirectUri
-                    + "&response_type=code";
-
-            response.sendRedirect(kakaoLoginUrl);
-        } catch (Exception e) {
-            throw new RuntimeException("카카오 리다이렉트 처리 중 오류: " + e.getMessage(), e);
         }
     }
 

@@ -1,7 +1,9 @@
 package com.epicode.controller;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.epicode.domain.User;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
+import com.epicode.service.KakaoJWTService;
 import com.epicode.service.KakaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,8 +24,20 @@ import java.util.Map;
 public class AuthController {
     private final Environment env;
     private final KakaoService kakaoService;
-//    private final UserRepository userRepository;
-//    private final JwtUtil jwtUtil;
+    private final KakaoJWTService kakaoJWTService;
+    private final JwtUtil jwtUtil;
+
+    @PostMapping("/kakao")
+    public String kakaoLogin(@RequestBody String idToken) {
+        // 1. ID 토큰 검증 및 디코딩
+        DecodedJWT decodedJWT = kakaoJWTService.authenticateRealKakao(idToken);
+
+        // 2. 사용자 정보 저장
+        User user = kakaoJWTService.saveUser(decodedJWT);
+
+        // 3. 자체 JWT 발급
+        return jwtUtil.createJwtToken(user);
+    }
 
     @GetMapping("/kakao/login")
     public ResponseEntity<String> redirectToKakao(HttpServletResponse response) {
