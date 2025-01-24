@@ -24,11 +24,12 @@ public class JwtUtil {
         this.EXPIRATION_TIME = expiration_time;
     }
 
-    public String createJwtToken(User user) {
+    public String createJwtToken(User user,List<Long> branchIds) {
         return Jwts.builder()
                 .setSubject(user.getEmail()) // 이메일을 주체로 설정
                 .claim("userId", user.getId()) // 사용자 고유 ID
                 .claim("nickname", user.getName()) // 닉네임
+                .claim("branchIds", branchIds)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)

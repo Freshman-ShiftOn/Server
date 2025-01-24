@@ -72,9 +72,9 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                 ServerHttpRequest modifiedRequest = request.mutate()
                         .header("X-Authenticated-User-Id", String.valueOf(userId))
                         .header("X-Authenticated-User", email)
-                        .header("X-Branch-Ids", branchIdsList.stream()
-                                .map(String::valueOf) // Integer를 String으로 변환
-                                .collect(Collectors.joining(","))) // 쉼표로 구분된 String 생성
+//                        .header("X-Branch-Ids", branchIdsList.stream()
+//                                .map(String::valueOf) // Integer를 String으로 변환
+//                                .collect(Collectors.joining(","))) // 쉼표로 구분된 String 생성
                         .build();
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());
             } catch (ExpiredJwtException e) {

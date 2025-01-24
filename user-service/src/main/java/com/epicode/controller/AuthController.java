@@ -1,20 +1,13 @@
 package com.epicode.controller;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.epicode.domain.User;
-import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
-import com.epicode.service.KakaoJWTService;
 import com.epicode.service.KakaoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,32 +17,9 @@ import java.util.Map;
 public class AuthController {
     private final Environment env;
     private final KakaoService kakaoService;
-    private final KakaoJWTService kakaoJWTService;
-    private final JwtUtil jwtUtil;
-
-    @PostMapping("/kakao")
-    public String kakaoLogin(@RequestBody String idToken) {
-        log.debug("Received ID Token: {}", idToken);
-
-        // 1. ID 토큰 검증 및 디코딩
-        DecodedJWT decodedJWT = kakaoJWTService.authenticateRealKakao(idToken);
-        log.debug("Decoded JWT: subject={}, email={}, nickname={}",
-                decodedJWT.getSubject(),
-                decodedJWT.getClaim("email").asString(),
-                decodedJWT.getClaim("nickname").asString());
-
-        // 2. 사용자 정보 저장
-        User user = kakaoJWTService.saveUser(decodedJWT);
-
-        // 3. 자체 JWT 발급
-        String jwt = jwtUtil.createJwtToken(user);
-        log.info("Generated JWT for user {}: {}", user.getId(), jwt);
-
-        return jwt;
-    }
 
     @GetMapping("/kakao/login")
-    public ResponseEntity<String> redirectToKakao(HttpServletResponse response) {
+    public ResponseEntity<String> redirectToKakao() {//HttpServletResponse response
         try {
             // 환경 변수에서 clientId와 redirectUri 가져오기
             String clientId = env.getProperty("spring.security.oauth2.client.registration.kakao.client-id");
@@ -74,13 +44,11 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/kakao/callback")
-    public ResponseEntity<String> handleKakaoCallback(@RequestParam String code) {
-        log.info("Received Kakao authorization code: {}", code);
-
+    @PostMapping("/kakao/callback")
+    public ResponseEntity<String> handleKakaoCallback(@RequestBody String accessToken) {
         try {
             // KakaoService를 통해 JWT 토큰 발급
-            String jwtToken = kakaoService.authenticateWithKakao(code);
+            String jwtToken = kakaoService.authenticateWithKakao(accessToken);
             // JWT 토큰 반환
             return ResponseEntity.ok(jwtToken);
         } catch (IllegalStateException e) {
@@ -94,6 +62,27 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
         }
     }
+
+//    @GetMapping("/kakao/callback")
+//    public ResponseEntity<String> handleKakaoCallback(@RequestParam String code) {
+//        log.info("Received Kakao authorization code: {}", code);
+//
+//        try {
+//            // KakaoService를 통해 JWT 토큰 발급
+//            String jwtToken = kakaoService.authenticateWithKakao(code);
+//            // JWT 토큰 반환
+//            return ResponseEntity.ok(jwtToken);
+//        } catch (IllegalStateException e) {
+//            log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
+//        } catch (RuntimeException e) {
+//            log.error("카카오 콜백 처리 중 오류: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
+//        } catch (Exception e) {
+//            log.error("예상치 못한 오류 발생: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
+//        }
+//    }
 
 //    @GetMapping("/join")
 //    public ResponseEntity<?> joinUser(@RequestHeader("X-Authenticated-User") String email,
