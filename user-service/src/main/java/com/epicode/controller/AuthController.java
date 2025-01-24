@@ -29,14 +29,23 @@ public class AuthController {
 
     @PostMapping("/kakao")
     public String kakaoLogin(@RequestBody String idToken) {
+        log.debug("Received ID Token: {}", idToken);
+
         // 1. ID 토큰 검증 및 디코딩
         DecodedJWT decodedJWT = kakaoJWTService.authenticateRealKakao(idToken);
+        log.debug("Decoded JWT: subject={}, email={}, nickname={}",
+                decodedJWT.getSubject(),
+                decodedJWT.getClaim("email").asString(),
+                decodedJWT.getClaim("nickname").asString());
 
         // 2. 사용자 정보 저장
         User user = kakaoJWTService.saveUser(decodedJWT);
 
         // 3. 자체 JWT 발급
-        return jwtUtil.createJwtToken(user);
+        String jwt = jwtUtil.createJwtToken(user);
+        log.info("Generated JWT for user {}: {}", user.getId(), jwt);
+
+        return jwt;
     }
 
     @GetMapping("/kakao/login")
