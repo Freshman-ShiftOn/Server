@@ -38,7 +38,7 @@ public class ShiftRequest {
     private Time reqEndTime;
 
     @ElementCollection
-    @CollectionTable(name = "schedule_work_types", joinColumns = @JoinColumn(name = "schedule_id"))
+    @CollectionTable(name = "req_shift_work_types", joinColumns = @JoinColumn(name = "schedule_id"))
     @Column(name = "work_type", length = 10, nullable = false)
     private List<String> workType;
 
