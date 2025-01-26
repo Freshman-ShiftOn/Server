@@ -186,11 +186,11 @@ public class BranchController {
             @RequestParam String token
     ) {
         Claims claims = inviteTokenizer.parseInviteToken(token);
-        String inviteeEmail = claims.get("email", String.class);
+        //String inviteeEmail = claims.get("email", String.class);
         //String inviteeEmail = inviteTokenizer.parseInviteToken(token).get("email", String.class);
         //Long branchId = inviteTokenizer.parseInviteToken(token).get("branchId", Long.class);
         Long branchId = Long.valueOf(claims.get("branchId", String.class));//String으로 받아 형 변환(혹시 몰라)
-        inviteService.validateAndJoinBranch(inviteeEmail,branchId,email);//검증&가입
+        inviteService.validateAndJoinBranch(branchId,email);//검증&가입
         return ResponseEntity.ok().build();
     }
 
@@ -199,17 +199,17 @@ public class BranchController {
             description = "초대자 이메일, 초대받는 사람 이메일, 지점 ID를 받아 초대장 토큰을 생성합니다.",
             parameters = {
                     @Parameter(name = "inviterEmail", description = "초대자 이메일", required = true, example = "inviter@example.com"),
-                    @Parameter(name = "inviteeEmail", description = "초대받는 사람 이메일", required = true, example = "invitee@example.com"),
+                    //@Parameter(name = "inviteeEmail", description = "초대받는 사람 이메일", required = true, example = "invitee@example.com"),
                     @Parameter(name = "branchId", description = "초대 지점 ID", required = true, example = "101")
             }
     )
     @GetMapping("/invite/generate")
     public ResponseEntity<String> generateInviteToken(
             @RequestParam String inviterEmail,
-            @RequestParam String inviteeEmail,
+            //@RequestParam String inviteeEmail,
             @RequestParam Long branchId
     ) {
-        String inviteToken = inviteService.generateInviteToken(inviterEmail, inviteeEmail, branchId);
+        String inviteToken = inviteService.generateInviteToken(inviterEmail, branchId);
         return ResponseEntity.ok(inviteToken);
     }
 }
