@@ -139,7 +139,7 @@ services:
 
 networks:
   app-network:
-    driver: host
+    driver: bridge
 
 volumes:
   mysql_data:
