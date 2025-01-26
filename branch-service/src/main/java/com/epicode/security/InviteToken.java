@@ -23,11 +23,10 @@ public class InviteToken {
         this.SECRET_KEY = Keys.hmacShaKeyFor(decodedKey);
     }
     // 초대장용 JWT 생성
-    public String generateInviteToken(String inviterEmail,String inviteEmail, Long branchId) {
+    public String generateInviteToken(String inviterEmail, Long branchId) {
         return Jwts.builder()
                 .setSubject("InviteToken")
                 .claim("inviterEmail", inviterEmail)
-                .claim("email", inviteEmail)
                 .claim("branchId", branchId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + INVITE_EXPIRATION_TIME))

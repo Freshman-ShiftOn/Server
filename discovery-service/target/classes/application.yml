@@ -5,10 +5,10 @@ spring:
     name: discovery-service
 eureka:
   server:
-    eviction-interval-timer-in-ms: 60000  # 기본값은 60초
+    eviction-interval-timer-in-ms: 120000  # 기본값은 60초
   client:
     register-with-eureka: false #자기 자신은 discovery에 등록X
     fetch-registry: false
   instance:
     lease-renewal-interval-in-seconds: 30  # 기본값: 30초
-    lease-expiration-duration-in-seconds: 90  # 기본값: 90초
+    lease-expiration-duration-in-seconds: 180  # 기본값: 90초
