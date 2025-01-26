@@ -9,6 +9,9 @@ services:
       - "18761:18761"
     networks:
       - app-network
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    command: java $JAVA_OPTS -jar discovery-server.jar
 
   apigateway-service:
     image: apigateway-service
