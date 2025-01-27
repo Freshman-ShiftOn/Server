@@ -54,6 +54,7 @@ public class BranchController {
     ) {
         // 사용자의 Branch 정보를 가져오기
         List<BranchIdNameProjection> branchNames = branchService.getBranchesByUserId(Long.valueOf(userId));
+        System.out.println("사용자ID: "+userId+"\n\n");
         return branchNames != null ? branchNames : List.of();
     }
 //    public List<String> getBranchNames(

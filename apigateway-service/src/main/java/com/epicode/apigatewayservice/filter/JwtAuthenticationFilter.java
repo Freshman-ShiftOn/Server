@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                         .getBody();
 
                 String email = claims.getSubject();
-                List<Integer> branchIdsList = claims.get("branchIds", List.class); // List<Integer>로 받음
+                //List<Integer> branchIdsList = claims.get("branchIds", List.class); // List<Integer>로 받음
                 Long userId = claims.get("userId",Long.class);
 
                 if(userId<0 || userId == null){
