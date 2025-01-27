@@ -28,7 +28,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(user.getEmail()) // 이메일을 주체로 설정
                 .claim("userId", user.getId()) // 사용자 고유 ID
-                .claim("nickname", user.getName()) // 닉네임
+                .claim("nickName", user.getName()) // 닉네임
                 .claim("branchIds", branchIds)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
