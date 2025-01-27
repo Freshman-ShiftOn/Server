@@ -63,7 +63,7 @@ public class KakaoService {
 
             //String userEmail = getUserInfoFromKakao(accessToken);
             User kakaoUser = getUserInfoFromKakao(accessToken);
-            System.out.println(kakaoUser);
+            //System.out.println(kakaoUser);
             kakaoUser.setCreatedAt(LocalDateTime.now());
             if (kakaoUser == null) {
                 throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
@@ -164,12 +164,12 @@ public class KakaoService {
                 String nickname = (profile != null) ? (String) profile.get("nickname") : "닉네임 없음";
 
                 // 사용자 고유 ID 추출
-                Long userId = (Long) response.getBody().get("id");
+                //Long userId = (Long) response.getBody().get("id");
 
                 // 유저 객체에 값 설정
                 kakaoUser.setEmail(email != null ? email : "이메일 없음");
                 kakaoUser.setName(nickname);
-                kakaoUser.setId(userId);
+                //kakaoUser.setId(userId);
                 return kakaoUser;
             } else {
                 throw new RuntimeException("Failed to fetch user info from Kakao: " + response.getStatusCode());
