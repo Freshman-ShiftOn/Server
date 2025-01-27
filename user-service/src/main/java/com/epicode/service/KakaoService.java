@@ -56,29 +56,34 @@ public class KakaoService {
         }
         userRepository.save(user);
     }
+    @Transactional
     public String authenticateWithKakao(String accessToken) {
         try {
             if (accessToken == null || accessToken.isEmpty()) {
                 throw new CustomException(ErrorCode.TOKEN_ERROR);
             }
 
-            //String userEmail = getUserInfoFromKakao(accessToken);
+            // 카카오에서 사용자 정보 가져오기 (저장은 하지 않음)
             User kakaoUser = getUserInfoFromKakao(accessToken);
-            //System.out.println(kakaoUser);
             kakaoUser.setCreatedAt(LocalDateTime.now());
+
             if (kakaoUser == null) {
                 throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
             }
 
-            if (!userRepository.existsByEmail(kakaoUser.getEmail())) {
-                saveUser(kakaoUser);
+            // 이메일로 사용자 검색
+            User existingUser = userRepository.findByEmail(kakaoUser.getEmail());
+
+            if (existingUser == null) {
+                // 데이터베이스에 저장하면서 ID 할당
+                existingUser = userRepository.save(kakaoUser); // 여기서 영속화되어 ID가 생성됨
             }
 
-            //Long userId = userRepository.findByEmail(kakaoUser.getEmail()).getId();
-            List<Long> branches = userBranchRepository.findBranchIdsByUserId(kakaoUser.getId());
+            // 사용자 Branch 정보 가져오기
+            List<Long> branches = userBranchRepository.findBranchIdsByUserId(existingUser.getId());
 
-
-            return jwtUtil.createJwtToken(kakaoUser,branches); // JWT 토큰 생성
+            // JWT 토큰 생성
+            return jwtUtil.createJwtToken(existingUser, branches);
         } catch (Exception e) {
             throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함: " + e.getMessage(), e);
         }
@@ -171,8 +176,7 @@ public class KakaoService {
                 kakaoUser.setEmail(email != null ? email : "이메일 없음");
                 kakaoUser.setName(nickname);
                 //kakaoUser.setId(userId);
-                // 영속화 (DB 저장)
-                return userRepository.save(kakaoUser); // userRepository는 JPA Repository
+                return kakaoUser;
             } else {
                 throw new RuntimeException("Failed to fetch user info from Kakao: " + response.getStatusCode());
             }
