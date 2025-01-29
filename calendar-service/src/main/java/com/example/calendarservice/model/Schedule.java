@@ -1,5 +1,6 @@
 package com.example.calendarservice.model;
 
+import com.example.calendarservice.util.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,9 +32,8 @@ public class Schedule {
     @Column(name = "branch_id", nullable = false)
     private Integer branchId;
 
-    @ElementCollection
-    @CollectionTable(name = "schedule_work_types", joinColumns = @JoinColumn(name = "schedule_id"))
-    @Column(name = "work_type", length = 10, nullable = false)
+    @Convert(converter = StringListConverter.class) // 리스트를 JSON으로 변환
+    @Column(name = "work_type", columnDefinition = "TEXT")
     private List<String> workType;
 
     @Column(name = "start_time", nullable = false)
