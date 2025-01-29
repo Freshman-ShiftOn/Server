@@ -1,6 +1,6 @@
 package com.example.calendarservice.model;
 
-import com.example.calendarservice.service.StringListConverter;
+import com.example.calendarservice.util.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
