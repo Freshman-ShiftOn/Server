@@ -27,10 +27,8 @@ public class ShiftRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private Schedule schedule;
+    @Column(name = "schedule_id", nullable = false)
+    private Integer scheduleId;
 
     @Column(name = "req_start_time", nullable = false)
     private Time reqStartTime;
@@ -43,13 +41,13 @@ public class ShiftRequest {
     private List<String> workType;
 
     @Column(name = "worker_id", nullable = false)
-    private String workerId;
+    private Integer workerId;
 
     @Column(name = "branch_id", nullable = false)
     private Integer branchId;
 
     @Column(name = "accept_id")
-    private String acceptId;
+    private Integer acceptId;
 
     @Column(name = "req_status", length = 10, nullable = false)
     private String reqStatus;

@@ -45,9 +45,4 @@ public class Schedule {
     @LastModifiedDate // 자동 업데이트
     @Column(name = "last_updated", nullable = false)
     private Date lastUpdated;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<ShiftRequest> shiftRequests = new ArrayList<>();
-
 }

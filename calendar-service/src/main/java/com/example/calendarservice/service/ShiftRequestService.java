@@ -9,10 +9,10 @@ public interface ShiftRequestService {
     ShiftRequest updateShiftRequest(Integer shiftRequestId, ShiftRequest shiftRequest);
     void deleteShiftRequest(Integer shiftRequestId);
 
-    boolean isUserShiftRequest(Integer reqShiftId, String workerId);
+    boolean isUserShiftRequest(Integer reqShiftId, Integer workerId);
 
-    ShiftRequest acceptShiftRequest(Integer shiftRequestId, String acceptId);
+    ShiftRequest acceptShiftRequest(Integer shiftRequestId, Integer acceptId);
 
-    List<ShiftRequest> getShiftRequestsByUser(String workerId);
-    List<ShiftRequest> getAcceptedShiftRequestsByUser(String workerId);
+    List<ShiftRequest> getShiftRequestsByUser(Integer workerId);
+    List<ShiftRequest> getAcceptedShiftRequestsByUser(Integer workerId);
 }
