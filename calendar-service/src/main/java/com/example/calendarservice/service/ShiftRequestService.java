@@ -11,7 +11,7 @@ public interface ShiftRequestService {
 
     boolean isUserShiftRequest(Integer reqShiftId, Integer workerId);
 
-    ShiftRequest acceptShiftRequest(Integer shiftRequestId, String acceptId);
+    ShiftRequest acceptShiftRequest(Integer shiftRequestId, Integer acceptId);
 
     List<ShiftRequest> getShiftRequestsByUser(Integer workerId);
     List<ShiftRequest> getAcceptedShiftRequestsByUser(Integer workerId);

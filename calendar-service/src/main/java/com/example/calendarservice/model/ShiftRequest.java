@@ -49,7 +49,7 @@ public class ShiftRequest {
     private Integer branchId;
 
     @Column(name = "accept_id")
-    private String acceptId;
+    private Integer acceptId;
 
     @Column(name = "req_status", length = 10, nullable = false)
     private String reqStatus;

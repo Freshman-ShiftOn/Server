@@ -57,7 +57,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public ShiftRequest acceptShiftRequest(Integer shiftRequestId, String acceptId) {
+    public ShiftRequest acceptShiftRequest(Integer shiftRequestId, Integer acceptId) {
         // 대타 요청 확인
         ShiftRequest existingShiftRequest = shiftRequestRepository.findById(shiftRequestId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId));
@@ -106,7 +106,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
         }
 
         // 3. 대타 요청 시간에 해당하는 스케줄 생성 (수락자)
-        schedule.setWorkerId(Integer.parseInt(acceptId)); // 대타를 수락한 유저로 변경
+        schedule.setWorkerId(acceptId); // 대타를 수락한 유저로 변경
         schedule.setStartTime(reqStartTime);
         schedule.setEndTime(reqEndTime);
         schedule.setWorkType(existingShiftRequest.getWorkType());
