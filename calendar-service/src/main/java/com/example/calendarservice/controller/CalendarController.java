@@ -134,7 +134,7 @@ public class CalendarController {
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody ShiftRequest shiftRequest) {
         shiftRequest.setBranchId(branchId);
-        shiftRequest.setWorkerId(userId);
+        shiftRequest.setWorkerId(Integer.valueOf(userId));
         ShiftRequest newRequest = shiftRequestService.createShiftRequest(shiftRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(newRequest);
     }
@@ -156,7 +156,7 @@ public class CalendarController {
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Integer reqShiftId) throws IllegalAccessException {
         // 검증: 요청한 유저가 해당 대타 요청의 작성자인지 확인
-        if (!shiftRequestService.isUserShiftRequest(reqShiftId, userId)) {
+        if (!shiftRequestService.isUserShiftRequest(reqShiftId, Integer.valueOf(userId))) {
             throw new IllegalAccessException("Unauthorized: This shift request does not belong to the authenticated user.");
         }
         shiftRequestService.deleteShiftRequest(reqShiftId);
@@ -169,7 +169,7 @@ public class CalendarController {
     public ResponseEntity<List<ShiftRequest>> getShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         // 해당 유저의 대타 요청 내역 조회
-        List<ShiftRequest> shiftRequests = shiftRequestService.getShiftRequestsByUser(userId);
+        List<ShiftRequest> shiftRequests = shiftRequestService.getShiftRequestsByUser(Integer.valueOf(userId));
         return ResponseEntity.ok(shiftRequests);
     }
 
@@ -179,7 +179,7 @@ public class CalendarController {
     public ResponseEntity<List<ShiftRequest>> getAcceptedShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         // 해당 유저의 대타 수락 내역 조회
-        List<ShiftRequest> acceptedShiftRequests = shiftRequestService.getAcceptedShiftRequestsByUser(userId);
+        List<ShiftRequest> acceptedShiftRequests = shiftRequestService.getAcceptedShiftRequestsByUser(Integer.valueOf(userId));
         return ResponseEntity.ok(acceptedShiftRequests);
     }
 }

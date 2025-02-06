@@ -43,7 +43,7 @@ public class ShiftRequest {
     private List<String> workType;
 
     @Column(name = "worker_id", nullable = false)
-    private String workerId;
+    private Integer workerId;
 
     @Column(name = "branch_id", nullable = false)
     private Integer branchId;

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Integer> {
-    boolean existsByIdAndWorkerId(Integer id, String workerId);
-    List<ShiftRequest> findByWorkerId(String workerId);
-    List<ShiftRequest> findByAcceptId(String workerId);
+    boolean existsByIdAndWorkerId(Integer id, Integer workerId);
+    List<ShiftRequest> findByWorkerId(Integer workerId);
+    List<ShiftRequest> findByAcceptId(Integer workerId);
 }

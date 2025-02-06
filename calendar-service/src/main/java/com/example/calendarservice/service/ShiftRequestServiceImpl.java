@@ -52,7 +52,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public boolean isUserShiftRequest(Integer reqShiftId, String workerId) {
+    public boolean isUserShiftRequest(Integer reqShiftId, Integer workerId) {
         return shiftRequestRepository.existsByIdAndWorkerId(reqShiftId, workerId);
     }
 
@@ -123,12 +123,12 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public List<ShiftRequest> getShiftRequestsByUser(String workerID){
+    public List<ShiftRequest> getShiftRequestsByUser(Integer workerID){
         return shiftRequestRepository.findByWorkerId(workerID);
     }
 
     @Override
-    public List<ShiftRequest> getAcceptedShiftRequestsByUser(String userId) {
+    public List<ShiftRequest> getAcceptedShiftRequestsByUser(Integer userId) {
         return shiftRequestRepository.findByAcceptId(userId);
     }
 }
