@@ -22,7 +22,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     @Override
     public ShiftRequest createShiftRequest(ShiftRequest shiftRequest) {
         // Validate that the schedule exists
-        if (!scheduleRepository.existsById(shiftRequest.getSchedule().getId())) {
+        if (!scheduleRepository.existsById(shiftRequest.getScheduleId())) {
             throw new ResourceNotFoundException("Schedule not found with id " + shiftRequest.getSchedule().getId());
         }
         return shiftRequestRepository.save(shiftRequest);
@@ -63,7 +63,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
                 .orElseThrow(() -> new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId));
 
         // 스케줄 가져오기
-        Schedule schedule = existingShiftRequest.getSchedule();
+        Schedule schedule = getScheduleFromShiftRequest(shiftRequestId);
         if (schedule == null) {
             throw new ResourceNotFoundException("Schedule not associated with ShiftRequest id " + shiftRequestId);
         }
@@ -130,5 +130,13 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     @Override
     public List<ShiftRequest> getAcceptedShiftRequestsByUser(Integer userId) {
         return shiftRequestRepository.findByAcceptId(userId);
+    }
+
+    private Schedule getScheduleFromShiftRequest(Integer shiftRequestId) {
+        ShiftRequest shiftRequest = shiftRequestRepository.findById(shiftRequestId)
+                .orElseThrow(() -> new RuntimeException("ShiftRequest not found"));
+
+        return scheduleRepository.findById(shiftRequest.getScheduleId())
+                .orElse(null); // ✅ scheduleId를 기반으로 Schedule 조회
     }
 }
