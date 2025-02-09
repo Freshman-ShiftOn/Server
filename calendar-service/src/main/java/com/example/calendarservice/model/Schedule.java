@@ -36,6 +36,9 @@ public class Schedule {
     @Column(name = "work_type", columnDefinition = "TEXT")
     private List<String> workType;
 
+    @Column(name = "input_type", nullable = false)
+    private Integer inputType;
+
     @Column(name = "start_time", nullable = false)
     private Date startTime;
 

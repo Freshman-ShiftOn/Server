@@ -56,6 +56,7 @@ public class CalendarController {
             @RequestBody Schedule schedule) {
         schedule.setBranchId(branchId);
         schedule.setWorkerId(Integer.valueOf(userId));
+        schedule.setInputType(1);
         Schedule newSchedule = scheduleService.createSchedule(schedule);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
     }

@@ -79,13 +79,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         switch (repeatRequest.getRepeat().getType()) {
             case "DAILY":
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-                    schedules.add(createSchedule(repeatRequest, date, startTime, endTime));
+                    schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime));
                 }
                 break;
 
             case "WEEKLY":
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusWeeks(1)) {
-                    schedules.add(createSchedule(repeatRequest, date, startTime, endTime));
+                    schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime));
                 }
                 break;
 
@@ -93,7 +93,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 List<DayOfWeek> daysOfWeek = repeatRequest.getRepeat().getDaysOfWeek();
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                     if (daysOfWeek.contains(date.getDayOfWeek())) {
-                        schedules.add(createSchedule(repeatRequest, date, startTime, endTime));
+                        schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime));
                     }
                 }
                 break;
@@ -106,11 +106,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.saveAll(schedules);
     }
 
-    private Schedule createSchedule(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    private Schedule createScheduleFromRepeatRequest(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return Schedule.builder()
                 .branchId(request.getBranchId())
                 .workerId(request.getUserId())
                 .workType(request.getWorkType())
+                .inputType(2)
                 .startTime(convertToDate(date.atTime(startTime)))
                 .endTime(convertToDate(date.atTime(endTime)))
                 .lastUpdated(new Date())
