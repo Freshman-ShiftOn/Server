@@ -40,9 +40,6 @@ public class ShiftRequest {
     @Column(name = "work_type", columnDefinition = "TEXT")
     private List<String> workType;
 
-    @Column(name = "input_type", nullable = false)
-    private Integer inputType;
-
     @Column(name = "worker_id", nullable = false)
     private Integer workerId;
 
