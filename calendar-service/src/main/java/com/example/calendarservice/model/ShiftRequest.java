@@ -25,10 +25,20 @@ public class ShiftRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
+    @Column(name = "worker_id", nullable = false)
+    private Long workerId;
+
+    @Column(name = "branch_id", nullable = false)
+    private Long branchId;
 
     @Column(name = "schedule_id", nullable = false)
-    private Integer scheduleId;
+    private Long scheduleId;
+
+    @Convert(converter = StringListConverter.class) // 리스트를 JSON으로 변환
+    @Column(name = "work_type", columnDefinition = "TEXT")
+    private List<String> workType;
 
     @Column(name = "req_start_time", nullable = false)
     private Time reqStartTime;
@@ -36,18 +46,8 @@ public class ShiftRequest {
     @Column(name = "req_end_time", nullable = false)
     private Time reqEndTime;
 
-    @Convert(converter = StringListConverter.class) // 리스트를 JSON으로 변환
-    @Column(name = "work_type", columnDefinition = "TEXT")
-    private List<String> workType;
-
-    @Column(name = "worker_id", nullable = false)
-    private Integer workerId;
-
-    @Column(name = "branch_id", nullable = false)
-    private Integer branchId;
-
     @Column(name = "accept_id")
-    private Integer acceptId;
+    private Long acceptId;
 
     @Column(name = "req_status", length = 10, nullable = false)
     private String reqStatus;

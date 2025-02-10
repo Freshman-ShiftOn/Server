@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface ShiftRequestService {
     ShiftRequest createShiftRequest(ShiftRequest shiftRequest);
-    ShiftRequest updateShiftRequest(Integer shiftRequestId, ShiftRequest shiftRequest);
-    void deleteShiftRequest(Integer shiftRequestId);
+    ShiftRequest updateShiftRequest(Long shiftRequestId, ShiftRequest shiftRequest);
+    void deleteShiftRequest(Long shiftRequestId);
 
-    boolean isUserShiftRequest(Integer reqShiftId, Integer workerId);
+    boolean isUserShiftRequest(Long reqShiftId, Long workerId);
 
-    ShiftRequest acceptShiftRequest(Integer shiftRequestId, Integer acceptId);
+    ShiftRequest acceptShiftRequest(Long shiftRequestId, Long acceptId);
 
-    List<ShiftRequest> getShiftRequestsByUser(Integer workerId);
-    List<ShiftRequest> getAcceptedShiftRequestsByUser(Integer workerId);
+    List<ShiftRequest> getShiftRequestsByUser(Long workerId);
+    List<ShiftRequest> getAcceptedShiftRequestsByUser(Long workerId);
 }

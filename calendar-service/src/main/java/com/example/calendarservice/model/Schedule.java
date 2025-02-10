@@ -24,13 +24,13 @@ import java.util.List;
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "worker_id", nullable = false)
-    private Integer workerId;
+    private Long workerId;
 
     @Column(name = "branch_id", nullable = false)
-    private Integer branchId;
+    private Long branchId;
 
     @Convert(converter = StringListConverter.class) // 리스트를 JSON으로 변환
     @Column(name = "work_type", columnDefinition = "TEXT")

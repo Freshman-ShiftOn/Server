@@ -30,7 +30,7 @@ public class CalendarController {
     @GetMapping("/{branchId}/{month}")
     @Operation(summary = "지점 스케줄 목록 조회 (월단위)", description = "해당 매장의 지점 스케줄을 월 단위로 조회한다.")
     public ResponseEntity<List<Schedule>> getSchedulesByBranchId(
-            @PathVariable Integer branchId,
+            @PathVariable Long branchId,
             @PathVariable Integer month) {
         List<Schedule> schedules = scheduleService.getSchedulesByBranchId(branchId, month);
         return ResponseEntity.ok(schedules);
@@ -40,10 +40,10 @@ public class CalendarController {
     @GetMapping("/{branchId}/{month}/user")
     @Operation(summary = "지점 스케줄 유저 별 조회 (월 단위)", description = "해당 매장의 특정 유저 스케줄을 월 단위로 조회한다.")
     public ResponseEntity<List<Schedule>> getSchedulesByBranchIdAndUserId(
-            @PathVariable Integer branchId,
+            @PathVariable Long branchId,
             @PathVariable Integer month,
             @RequestHeader("X-Authenticated-User-Id") String userId) {
-        List<Schedule> schedules = scheduleService.getSchedulesByBranchIdAndUserId(branchId, month, Integer.valueOf(userId));
+        List<Schedule> schedules = scheduleService.getSchedulesByBranchIdAndUserId(branchId, month, Long.valueOf(userId));
         return ResponseEntity.ok(schedules);
     }
 
@@ -51,12 +51,11 @@ public class CalendarController {
     @PostMapping("/{branchId}")
     @Operation(summary = "내 스케줄 등록", description = "현재 사용자의 스케줄을 등록한다.")
     public ResponseEntity<Schedule> registerSchedule(
-            @PathVariable Integer branchId,
+            @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody Schedule schedule) {
         schedule.setBranchId(branchId);
-        schedule.setWorkerId(Integer.valueOf(userId));
-        schedule.setInputType(1);
+        schedule.setWorkerId(Long.valueOf(userId));
         Schedule newSchedule = scheduleService.createSchedule(schedule);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
     }
@@ -65,13 +64,13 @@ public class CalendarController {
     @PostMapping("/{branchId}/bulk")
     @Operation(summary = "반복 스케줄 등록", description = "현재 사용자의 반복 스케줄을 등록한다.")
     public ResponseEntity<List<Schedule>> registerSchedules(
-            @PathVariable Integer branchId,
+            @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody RepeatScheduleRequest repeatScheduleRequest) {
 
         // 요청 데이터에서 branchId와 userId 설정
         repeatScheduleRequest.setBranchId(branchId);
-        repeatScheduleRequest.setUserId(Integer.valueOf(userId));
+        repeatScheduleRequest.setUserId(Long.valueOf(userId));
 
         // 반복 스케줄 생성
         List<Schedule> schedules = scheduleService.createRepeatSchedules(repeatScheduleRequest);
@@ -82,25 +81,16 @@ public class CalendarController {
     @PutMapping("/{scheduleId}")
     @Operation(summary = "내 스케줄 수정", description = "현재 사용자의 특정 스케줄을 수정한다.")
     public ResponseEntity<Schedule> updateSchedule(
-            @RequestHeader("X-Authenticated-User-Id") String userIdHeader,
-            @PathVariable Integer scheduleId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @PathVariable Long scheduleId,
             @RequestBody Schedule schedule) {
 
-        // 1. 유저 ID 파싱
-        int userId;
-        try {
-            userId = Integer.parseInt(userIdHeader);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid user ID format in header.");
-        }
-
-        // 2. 스케줄 소유권 및 브랜치 일치 확인
-        if (!scheduleService.isUserSchedule(scheduleId, userId)) {
+        // 해당 스케줄이 현재 유저의 스케줄인지 검증
+        if (!scheduleService.isUserSchedule(scheduleId, Long.valueOf(userId))) {
             throw new IllegalArgumentException("Unauthorized: The schedule does not belong to the authenticated user.");
         }
 
-        // 3. 수정 로직
-        schedule.setWorkerId(userId);
+        schedule.setWorkerId(Long.valueOf(userId));
         Schedule updatedSchedule = scheduleService.updateSchedule(scheduleId, schedule);
 
         return ResponseEntity.ok(updatedSchedule);
@@ -110,19 +100,14 @@ public class CalendarController {
     @DeleteMapping("/{scheduleId}")
     @Operation(summary = "스케줄 삭제", description = "특정 스케줄을 삭제한다.")
     public ResponseEntity<Void> deleteSchedule(
-            @RequestHeader("X-Authenticated-User-Id") String userIdHeader,
-            @PathVariable Integer scheduleId) throws IllegalAccessException {
-        int userId;
-        try {
-            userId = Integer.parseInt(userIdHeader);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid user ID format in header.");
-        }
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @PathVariable Long scheduleId) throws IllegalAccessException {
 
         // 해당 스케줄이 현재 유저의 스케줄인지 검증
-        if (!scheduleService.isUserSchedule(scheduleId, userId)) {
+        if (!scheduleService.isUserSchedule(scheduleId, Long.valueOf(userId))) {
             throw new IllegalAccessException("Unauthorized: The schedule does not belong to the authenticated user.");
         }
+
         scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.noContent().build();
     }
@@ -131,11 +116,12 @@ public class CalendarController {
     @PostMapping("/{branchId}/request-shift")
     @Operation(summary = "대타 요청", description = "대타를 요청한다.")
     public ResponseEntity<ShiftRequest> requestShift(
-            @PathVariable Integer branchId,
+            @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody ShiftRequest shiftRequest) {
+
         shiftRequest.setBranchId(branchId);
-        shiftRequest.setWorkerId(Integer.valueOf(userId));
+        shiftRequest.setWorkerId(Long.valueOf(userId));
         ShiftRequest newRequest = shiftRequestService.createShiftRequest(shiftRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(newRequest);
     }
@@ -145,8 +131,8 @@ public class CalendarController {
     @Operation(summary = "대타 수락", description = "현재 사용자가 특정 대타 요청을 수락한다.")
     public ResponseEntity<ShiftRequest> acceptShiftRequest(
             @RequestHeader("X-Authenticated-User-Id") String userId,
-            @PathVariable Integer reqShiftId) {
-        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, Integer.valueOf(userId));
+            @PathVariable Long reqShiftId) {
+        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, Long.valueOf(userId));
         return ResponseEntity.ok(updatedRequest);
     }
 
@@ -155,9 +141,10 @@ public class CalendarController {
     @Operation(summary = "대타 삭제", description = "특정 대타 요청을 삭제한다.")
     public ResponseEntity<Void> deleteShiftRequest(
             @RequestHeader("X-Authenticated-User-Id") String userId,
-            @PathVariable Integer reqShiftId) throws IllegalAccessException {
+            @PathVariable Long reqShiftId) throws IllegalAccessException {
+
         // 검증: 요청한 유저가 해당 대타 요청의 작성자인지 확인
-        if (!shiftRequestService.isUserShiftRequest(reqShiftId, Integer.valueOf(userId))) {
+        if (!shiftRequestService.isUserShiftRequest(reqShiftId, Long.valueOf(userId))) {
             throw new IllegalAccessException("Unauthorized: This shift request does not belong to the authenticated user.");
         }
         shiftRequestService.deleteShiftRequest(reqShiftId);
@@ -170,7 +157,7 @@ public class CalendarController {
     public ResponseEntity<List<ShiftRequest>> getShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         // 해당 유저의 대타 요청 내역 조회
-        List<ShiftRequest> shiftRequests = shiftRequestService.getShiftRequestsByUser(Integer.valueOf(userId));
+        List<ShiftRequest> shiftRequests = shiftRequestService.getShiftRequestsByUser(Long.valueOf(userId));
         return ResponseEntity.ok(shiftRequests);
     }
 
@@ -180,7 +167,7 @@ public class CalendarController {
     public ResponseEntity<List<ShiftRequest>> getAcceptedShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         // 해당 유저의 대타 수락 내역 조회
-        List<ShiftRequest> acceptedShiftRequests = shiftRequestService.getAcceptedShiftRequestsByUser(Integer.valueOf(userId));
+        List<ShiftRequest> acceptedShiftRequests = shiftRequestService.getAcceptedShiftRequestsByUser(Long.valueOf(userId));
         return ResponseEntity.ok(acceptedShiftRequests);
     }
 }
