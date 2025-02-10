@@ -9,8 +9,8 @@ import java.util.List;
 
 @Data
 public class RepeatScheduleRequest {
-    private Integer branchId;
-    private Integer userId;
+    private Long branchId;
+    private Long userId;
     private LocalTime startTime;
     private LocalTime endTime;
     private Repeat repeat;

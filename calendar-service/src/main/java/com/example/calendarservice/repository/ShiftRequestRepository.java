@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Integer> {
-    boolean existsByIdAndWorkerId(Integer id, Integer workerId);
-    List<ShiftRequest> findByWorkerId(Integer workerId);
-    List<ShiftRequest> findByAcceptId(Integer workerId);
+public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long> {
+    boolean existsByIdAndWorkerId(Long id, Long workerId);
+    List<ShiftRequest> findByWorkerId(Long workerId);
+    List<ShiftRequest> findByAcceptId(Long workerId);
 }

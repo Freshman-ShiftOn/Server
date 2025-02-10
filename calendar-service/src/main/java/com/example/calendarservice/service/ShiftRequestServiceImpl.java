@@ -29,7 +29,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public ShiftRequest updateShiftRequest(Integer shiftRequestId, ShiftRequest shiftRequest) {
+    public ShiftRequest updateShiftRequest(Long shiftRequestId, ShiftRequest shiftRequest) {
         ShiftRequest existingShiftRequest = shiftRequestRepository.findById(shiftRequestId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId));
 
@@ -44,7 +44,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public void deleteShiftRequest(Integer shiftRequestId) {
+    public void deleteShiftRequest(Long shiftRequestId) {
         if (!shiftRequestRepository.existsById(shiftRequestId)) {
             throw new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId);
         }
@@ -52,12 +52,12 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public boolean isUserShiftRequest(Integer reqShiftId, Integer workerId) {
+    public boolean isUserShiftRequest(Long reqShiftId, Long workerId) {
         return shiftRequestRepository.existsByIdAndWorkerId(reqShiftId, workerId);
     }
 
     @Override
-    public ShiftRequest acceptShiftRequest(Integer shiftRequestId, Integer acceptId) {
+    public ShiftRequest acceptShiftRequest(Long shiftRequestId, Long acceptId) {
         // 대타 요청 확인
         ShiftRequest existingShiftRequest = shiftRequestRepository.findById(shiftRequestId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId));
@@ -123,16 +123,16 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public List<ShiftRequest> getShiftRequestsByUser(Integer workerID){
+    public List<ShiftRequest> getShiftRequestsByUser(Long workerID){
         return shiftRequestRepository.findByWorkerId(workerID);
     }
 
     @Override
-    public List<ShiftRequest> getAcceptedShiftRequestsByUser(Integer userId) {
+    public List<ShiftRequest> getAcceptedShiftRequestsByUser(Long userId) {
         return shiftRequestRepository.findByAcceptId(userId);
     }
 
-    private Schedule getScheduleFromShiftRequest(Integer shiftRequestId) {
+    private Schedule getScheduleFromShiftRequest(Long shiftRequestId) {
         ShiftRequest shiftRequest = shiftRequestRepository.findById(shiftRequestId)
                 .orElseThrow(() -> new RuntimeException("ShiftRequest not found"));
 

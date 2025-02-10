@@ -23,7 +23,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedule updateSchedule(Integer scheduleId, Schedule schedule) {
+    public Schedule updateSchedule(Long scheduleId, Schedule schedule) {
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
 
@@ -37,7 +37,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void deleteSchedule(Integer scheduleId) {
+    public void deleteSchedule(Long scheduleId) {
         if (!scheduleRepository.existsById(scheduleId)) {
             throw new ResourceNotFoundException("Schedule not found with id " + scheduleId);
         }
@@ -45,22 +45,24 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<Schedule> getSchedulesByBranchId(Integer branchId, Integer month) {
+    public List<Schedule> getSchedulesByBranchId(Long branchId, Integer month) {
         return scheduleRepository.findByBranchIdAndMonth(branchId, month);
     }
 
     @Override
-    public List<Schedule> getSchedulesByBranchIdAndUserId(Integer branchId, Integer month, Integer userId) {
+    public List<Schedule> getSchedulesByBranchIdAndUserId(Long branchId, Integer month, Long userId) {
         return scheduleRepository.findByBranchIdAndMonthAndUserId(branchId, month, userId);
     }
 
-    public boolean isUserSchedule(Integer scheduleId, int userId) {
+    @Override
+    public boolean isUserSchedule(Long scheduleId, Long userId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new IllegalArgumentException("Schedule not found with ID: " + scheduleId));
         return schedule.getWorkerId().equals(userId);
     }
 
-    public boolean isScheduleInBranch(Integer scheduleId, Integer branchId) {
+    @Override
+    public boolean isScheduleInBranch(Long scheduleId, Long branchId) {
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
         return schedule.getBranchId().equals(branchId);
@@ -79,13 +81,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         switch (repeatRequest.getRepeat().getType()) {
             case "DAILY":
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-                    schedules.add(createSchedule(repeatRequest, date, startTime, endTime));
+                    schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime));
                 }
                 break;
 
             case "WEEKLY":
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusWeeks(1)) {
-                    schedules.add(createSchedule(repeatRequest, date, startTime, endTime));
+                    schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime));
                 }
                 break;
 
@@ -93,7 +95,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 List<DayOfWeek> daysOfWeek = repeatRequest.getRepeat().getDaysOfWeek();
                 for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
                     if (daysOfWeek.contains(date.getDayOfWeek())) {
-                        schedules.add(createSchedule(repeatRequest, date, startTime, endTime));
+                        schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime));
                     }
                 }
                 break;
@@ -106,11 +108,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.saveAll(schedules);
     }
 
-    private Schedule createSchedule(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime) {
+    private Schedule createScheduleFromRepeatRequest(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime) {
         return Schedule.builder()
                 .branchId(request.getBranchId())
                 .workerId(request.getUserId())
                 .workType(request.getWorkType())
+                .inputType(2) // 반복근무
                 .startTime(convertToDate(date.atTime(startTime)))
                 .endTime(convertToDate(date.atTime(endTime)))
                 .lastUpdated(new Date())
