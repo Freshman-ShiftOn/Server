@@ -52,6 +52,9 @@ public class ShiftRequest {
     @Column(name = "req_status", length = 10, nullable = false)
     private String reqStatus;
 
+    @Column(name = "reason")
+    private String reason;
+
     @LastModifiedDate // 자동 업데이트
     @Column(name = "last_updated", nullable = false)
     private Date lastUpdated;
