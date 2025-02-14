@@ -129,7 +129,7 @@ public class CalendarController {
     }
 
     // 반복 스케줄 삭제
-    @DeleteMapping("/{scheduleId}")
+    @DeleteMapping("/{scheduleId}/bulk")
     @Operation(summary = "반복 스케줄 삭제", description = "반복 스케줄을 삭제한다.")
     public ResponseEntity<Void> deleteSchedules(
             @RequestHeader("X-Authenticated-User-Id") String userId,
