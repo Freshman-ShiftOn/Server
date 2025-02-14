@@ -1,6 +1,7 @@
 package com.example.calendarservice.controller;
 
 import com.example.calendarservice.dto.RepeatScheduleRequest;
+import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
 import com.example.calendarservice.service.ScheduleService;
@@ -94,6 +95,23 @@ public class CalendarController {
         return ResponseEntity.ok(updatedSchedule);
     }
 
+    // 반복 스케줄 수정
+    @PutMapping("/{scheduleId}/bulk")
+    @Operation(summary = "반복 스케줄 수정", description = "현재 사용자의 반복 스케줄을 수정한다.")
+    public ResponseEntity<List<Schedule>> updateSchedules(
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @PathVariable Long scheduleId,
+            @RequestBody RepeatScheduleUpdateRequest request) {
+
+        // 해당 스케줄이 현재 유저의 스케줄인지 검증
+        if (!scheduleService.isUserSchedule(scheduleId, Long.valueOf(userId))) {
+            throw new IllegalArgumentException("Unauthorized: The schedule does not belong to the authenticated user.");
+        }
+
+        List<Schedule> updatedSchedules = scheduleService.updateRepeatSchedule(scheduleId, request);
+        return ResponseEntity.ok(updatedSchedules);
+    }
+
     // 내 스케줄 삭제
     @DeleteMapping("/{scheduleId}")
     @Operation(summary = "스케줄 삭제", description = "특정 스케줄을 삭제한다.")
@@ -107,6 +125,23 @@ public class CalendarController {
         }
 
         scheduleService.deleteSchedule(scheduleId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 반복 스케줄 삭제
+    @DeleteMapping("/{scheduleId}")
+    @Operation(summary = "반복 스케줄 삭제", description = "반복 스케줄을 삭제한다.")
+    public ResponseEntity<Void> deleteSchedules(
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @PathVariable Long scheduleId,
+            @RequestParam String deleteOption) throws IllegalAccessException {
+
+        // 해당 스케줄이 현재 유저의 스케줄인지 검증
+        if (!scheduleService.isUserSchedule(scheduleId, Long.valueOf(userId))) {
+            throw new IllegalAccessException("Unauthorized: The schedule does not belong to the authenticated user.");
+        }
+
+        scheduleService.deleteRepeatSchedule(scheduleId, deleteOption);
         return ResponseEntity.noContent().build();
     }
 

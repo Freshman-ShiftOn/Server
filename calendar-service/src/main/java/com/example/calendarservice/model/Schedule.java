@@ -39,6 +39,9 @@ public class Schedule {
     @Column(name = "input_type", nullable = false)
     private Integer inputType;
 
+     @Column(name = "repeat_group_id")
+    private Long repeatGroupId;
+
     @Column(name = "start_time", nullable = false)
     private Date startTime;
 
