@@ -39,6 +39,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
         existingShiftRequest.setWorkerId(shiftRequest.getWorkerId());
         existingShiftRequest.setBranchId(shiftRequest.getBranchId());
         existingShiftRequest.setReqStatus(shiftRequest.getReqStatus());
+        existingShiftRequest.setReason(shiftRequest.getReason());
 
         return shiftRequestRepository.save(existingShiftRequest);
     }

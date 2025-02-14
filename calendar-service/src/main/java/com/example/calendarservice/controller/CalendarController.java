@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "calendar-service-controller", description = "Calendar 서비스 API")
 public class CalendarController {
-    private final Environment env;
     private final ScheduleService scheduleService;
     private final ShiftRequestService shiftRequestService;
 
@@ -126,13 +124,14 @@ public class CalendarController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newRequest);
     }
 
-    // 대타 수락
+    // 대타 수정
     @PutMapping("/request-shift/{reqShiftId}")
-    @Operation(summary = "대타 수락", description = "현재 사용자가 특정 대타 요청을 수락한다.")
-    public ResponseEntity<ShiftRequest> acceptShiftRequest(
+    @Operation(summary = "대타 수정", description = "대타 요청을 수정한다.")
+    public ResponseEntity<ShiftRequest> updateShiftRequest(
             @RequestHeader("X-Authenticated-User-Id") String userId,
-            @PathVariable Long reqShiftId) {
-        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, Long.valueOf(userId));
+            @PathVariable Long reqShiftId,
+            @RequestBody ShiftRequest shiftRequest) {
+        ShiftRequest updatedRequest = shiftRequestService.updateShiftRequest(reqShiftId, shiftRequest);
         return ResponseEntity.ok(updatedRequest);
     }
 
@@ -149,6 +148,16 @@ public class CalendarController {
         }
         shiftRequestService.deleteShiftRequest(reqShiftId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 대타 수락
+    @PutMapping("/request-shift/{reqShiftId}/accept")
+    @Operation(summary = "대타 수락", description = "현재 사용자가 특정 대타 요청을 수락한다.")
+    public ResponseEntity<ShiftRequest> acceptShiftRequest(
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @PathVariable Long reqShiftId) {
+        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, Long.valueOf(userId));
+        return ResponseEntity.ok(updatedRequest);
     }
 
     // 대타 요청 내역 조회 (마이페이지용)
