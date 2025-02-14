@@ -23,7 +23,10 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     public ShiftRequest createShiftRequest(ShiftRequest shiftRequest) {
         // Validate that the schedule exists
         if (!scheduleRepository.existsById(shiftRequest.getScheduleId())) {
-            throw new ResourceNotFoundException("Schedule not found with id " + shiftRequest.getScheduleId());
+            throw new ResourceNotFoundException("Schedule not found with id : " + shiftRequest.getScheduleId());
+        }
+        if (shiftRequestRepository.existsByScheduleId(shiftRequest.getScheduleId())) {
+            throw new ResourceNotFoundException("ScheduleRequest already with schedule id : " + shiftRequest.getScheduleId());
         }
         return shiftRequestRepository.save(shiftRequest);
     }
@@ -39,6 +42,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
         existingShiftRequest.setWorkerId(shiftRequest.getWorkerId());
         existingShiftRequest.setBranchId(shiftRequest.getBranchId());
         existingShiftRequest.setReqStatus(shiftRequest.getReqStatus());
+        existingShiftRequest.setReason(shiftRequest.getReason());
 
         return shiftRequestRepository.save(existingShiftRequest);
     }
