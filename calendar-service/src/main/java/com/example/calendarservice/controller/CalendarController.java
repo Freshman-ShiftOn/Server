@@ -2,6 +2,7 @@ package com.example.calendarservice.controller;
 
 import com.example.calendarservice.dto.RepeatScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
+import com.example.calendarservice.dto.UpdateShiftRequestDto;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
 import com.example.calendarservice.service.ScheduleService;
@@ -165,8 +166,8 @@ public class CalendarController {
     public ResponseEntity<ShiftRequest> updateShiftRequest(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Long reqShiftId,
-            @RequestBody String reason) {
-        ShiftRequest updatedRequest = shiftRequestService.updateShiftRequest(reqShiftId, reason);
+            @RequestBody UpdateShiftRequestDto updateShiftRequestDto) {
+        ShiftRequest updatedRequest = shiftRequestService.updateShiftRequest(reqShiftId, updateShiftRequestDto.getReason());
         return ResponseEntity.ok(updatedRequest);
     }
 
