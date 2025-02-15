@@ -165,8 +165,8 @@ public class CalendarController {
     public ResponseEntity<ShiftRequest> updateShiftRequest(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Long reqShiftId,
-            @RequestBody ShiftRequest shiftRequest) {
-        ShiftRequest updatedRequest = shiftRequestService.updateShiftRequest(reqShiftId, shiftRequest);
+            @RequestBody String reason) {
+        ShiftRequest updatedRequest = shiftRequestService.updateShiftRequest(reqShiftId, reason);
         return ResponseEntity.ok(updatedRequest);
     }
 
