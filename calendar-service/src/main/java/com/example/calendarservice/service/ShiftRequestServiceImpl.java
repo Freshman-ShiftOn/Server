@@ -32,17 +32,11 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public ShiftRequest updateShiftRequest(Long shiftRequestId, ShiftRequest shiftRequest) {
+    public ShiftRequest updateShiftRequest(Long shiftRequestId, String reason) {
         ShiftRequest existingShiftRequest = shiftRequestRepository.findById(shiftRequestId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId));
 
-        existingShiftRequest.setReqStartTime(shiftRequest.getReqStartTime());
-        existingShiftRequest.setReqEndTime(shiftRequest.getReqEndTime());
-        existingShiftRequest.setWorkType(shiftRequest.getWorkType());
-        existingShiftRequest.setWorkerId(shiftRequest.getWorkerId());
-        existingShiftRequest.setBranchId(shiftRequest.getBranchId());
-        existingShiftRequest.setReqStatus(shiftRequest.getReqStatus());
-        existingShiftRequest.setReason(shiftRequest.getReason());
+        existingShiftRequest.setReason(reason);
 
         return shiftRequestRepository.save(existingShiftRequest);
     }

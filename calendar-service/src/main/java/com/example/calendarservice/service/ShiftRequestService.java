@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ShiftRequestService {
     ShiftRequest createShiftRequest(ShiftRequest shiftRequest);
-    ShiftRequest updateShiftRequest(Long shiftRequestId, ShiftRequest shiftRequest);
+    ShiftRequest updateShiftRequest(Long shiftRequestId, String reason);
     void deleteShiftRequest(Long shiftRequestId);
 
     boolean isUserShiftRequest(Long reqShiftId, Long workerId);
