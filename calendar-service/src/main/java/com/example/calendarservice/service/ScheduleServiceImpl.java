@@ -5,6 +5,7 @@ import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.exception.ResourceNotFoundException;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.repository.ScheduleRepository;
+import com.example.calendarservice.repository.ShiftRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    private final ShiftRequestRepository shiftRequestRepository;
 
     @Override
     public Schedule createSchedule(Schedule schedule) {
@@ -42,6 +44,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (!scheduleRepository.existsById(scheduleId)) {
             throw new ResourceNotFoundException("Schedule not found with id " + scheduleId);
         }
+        // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+        shiftRequestRepository.deleteByScheduleId(scheduleId);
         scheduleRepository.deleteById(scheduleId);
     }
 
@@ -186,6 +190,8 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         switch (deleteOption) {
             case "ONE":
+                // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+                shiftRequestRepository.deleteByScheduleId(scheduleId);
                 // 이 일정만 삭제
                 scheduleRepository.deleteById(scheduleId);
                 break;
@@ -194,12 +200,22 @@ public class ScheduleServiceImpl implements ScheduleService {
                 // 해당 날짜 이후(포함) 모든 일정 삭제
                 List<Schedule> schedulesToDelete = scheduleRepository.findByRepeatGroupIdAndStartTimeAfter(
                         existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
+
+                // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+                List<Long> scheduleIdsToDelete = schedulesToDelete.stream().map(Schedule::getId).toList();
+                shiftRequestRepository.deleteByScheduleIdIn(scheduleIdsToDelete);
+
                 scheduleRepository.deleteAll(schedulesToDelete);
                 break;
 
             case "ALL":
                 // 전체 반복 일정 삭제
                 List<Schedule> allSchedules = scheduleRepository.findByRepeatGroupId(existingSchedule.getRepeatGroupId());
+
+                // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+                List<Long> allScheduleIds = allSchedules.stream().map(Schedule::getId).toList();
+                shiftRequestRepository.deleteByScheduleIdIn(allScheduleIds);
+
                 scheduleRepository.deleteAll(allSchedules);
                 break;
 

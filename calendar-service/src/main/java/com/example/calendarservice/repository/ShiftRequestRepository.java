@@ -12,4 +12,7 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     boolean existsByScheduleId(Long scheduleId);
     List<ShiftRequest> findByWorkerId(Long workerId);
     List<ShiftRequest> findByAcceptId(Long workerId);
+
+    void deleteByScheduleId(Long scheduleId);
+    void deleteByScheduleIdIn(List<Long> scheduleIds);
 }
