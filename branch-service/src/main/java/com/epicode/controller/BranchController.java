@@ -182,7 +182,7 @@ public class BranchController {
             }
     )
     @PostMapping("/invite/join")
-    public ResponseEntity<Void> joinBranch(
+    public ResponseEntity<Branch> joinBranch(
             @RequestHeader("X-Authenticated-User") String email,
             @RequestParam String token
     ) {
@@ -192,7 +192,8 @@ public class BranchController {
         //Long branchId = inviteTokenizer.parseInviteToken(token).get("branchId", Long.class);
         Long branchId = Long.valueOf(claims.get("branchId", String.class));//String으로 받아 형 변환(혹시 몰라)
         inviteService.validateAndJoinBranch(branchId,email);//검증&가입
-        return ResponseEntity.ok().build();
+        Branch branch = branchService.getBranchProfile(branchId);
+        return ResponseEntity.ok(branch);
     }
 
     @Operation(
