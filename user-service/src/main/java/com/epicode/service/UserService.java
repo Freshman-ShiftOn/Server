@@ -2,11 +2,20 @@ package com.epicode.service;
 import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
+import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
+import com.epicode.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
