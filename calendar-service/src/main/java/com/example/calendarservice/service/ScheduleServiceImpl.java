@@ -6,6 +6,7 @@ import com.example.calendarservice.exception.ResourceNotFoundException;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.repository.ScheduleRepository;
 import com.example.calendarservice.repository.ShiftRequestRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
@@ -184,6 +186,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         return schedulesToUpdate;
     }
 
+    @Transactional
     public void deleteRepeatSchedule(Long scheduleId, String deleteOption) {
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
