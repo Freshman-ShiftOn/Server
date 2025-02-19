@@ -186,10 +186,23 @@ public class BranchController {
             @RequestParam String token
     ) {
         Claims claims = inviteTokenizer.parseInviteToken(token);
+        //
         //String inviteeEmail = claims.get("email", String.class);
         //String inviteeEmail = inviteTokenizer.parseInviteToken(token).get("email", String.class);
         //Long branchId = inviteTokenizer.parseInviteToken(token).get("branchId", Long.class);
-        Long branchId = Long.valueOf(claims.get("branchId", String.class));//String으로 받아 형 변환(혹시 몰라)
+        //
+        //Long branchId = Long.valueOf(claims.get("branchId", String.class));//String으로 받아 형 변환(혹시 몰라)
+
+        Object branchIdObj = claims.get("branchId");
+        Long branchId = null;
+
+        if (branchIdObj instanceof Integer) {
+            branchId = ((Integer) branchIdObj).longValue();
+        } else if (branchIdObj instanceof String) {
+            branchId = Long.valueOf((String) branchIdObj);
+        } else {
+            throw new IllegalArgumentException("Unexpected type for branchId: " + branchIdObj.getClass());
+        }
         inviteService.validateAndJoinBranch(branchId,email);//검증&가입
         Branch branch = branchService.getBranchProfile(branchId);
         return ResponseEntity.ok(branch);
