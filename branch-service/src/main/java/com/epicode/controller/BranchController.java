@@ -177,7 +177,7 @@ public class BranchController {
             summary = "사용자 지점 가입",
             description = "사용자가 초대장 토큰을 가지고 특정 지점(branchId)에 가입합니다.",
             parameters = {
-                    @Parameter(name = "inviteToken", description = "초대장 토큰", required = true, example = "eyJhbGciOiJIUzI1NiJ9...")
+                    @Parameter(name = "token", description = "초대장 토큰", required = true, example = "eyJhbGciOiJIUzI1NiJ9...")
             }
     )
     @PostMapping("/invite/join")
@@ -186,10 +186,23 @@ public class BranchController {
             @RequestParam String token
     ) {
         Claims claims = inviteTokenizer.parseInviteToken(token);
+        //
         //String inviteeEmail = claims.get("email", String.class);
         //String inviteeEmail = inviteTokenizer.parseInviteToken(token).get("email", String.class);
         //Long branchId = inviteTokenizer.parseInviteToken(token).get("branchId", Long.class);
-        Long branchId = Long.valueOf(claims.get("branchId", String.class));//String으로 받아 형 변환(혹시 몰라)
+        //
+        //Long branchId = Long.valueOf(claims.get("branchId", String.class));//String으로 받아 형 변환(혹시 몰라)
+
+        Object branchIdObj = claims.get("branchId");
+        Long branchId = null;
+
+        if (branchIdObj instanceof Integer) {
+            branchId = ((Integer) branchIdObj).longValue();
+        } else if (branchIdObj instanceof String) {
+            branchId = Long.valueOf((String) branchIdObj);
+        } else {
+            throw new IllegalArgumentException("Unexpected type for branchId: " + branchIdObj.getClass());
+        }
         inviteService.validateAndJoinBranch(branchId,email);//검증&가입
         Branch branch = branchService.getBranchProfile(branchId);
         return ResponseEntity.ok(branch);
