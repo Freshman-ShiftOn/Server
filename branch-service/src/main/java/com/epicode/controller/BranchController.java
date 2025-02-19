@@ -177,7 +177,7 @@ public class BranchController {
             summary = "사용자 지점 가입",
             description = "사용자가 초대장 토큰을 가지고 특정 지점(branchId)에 가입합니다.",
             parameters = {
-                    @Parameter(name = "inviteToken", description = "초대장 토큰", required = true, example = "eyJhbGciOiJIUzI1NiJ9...")
+                    @Parameter(name = "token", description = "초대장 토큰", required = true, example = "eyJhbGciOiJIUzI1NiJ9...")
             }
     )
     @PostMapping("/invite/join")
