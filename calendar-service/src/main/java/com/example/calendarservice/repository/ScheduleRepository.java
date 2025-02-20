@@ -18,6 +18,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByBranchIdAndMonthAndUserId(@Param("branchId") Long branchId, @Param("month") Integer month, @Param("userId") Long userId);
 
     List<Schedule> findByRepeatGroupId(Long repeatGroupId);
-    List<Schedule> findByRepeatGroupIdAndStartTimeAfter(Long repeatGroupId, Date startTime);
-
+    List<Schedule> findByRepeatGroupIdAndStartTimeGreaterThanEqual(Long repeatGroupId, Date startTime);
 }

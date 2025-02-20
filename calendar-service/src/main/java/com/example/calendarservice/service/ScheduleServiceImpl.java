@@ -5,6 +5,8 @@ import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.exception.ResourceNotFoundException;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.repository.ScheduleRepository;
+import com.example.calendarservice.repository.ShiftRequestRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,11 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    private final ShiftRequestRepository shiftRequestRepository;
 
     @Override
     public Schedule createSchedule(Schedule schedule) {
@@ -42,6 +46,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (!scheduleRepository.existsById(scheduleId)) {
             throw new ResourceNotFoundException("Schedule not found with id " + scheduleId);
         }
+        // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+        shiftRequestRepository.deleteByScheduleId(scheduleId);
         scheduleRepository.deleteById(scheduleId);
     }
 
@@ -152,7 +158,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
             case "AFTER":
                 // 해당 날짜 이후(포함) 모든 일정 수정
-                schedulesToUpdate = scheduleRepository.findByRepeatGroupIdAndStartTimeAfter(
+                schedulesToUpdate = scheduleRepository.findByRepeatGroupIdAndStartTimeGreaterThanEqual(
                         existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
                 for (Schedule schedule : schedulesToUpdate) {
                     schedule.setWorkType(request.getWorkType());
@@ -180,26 +186,39 @@ public class ScheduleServiceImpl implements ScheduleService {
         return schedulesToUpdate;
     }
 
+    @Transactional
     public void deleteRepeatSchedule(Long scheduleId, String deleteOption) {
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
 
         switch (deleteOption) {
             case "ONE":
+                // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+                shiftRequestRepository.deleteByScheduleId(scheduleId);
                 // 이 일정만 삭제
                 scheduleRepository.deleteById(scheduleId);
                 break;
 
             case "AFTER":
                 // 해당 날짜 이후(포함) 모든 일정 삭제
-                List<Schedule> schedulesToDelete = scheduleRepository.findByRepeatGroupIdAndStartTimeAfter(
+                List<Schedule> schedulesToDelete = scheduleRepository.findByRepeatGroupIdAndStartTimeGreaterThanEqual(
                         existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
+
+                // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+                List<Long> scheduleIdsToDelete = schedulesToDelete.stream().map(Schedule::getId).toList();
+                shiftRequestRepository.deleteByScheduleIdIn(scheduleIdsToDelete);
+
                 scheduleRepository.deleteAll(schedulesToDelete);
                 break;
 
             case "ALL":
                 // 전체 반복 일정 삭제
                 List<Schedule> allSchedules = scheduleRepository.findByRepeatGroupId(existingSchedule.getRepeatGroupId());
+
+                // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
+                List<Long> allScheduleIds = allSchedules.stream().map(Schedule::getId).toList();
+                shiftRequestRepository.deleteByScheduleIdIn(allScheduleIds);
+
                 scheduleRepository.deleteAll(allSchedules);
                 break;
 
