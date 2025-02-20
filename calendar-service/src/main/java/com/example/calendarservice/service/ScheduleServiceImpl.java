@@ -158,7 +158,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
             case "AFTER":
                 // 해당 날짜 이후(포함) 모든 일정 수정
-                schedulesToUpdate = scheduleRepository.findByRepeatGroupIdAndStartTimeAfter(
+                schedulesToUpdate = scheduleRepository.findByRepeatGroupIdAndStartTimeGreaterThanEqual(
                         existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
                 for (Schedule schedule : schedulesToUpdate) {
                     schedule.setWorkType(request.getWorkType());
@@ -201,7 +201,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
             case "AFTER":
                 // 해당 날짜 이후(포함) 모든 일정 삭제
-                List<Schedule> schedulesToDelete = scheduleRepository.findByRepeatGroupIdAndStartTimeAfter(
+                List<Schedule> schedulesToDelete = scheduleRepository.findByRepeatGroupIdAndStartTimeGreaterThanEqual(
                         existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
 
                 // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
