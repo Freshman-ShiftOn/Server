@@ -29,7 +29,7 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     @Query("SELECT sr FROM ShiftRequest sr " +
             "JOIN Schedule s ON sr.scheduleId = s.id " +
             "WHERE s.branchId = :branchId " +
-            "  AND FUNCTION('MONTH', s.scheduleDate) = :month")
+            "  AND FUNCTION('MONTH', s.startTime) = :month")
     List<ShiftRequest> findByBranchIdAndMonth(@Param("branchId") Long branchId,
                                               @Param("month") Integer month);
 }
