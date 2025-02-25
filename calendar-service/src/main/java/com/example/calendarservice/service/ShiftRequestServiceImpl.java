@@ -137,4 +137,10 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
         return scheduleRepository.findById(shiftRequest.getScheduleId())
                 .orElse(null); // ✅ scheduleId를 기반으로 Schedule 조회
     }
+
+    public List<ShiftRequest> getShiftRequestsByBranchAndMonth(Long branchId, Integer month) {
+        // Repository를 통해 조건에 맞는 ShiftRequest 리스트를 조회.
+        // 예) 아래처럼 쿼리 메서드를 작성하거나 Query DSL, JPQL 등을 활용할 수 있습니다.
+        return shiftRequestRepository.findByBranchIdAndMonth(branchId, month);
+    }
 }
