@@ -15,4 +15,6 @@ public interface ShiftRequestService {
 
     List<ShiftRequest> getShiftRequestsByUser(Long workerId);
     List<ShiftRequest> getAcceptedShiftRequestsByUser(Long workerId);
+
+    List<ShiftRequest> getShiftRequestsByBranchAndMonth(Long branchId, Integer month);
 }

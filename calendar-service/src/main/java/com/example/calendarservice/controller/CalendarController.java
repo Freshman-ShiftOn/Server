@@ -2,6 +2,7 @@ package com.example.calendarservice.controller;
 
 import com.example.calendarservice.dto.RepeatScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
+import com.example.calendarservice.dto.ShiftRequestsByBranchMonthResponseDto;
 import com.example.calendarservice.dto.UpdateShiftRequestDto;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -214,5 +216,37 @@ public class CalendarController {
         // 해당 유저의 대타 수락 내역 조회
         List<ShiftRequest> acceptedShiftRequests = shiftRequestService.getAcceptedShiftRequestsByUser(Long.valueOf(userId));
         return ResponseEntity.ok(acceptedShiftRequests);
+    }
+
+    // 지점 대타 요청 내역 조회 (캘린더용)
+    @GetMapping("/{branchId}/{month}/request-shift")
+    @Operation(summary = "지점 대타 요청 내역 조회 (캘린더용)",
+            description = "특정 지점과 월에 해당하는 대타 요청 내역을 조회한다. " +
+                    "결과에서 현재 사용자의 요청(myRequests)과 다른 사용자의 요청(othersRequests)을 구분해 반환한다.")
+    public ResponseEntity<ShiftRequestsByBranchMonthResponseDto> getShiftRequestsByBranchAndMonth(
+            @PathVariable Long branchId,
+            @PathVariable Integer month,
+            @RequestHeader("X-Authenticated-User-Id") String userId) {
+
+        List<ShiftRequest> allRequests = shiftRequestService.getShiftRequestsByBranchAndMonth(branchId, month);
+
+        // 현재 사용자의 요청과 다른 사용자의 요청을 분리
+        List<ShiftRequest> myRequests = new ArrayList<>();
+        List<ShiftRequest> othersRequests = new ArrayList<>();
+
+        Long currentUserId = Long.valueOf(userId);
+
+        for (ShiftRequest request : allRequests) {
+            if (request.getWorkerId().equals(currentUserId)) {
+                myRequests.add(request);
+            } else {
+                othersRequests.add(request);
+            }
+        }
+
+        ShiftRequestsByBranchMonthResponseDto response =
+                new ShiftRequestsByBranchMonthResponseDto(myRequests, othersRequests);
+
+        return ResponseEntity.ok(response);
     }
 }
