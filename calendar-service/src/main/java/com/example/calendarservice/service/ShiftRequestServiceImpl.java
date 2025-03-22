@@ -1,10 +1,10 @@
-package com.example.approvalservice.service;
+package com.example.calendarservice.service;
 
-import com.example.approvalservice.exception.ResourceNotFoundException;
-import com.example.approvalservice.model.Schedule;
-import com.example.approvalservice.model.ShiftRequest;
-import com.example.approvalservice.repository.ScheduleRepository;
-import com.example.approvalservice.repository.ShiftRequestRepository;
+import com.example.calendarservice.exception.ResourceNotFoundException;
+import com.example.calendarservice.model.Schedule;
+import com.example.calendarservice.model.ShiftRequest;
+import com.example.calendarservice.repository.ScheduleRepository;
+import com.example.calendarservice.repository.ShiftRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

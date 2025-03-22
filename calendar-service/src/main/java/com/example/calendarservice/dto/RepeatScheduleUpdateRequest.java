@@ -1,4 +1,4 @@
-package com.example.approvalservice.dto;
+package com.example.calendarservice.dto;
 
 import lombok.Getter;
 import lombok.Setter;

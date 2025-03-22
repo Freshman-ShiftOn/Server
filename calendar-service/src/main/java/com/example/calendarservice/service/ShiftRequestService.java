@@ -1,6 +1,6 @@
-package com.example.approvalservice.service;
+package com.example.calendarservice.service;
 
-import com.example.approvalservice.model.ShiftRequest;
+import com.example.calendarservice.model.ShiftRequest;
 
 import java.util.List;
 

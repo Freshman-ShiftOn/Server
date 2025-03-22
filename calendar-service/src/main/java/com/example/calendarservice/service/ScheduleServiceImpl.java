@@ -1,11 +1,11 @@
-package com.example.approvalservice.service;
+package com.example.calendarservice.service;
 
-import com.example.approvalservice.dto.RepeatScheduleRequest;
-import com.example.approvalservice.dto.RepeatScheduleUpdateRequest;
-import com.example.approvalservice.exception.ResourceNotFoundException;
-import com.example.approvalservice.model.Schedule;
-import com.example.approvalservice.repository.ScheduleRepository;
-import com.example.approvalservice.repository.ShiftRequestRepository;
+import com.example.calendarservice.dto.RepeatScheduleRequest;
+import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
+import com.example.calendarservice.exception.ResourceNotFoundException;
+import com.example.calendarservice.model.Schedule;
+import com.example.calendarservice.repository.ScheduleRepository;
+import com.example.calendarservice.repository.ShiftRequestRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

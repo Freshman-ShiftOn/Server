@@ -1,4 +1,4 @@
-package com.example.approvalservice;
+package com.example.calendarservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

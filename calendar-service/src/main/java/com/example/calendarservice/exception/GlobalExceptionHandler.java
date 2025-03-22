@@ -1,4 +1,4 @@
-package com.example.approvalservice.exception;
+package com.example.calendarservice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

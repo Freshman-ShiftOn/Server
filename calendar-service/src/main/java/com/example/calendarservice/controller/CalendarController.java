@@ -1,13 +1,13 @@
-package com.example.approvalservice.controller;
+package com.example.calendarservice.controller;
 
-import com.example.approvalservice.dto.RepeatScheduleRequest;
-import com.example.approvalservice.dto.RepeatScheduleUpdateRequest;
-import com.example.approvalservice.dto.ShiftRequestsByBranchMonthResponseDto;
-import com.example.approvalservice.dto.UpdateShiftRequestDto;
-import com.example.approvalservice.model.Schedule;
-import com.example.approvalservice.model.ShiftRequest;
-import com.example.approvalservice.service.ScheduleService;
-import com.example.approvalservice.service.ShiftRequestService;
+import com.example.calendarservice.dto.RepeatScheduleRequest;
+import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
+import com.example.calendarservice.dto.ShiftRequestsByBranchMonthResponseDto;
+import com.example.calendarservice.dto.UpdateShiftRequestDto;
+import com.example.calendarservice.model.Schedule;
+import com.example.calendarservice.model.ShiftRequest;
+import com.example.calendarservice.service.ScheduleService;
+import com.example.calendarservice.service.ShiftRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

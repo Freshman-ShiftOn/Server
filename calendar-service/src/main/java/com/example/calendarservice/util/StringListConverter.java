@@ -1,4 +1,4 @@
-package com.example.approvalservice.util;
+package com.example.calendarservice.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

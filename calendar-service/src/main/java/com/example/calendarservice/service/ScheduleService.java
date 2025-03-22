@@ -1,8 +1,8 @@
-package com.example.approvalservice.service;
+package com.example.calendarservice.service;
 
-import com.example.approvalservice.dto.RepeatScheduleRequest;
-import com.example.approvalservice.dto.RepeatScheduleUpdateRequest;
-import com.example.approvalservice.model.Schedule;
+import com.example.calendarservice.dto.RepeatScheduleRequest;
+import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
+import com.example.calendarservice.model.Schedule;
 
 import java.util.List;
 

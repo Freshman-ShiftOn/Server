@@ -1,6 +1,6 @@
-package com.example.approvalservice.repository;
+package com.example.calendarservice.repository;
 
-import com.example.approvalservice.model.Schedule;
+import com.example.calendarservice.model.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

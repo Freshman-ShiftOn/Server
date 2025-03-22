@@ -1,6 +1,6 @@
-package com.example.approvalservice.repository;
+package com.example.calendarservice.repository;
 
-import com.example.approvalservice.model.ShiftRequest;
+import com.example.calendarservice.model.ShiftRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
