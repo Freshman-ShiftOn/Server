@@ -133,7 +133,7 @@ services:
   #     - apigateway-service
 
   approval-service:
-    image: user-service
+    image: approval-service
     ports:
       - "13005:13005"
     environment:
