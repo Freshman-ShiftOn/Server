@@ -132,6 +132,23 @@ services:
   #     - discovery-service
   #     - apigateway-service
 
+  approval-service:
+    image: user-service
+    ports:
+      - "13005:13005"
+    environment:
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      EUREKA_SERVER: ${EUREKA_SERVER}
+      BASE_URL: ${BASE_URL}
+      JWT_KEY: ${JWT_KEY}
+
+    networks:
+      - app-network
+    depends_on:
+      - discovery-service
+      - apigateway-service
 
 
 networks:
