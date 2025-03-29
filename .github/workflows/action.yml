@@ -102,6 +102,16 @@ jobs:
           JWT_KEY: ${{ secrets.JWT_KEY }}
         run: ./gradlew clean build -x test
 
+      - name: Build approval-service
+        working-directory: approval-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+        run: ./gradlew clean build -x test
+
       - name: Build Docker images
         run: |
           docker build -t manual-service:latest ./manual-service
@@ -110,6 +120,7 @@ jobs:
           docker build -t calendar-service:latest ./calendar-service
           docker build -t user-service:latest ./user-service
           docker build -t branch-service:latest ./branch-service
+          docker build -t approval-service:latest ./approval-service
 
       - name: Save Docker images to files
         run: |
@@ -119,6 +130,7 @@ jobs:
           docker save calendar-service:latest -o calendar-service.tar
           docker save user-service:latest -o user-service.tar
           docker save branch-service:latest -o branch-service.tar
+          docker save approval-service:latest -o approval-service.tar
           
       - name: Verify .tar files
         run: |
@@ -140,6 +152,7 @@ jobs:
           scp -i epicode_key.pem -o StrictHostKeyChecking=no calendar-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no user-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no branch-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no approval-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no .env ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
 
@@ -152,6 +165,7 @@ jobs:
             docker load -i calendar-service.tar
             docker load -i user-service.tar
             docker load -i branch-service.tar
+            docker load -i approval-service.tar
             docker-compose down || true
             docker-compose up -d
           EOF
