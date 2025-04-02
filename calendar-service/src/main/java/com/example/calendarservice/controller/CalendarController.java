@@ -8,6 +8,7 @@ import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
 import com.example.calendarservice.service.ScheduleService;
 import com.example.calendarservice.service.ShiftRequestService;
+import com.example.calendarservice.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.List;
 public class CalendarController {
     private final ScheduleService scheduleService;
     private final ShiftRequestService shiftRequestService;
+    private final UserService userService;
 
     // 지점 스케줄 목록 조회 (월단위)
     @GetMapping("/{branchId}/{month}")
@@ -58,6 +60,7 @@ public class CalendarController {
             @RequestBody Schedule schedule) {
         schedule.setBranchId(branchId);
         schedule.setWorkerId(Long.valueOf(userId));
+        schedule.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
         Schedule newSchedule = scheduleService.createSchedule(schedule);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
     }
@@ -72,7 +75,8 @@ public class CalendarController {
 
         // 요청 데이터에서 branchId와 userId 설정
         repeatScheduleRequest.setBranchId(branchId);
-        repeatScheduleRequest.setUserId(Long.valueOf(userId));
+        repeatScheduleRequest.setWorkerId(Long.valueOf(userId));
+        repeatScheduleRequest.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
 
         // 반복 스케줄 생성
         List<Schedule> schedules = scheduleService.createRepeatSchedules(repeatScheduleRequest);
@@ -158,6 +162,7 @@ public class CalendarController {
 
         shiftRequest.setBranchId(branchId);
         shiftRequest.setWorkerId(Long.valueOf(userId));
+        shiftRequest.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
         ShiftRequest newRequest = shiftRequestService.createShiftRequest(shiftRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(newRequest);
     }
@@ -194,7 +199,8 @@ public class CalendarController {
     public ResponseEntity<ShiftRequest> acceptShiftRequest(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Long reqShiftId) {
-        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, Long.valueOf(userId));
+        String userName = userService.getUserNameById(Long.valueOf(userId));
+        ShiftRequest updatedRequest = shiftRequestService.acceptShiftRequest(reqShiftId, Long.valueOf(userId), userName);
         return ResponseEntity.ok(updatedRequest);
     }
 

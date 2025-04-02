@@ -29,6 +29,9 @@ public class ShiftRequest {
     @Column(name = "worker_id", nullable = false)
     private Long workerId;
 
+    @Column(name = "worker_name", nullable = false)
+    private String workerName;
+
     @Column(name = "branch_id", nullable = false)
     private Long branchId;
 
