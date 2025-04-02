@@ -126,7 +126,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     private Schedule createScheduleFromRepeatRequest(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime, Long repeatGroupId) {
         return Schedule.builder()
                 .branchId(request.getBranchId())
-                .workerId(request.getUserId())
+                .workerId(request.getWorkerId())
+                .workerName(request.getWorkerName())
                 .workType(request.getWorkType())
                 .inputType(2) // 반복근무
                 .repeatGroupId(repeatGroupId)

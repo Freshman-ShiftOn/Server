@@ -55,7 +55,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public ShiftRequest acceptShiftRequest(Long shiftRequestId, Long acceptId) {
+    public ShiftRequest acceptShiftRequest(Long shiftRequestId, Long acceptId, String acceptName) {
         // 대타 요청 확인
         ShiftRequest existingShiftRequest = shiftRequestRepository.findById(shiftRequestId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId));
@@ -68,6 +68,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 
         // 대타 요청 수락 처리
         existingShiftRequest.setAcceptId(acceptId);
+        existingShiftRequest.setWorkerName(acceptName);
         existingShiftRequest.setReqStatus("ACCEPTED");
         shiftRequestRepository.save(existingShiftRequest);
 
@@ -84,6 +85,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
             newSchedules.add(Schedule.builder()
                     .branchId(schedule.getBranchId())
                     .workerId(schedule.getWorkerId()) // 요청자가 남는 부분
+                    .workerName(schedule.getWorkerName()) // 요청자가 남는 부분
                     .workType(schedule.getWorkType())
                     .startTime(originalStartTime)
                     .endTime(reqStartTime)
@@ -96,6 +98,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
             newSchedules.add(Schedule.builder()
                     .branchId(schedule.getBranchId())
                     .workerId(schedule.getWorkerId()) // 요청자가 남는 부분
+                    .workerName(schedule.getWorkerName()) // 요청자가 남는 부분
                     .workType(schedule.getWorkType())
                     .startTime(reqEndTime)
                     .endTime(originalEndTime)
@@ -105,6 +108,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 
         // 3. 대타 요청 시간에 해당하는 스케줄 생성 (수락자)
         schedule.setWorkerId(acceptId); // 대타를 수락한 유저로 변경
+        schedule.setWorkerName(acceptName); // 대타를 수락한 유저로 변경
         schedule.setStartTime(reqStartTime);
         schedule.setEndTime(reqEndTime);
         schedule.setWorkType(existingShiftRequest.getWorkType());
