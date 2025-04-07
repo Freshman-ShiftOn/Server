@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "auth-service-controller", description = "OAuth2.0 Auth 서비스 API")
+@Tag(name = "boss-auth-service-controller", description = "OAuth2.0 Auth 서비스 API")
 public class AuthController {
     private final Environment env;
     private final KakaoService kakaoService;
     private final UserService userService;
     @Operation(
-            summary = "사용자 카카오 로그인",
+            summary = "자영업 사용자 카카오 로그인",
             description = "사용자의 카카오 정보로 로그인을 시도합니다.(없으면 회원가입 후 로그인 자동)"
     )
     @GetMapping("/kakao/login")
@@ -88,26 +88,26 @@ public class AuthController {
         }
     }
 
-   @GetMapping("/kakao/web/login")
-   public ResponseEntity<String> KakaoWebLogin(@RequestParam String code) {
-       log.info("Received Kakao authorization code: {}", code);
-
-       try {
-           // KakaoService를 통해 JWT 토큰 발급
-           String jwtToken = kakaoService.authenticateWithKakao(code);
-           // JWT 토큰 반환
-           return ResponseEntity.ok(jwtToken);
-       } catch (IllegalStateException e) {
-           log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
-       } catch (RuntimeException e) {
-           log.error("카카오 콜백 처리 중 오류: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
-       } catch (Exception e) {
-           log.error("예상치 못한 오류 발생: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
-       }
-   }
+//    @GetMapping("/kakao/callback")
+//    public ResponseEntity<String> handleKakaoCallback(@RequestParam String code) {
+//        log.info("Received Kakao authorization code: {}", code);
+//
+//        try {
+//            // KakaoService를 통해 JWT 토큰 발급
+//            String jwtToken = kakaoService.authenticateWithKakao(code);
+//            // JWT 토큰 반환
+//            return ResponseEntity.ok(jwtToken);
+//        } catch (IllegalStateException e) {
+//            log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
+//        } catch (RuntimeException e) {
+//            log.error("카카오 콜백 처리 중 오류: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
+//        } catch (Exception e) {
+//            log.error("예상치 못한 오류 발생: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
+//        }
+//    }
 
 //    @GetMapping("/join")
 //    public ResponseEntity<?> joinUser(@RequestHeader("X-Authenticated-User") String email,

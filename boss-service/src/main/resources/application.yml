@@ -1,0 +1,71 @@
+server:
+  port: 14001
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.epicode: DEBUG
+    org.springdoc: DEBUG
+    org.springframework: DEBUG
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+  application:
+    name: boss-service
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_RESTAPI}
+            redirect-uri: ${BASE_URL}
+            authorization-grant-type: authorization_code
+            scope: account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        cache.use_second_level_cache: false
+        cache.use_query_cache: false
+
+  datasource: #mysql_container #localhost
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: HikariCP
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 20000
+      connection-test-query: SELECT 1
+      leak-detection-threshold: 60000
+jwt:
+  secret-key: ${JWT_KEY}
+  expiration_time: 86400000
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER}
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
