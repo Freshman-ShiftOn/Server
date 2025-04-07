@@ -1,5 +1,5 @@
 package com.epicode.service;
-import com.epicode.domain.User;
+import com.epicode.domain.Boss;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.repository.BossRepository;
@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service;
 public class BossService {
     private final BossRepository bossRepository;
 
+    
     @Transactional
-    public void saveUser(User user) {//,String name
-        if(bossRepository.existsByEmail(user.getEmail())){
+    public void saveBoss(Boss boss) {//,String name
+        if(bossRepository.existsByEmail(boss.getEmail())){
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }
-        bossRepository.save(user);
+        bossRepository.save(boss);
     }
     @Transactional
     public void deleteUser(String userEmail) {//회원 탈퇴
