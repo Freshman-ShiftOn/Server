@@ -28,6 +28,7 @@ public class KakaoService {
     private final Environment env;
     private final UserRepository userRepository;
     private final BossRepository bossRepository;
+    private final BossService bossService;
     private final UserBranchRepository userBranchRepository;
     private final BossBranchRepository bossBranchRepository;
     private final JwtUtil jwtUtil;
@@ -78,7 +79,7 @@ public class KakaoService {
            
 
            if (!bossRepository.existsByEmail(userEmail)) {
-                saveBoss(boss);
+                bossService.saveBoss(boss);
            }
 
            Long bossId = bossRepository.findByEmail(userEmail).getId();
@@ -203,13 +204,7 @@ public class KakaoService {
         }
     }
 
-    @Transactional
-    public void saveBoss(Boss boss) {//,String name
-        if(bossRepository.existsByEmail(boss.getEmail())){
-            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
-        }
-        bossRepository.save(boss);
-    }
+    
 
     //AT -> (없으면 생성) -> 이메일 리턴
     @Transactional
