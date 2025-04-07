@@ -1,5 +1,7 @@
 C:\Users\epicode\Desktop\Server\apigateway-service\src\main\java\com\epicode\apigatewayservice\config\FilterConfig.java
 C:\Users\epicode\Desktop\Server\apigateway-service\src\main\java\com\epicode\apigatewayservice\ApigatewayServiceApplication.java
+C:\Users\epicode\Desktop\Server\apigateway-service\src\main\java\com\epicode\apigatewayservice\config\GlobalCorsConfiguration.java
+C:\Users\epicode\Desktop\Server\apigateway-service\src\main\java\com\epicode\apigatewayservice\filter\InviteJwtAuthenticationFilter.java
 C:\Users\epicode\Desktop\Server\apigateway-service\src\main\java\com\epicode\apigatewayservice\filter\CustomFilter.java
 C:\Users\epicode\Desktop\Server\apigateway-service\src\main\java\com\epicode\apigatewayservice\filter\JwtAuthenticationFilter.java
 C:\Users\epicode\Desktop\Server\apigateway-service\src\main\java\com\epicode\apigatewayservice\filter\GlobalFilter.java
