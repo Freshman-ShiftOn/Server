@@ -4,7 +4,6 @@ import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.repository.*;
-import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
