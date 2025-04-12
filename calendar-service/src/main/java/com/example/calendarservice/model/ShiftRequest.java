@@ -50,6 +50,9 @@ public class ShiftRequest {
     @Column(name = "accept_id")
     private Long acceptId;
 
+    @Column(name = "accept_name")
+    private String acceptName;
+
     @Column(name = "req_status", length = 10, nullable = false)
     private String reqStatus;
 
