@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
@@ -43,13 +42,16 @@ public class ShiftRequest {
     private List<String> workType;
 
     @Column(name = "req_start_time", nullable = false)
-    private Time reqStartTime;
+    private Date reqStartTime;
 
     @Column(name = "req_end_time", nullable = false)
-    private Time reqEndTime;
+    private Date reqEndTime;
 
     @Column(name = "accept_id")
     private Long acceptId;
+
+    @Column(name = "accept_name")
+    private String acceptName;
 
     @Column(name = "req_status", length = 10, nullable = false)
     private String reqStatus;

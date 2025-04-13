@@ -68,7 +68,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 
         // 대타 요청 수락 처리
         existingShiftRequest.setAcceptId(acceptId);
-        existingShiftRequest.setWorkerName(acceptName);
+        existingShiftRequest.setAcceptName(acceptName);
         existingShiftRequest.setReqStatus("ACCEPTED");
         shiftRequestRepository.save(existingShiftRequest);
 
