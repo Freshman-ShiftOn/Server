@@ -125,13 +125,21 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public List<ShiftRequest> getShiftRequestsByUser(Long workerID){
-        return shiftRequestRepository.findByWorkerId(workerID);
+    public List<ShiftRequest> getShiftRequestsByUser(Long workerId, Long branchId){
+        if (branchId != null) {
+            return shiftRequestRepository.findByWorkerIdAndBranchId(workerId, branchId);
+        } else {
+            return shiftRequestRepository.findByWorkerId(workerId);
+        }
     }
 
     @Override
-    public List<ShiftRequest> getAcceptedShiftRequestsByUser(Long userId) {
-        return shiftRequestRepository.findByAcceptId(userId);
+    public List<ShiftRequest> getAcceptedShiftRequestsByUser(Long acceptId, Long branchId) {
+        if (branchId != null) {
+            return shiftRequestRepository.findByAcceptIdAndBranchId(acceptId, branchId);
+        } else {
+            return shiftRequestRepository.findByAcceptId(acceptId);
+        }
     }
 
     private Schedule getScheduleFromShiftRequest(Long shiftRequestId) {

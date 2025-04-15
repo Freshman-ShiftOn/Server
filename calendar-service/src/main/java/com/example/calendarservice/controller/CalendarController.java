@@ -204,23 +204,29 @@ public class CalendarController {
         return ResponseEntity.ok(updatedRequest);
     }
 
-    // 대타 요청 내역 조회 (마이페이지용)
+    // 대타 요청 내역 조회 (지점 필터 추가)
     @GetMapping("/request-shift")
     @Operation(summary = "대타 요청 내역 조회 (마이페이지용)", description = "특정한 유저의 대타 요청 내역을 조회한다.")
     public ResponseEntity<List<ShiftRequest>> getShiftRequestsByUser(
-            @RequestHeader("X-Authenticated-User-Id") String userId) {
-        // 해당 유저의 대타 요청 내역 조회
-        List<ShiftRequest> shiftRequests = shiftRequestService.getShiftRequestsByUser(Long.valueOf(userId));
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestParam(value = "branchId", required = false) Long branchId) {
+
+        List<ShiftRequest> shiftRequests = shiftRequestService
+                .getShiftRequestsByUser(Long.valueOf(userId), branchId);
+
         return ResponseEntity.ok(shiftRequests);
     }
 
-    // 대타 수락 내역 조회 (마이페이지용)
+    // 대타 수락 내역 조회 (지점 필터 추가)
     @GetMapping("/accepted-shift")
     @Operation(summary = "대타 수락 내역 조회 (마이페이지용)", description = "특정 유저가 수락한 대타 요청 내역을 조회한다.")
     public ResponseEntity<List<ShiftRequest>> getAcceptedShiftRequestsByUser(
-            @RequestHeader("X-Authenticated-User-Id") String userId) {
-        // 해당 유저의 대타 수락 내역 조회
-        List<ShiftRequest> acceptedShiftRequests = shiftRequestService.getAcceptedShiftRequestsByUser(Long.valueOf(userId));
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestParam(value = "branchId", required = false) Long branchId) {
+
+        List<ShiftRequest> acceptedShiftRequests = shiftRequestService
+                .getAcceptedShiftRequestsByUser(Long.valueOf(userId), branchId);
+
         return ResponseEntity.ok(acceptedShiftRequests);
     }
 

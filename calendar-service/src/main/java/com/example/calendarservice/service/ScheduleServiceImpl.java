@@ -92,6 +92,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         // 첫 번째 스케줄 ID를 repeatGroupId로 설정하여 나머지 일정 생성
         Long repeatGroupId = firstSchedule.getId();
         firstSchedule.setRepeatGroupId(repeatGroupId);
+        scheduleRepository.save(firstSchedule);
 
         switch (repeatRequest.getRepeat().getType()) {
             case "DAILY":

@@ -13,8 +13,8 @@ public interface ShiftRequestService {
 
     ShiftRequest acceptShiftRequest(Long shiftRequestId, Long acceptId, String acceptName);
 
-    List<ShiftRequest> getShiftRequestsByUser(Long workerId);
-    List<ShiftRequest> getAcceptedShiftRequestsByUser(Long workerId);
+    List<ShiftRequest> getShiftRequestsByUser(Long workerId, Long branchId);
+    List<ShiftRequest> getAcceptedShiftRequestsByUser(Long workerId, Long branchId);
 
     List<ShiftRequest> getShiftRequestsByBranchAndMonth(Long branchId, Integer month);
 }
