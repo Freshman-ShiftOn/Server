@@ -4,7 +4,6 @@ import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.repository.*;
-import com.epicode.repository.UserRepository;
 import com.epicode.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -61,10 +60,43 @@ public class KakaoService {
         userRepository.save(user);
     }
     
+    @Transactional
+    public String authenticateWithKakao(String accessToken) {
+        try {
+            if (accessToken == null || accessToken.isEmpty()) {
+                throw new CustomException(ErrorCode.TOKEN_ERROR);
+            }
+
+            // 카카오에서 사용자 정보 가져오기 (저장은 하지 않음)
+            User kakaoUser = getUserInfoFromKakao(accessToken);
+            kakaoUser.setCreatedAt(LocalDateTime.now());
+
+            if (kakaoUser == null) {
+                throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
+            }
+
+            // 이메일로 사용자 검색
+            User existingUser = userRepository.findByEmail(kakaoUser.getEmail());
+
+            if (existingUser == null) {
+                // 데이터베이스에 저장하면서 ID 할당
+                existingUser = userRepository.save(kakaoUser); // 여기서 영속화되어 ID가 생성됨
+            }
+
+            // 사용자 Branch 정보 가져오기
+            List<Long> branches = userBranchRepository.findBranchIdsByUserId(existingUser.getId());
+
+            // JWT 토큰 생성
+            return jwtUtil.createJwtToken(existingUser, branches);
+        } catch (Exception e) {
+            throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함: " + e.getMessage(), e);
+        }
+    }
+
 
 
 //AccessCode로부터 받아오기 버전(Web)-> return JWT
-   public String authenticateWithKakao(String code) {
+   public String BossAuthenticateWithKakao(String code) {
        try {
            String accessToken = getAccessTokenFromKakao(code);
            if (accessToken == null || accessToken.isEmpty()) {

@@ -31,6 +31,13 @@ public class UserService {
         userRepository.save(user);
     }
     @Transactional
+    public User updateUserName(Long userId, String newName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setName(newName);
+        return userRepository.save(user);
+    }
+    @Transactional
     public void deleteUser(String userEmail) {//회원 탈퇴
         if(!userRepository.existsByEmail(userEmail)){
             throw new CustomException(ErrorCode.USER_NOT_FOUND);

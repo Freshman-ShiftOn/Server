@@ -1,4 +1,5 @@
 package com.epicode.controller;
+import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
 import com.epicode.security.JwtUtil;
 import com.epicode.service.KakaoService;
@@ -88,13 +89,33 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "사용자 이름 변경",
+            description = "사용자 정보를 변경합니다.",
+            parameters = {
+                    @Parameter(name = "name", description = "사용자 new이름", required = true)
+            }
+    )
+    @PutMapping("/edit/{name}")
+    public ResponseEntity<?> updateName(@RequestHeader("X-Authenticated-User-Id") String userId, @PathVariable String name) {
+        User updatedUser = userService.updateUserName(Long.parseLong(userId), name);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @Operation(
+            summary = "사용자 웹 카카오",
+            description = "웹 로그인 카카오.",
+            parameters = {
+                    @Parameter(name = "email", description = "사용자 이메일", required = true)
+            }
+    )
    @GetMapping("/kakao/web/login")
    public ResponseEntity<String> KakaoWebLogin(@RequestParam String code) {
        log.info("Received Kakao authorization code: {}", code);
 
        try {
            // KakaoService를 통해 JWT 토큰 발급
-           String jwtToken = kakaoService.authenticateWithKakao(code);
+           String jwtToken = kakaoService.BossAuthenticateWithKakao(code);
            // JWT 토큰 반환
            return ResponseEntity.ok(jwtToken);
        } catch (IllegalStateException e) {
