@@ -102,41 +102,16 @@ public class AuthController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    @Operation(
-            summary = "사용자 웹 카카오",
-            description = "웹 로그인 카카오.",
-            parameters = {
-                    @Parameter(name = "email", description = "사용자 이메일", required = true)
-            }
-    )
-   @GetMapping("/kakao/web/login")
-   public ResponseEntity<String> KakaoWebLogin(@RequestParam String code) {
-       log.info("Received Kakao authorization code: {}", code);
-
-       try {
-           // KakaoService를 통해 JWT 토큰 발급
-           String jwtToken = kakaoService.BossAuthenticateWithKakao(code);
-           // JWT 토큰 반환
-           return ResponseEntity.ok(jwtToken);
-       } catch (IllegalStateException e) {
-           log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
-       } catch (RuntimeException e) {
-           log.error("카카오 콜백 처리 중 오류: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
-       } catch (Exception e) {
-           log.error("예상치 못한 오류 발생: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
-       }
-   }
-
-//    @GetMapping("/join")
-//    public ResponseEntity<?> joinUser(@RequestHeader("X-Authenticated-User") String email,
-//                                         @RequestParam String name) {
-//        kakaoService.saveUser(email,name);
-//        return ResponseEntity.status(HttpStatus.OK).build();
-//    }
+    /////////////////////////////////////
+    
 //
+
+// @GetMapping("/join")
+// public ResponseEntity<?> joinUser(@RequestHeader("X-Authenticated-User") String email,
+//                                      @RequestParam String name) {
+//     kakaoService.saveUser(email,name);
+//     return ResponseEntity.status(HttpStatus.OK).build();
+// }
 //    @GetMapping("/info")
 //    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
 //        try {
