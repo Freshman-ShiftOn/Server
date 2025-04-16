@@ -16,12 +16,26 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class SwaggerConfig {
     @Bean
-    public GroupedOpenApi customTestOpenAPI() {
-        String[] paths = {"/api/salaries/**"};
-
+    public GroupedOpenApi salaryApi() {
         return GroupedOpenApi.builder()
-                .group("Salary service 위한 API")
-                .pathsToMatch(paths)
+                .group("Salary API")
+                .pathsToMatch("/api/salaries/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi webAuthApi() {
+        return GroupedOpenApi.builder()
+                .group("Web Auth(일반로그인) API")
+                .pathsToMatch("/api/web/auth/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi authApi() {
+        return GroupedOpenApi.builder()
+                .group("Kakao Auth API")
+                .pathsToMatch("/api/auth/**")
                 .build();
     }
 }
