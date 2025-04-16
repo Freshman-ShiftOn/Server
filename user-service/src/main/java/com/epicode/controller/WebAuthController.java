@@ -2,7 +2,6 @@ package com.epicode.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import io.swagger.v3.oas.annotations.*;
 import com.epicode.domain.*;
@@ -17,20 +16,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/web/auth")
-@Tag(name = "web-auth-service-controller", description = "OAuth2.0 Auth 서비스 API")
+@Tag(name = "web-auth-service-controller", description = "Auth 서비스 API")
 public class WebAuthController {
-    private final Environment env;
     private final JwtUtil jwtUtil;
     private final KakaoService kakaoService;
     private final UserCredentialService userCredentialService;
