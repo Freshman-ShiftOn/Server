@@ -18,8 +18,7 @@ public class SecurityConfig {
         http.csrf( (csrf) -> csrf.disable());
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html","/kakao/login","/error",
-    "/v3/api-docs/swagger-config").permitAll()
+                        .requestMatchers("/api/web/auth/**","/api/auth/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html","/kakao/login","/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(secretKey),
