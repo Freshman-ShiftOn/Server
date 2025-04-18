@@ -28,6 +28,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/web/auth/**","/api/auth/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html","/kakao/login","/error").permitAll()
                         .anyRequest().authenticated()
                 )
+                .httpBasic().disable()
+                .formLogin().disable()
                 .addFilterBefore(new JwtAuthenticationFilter(secretKey),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(oauth2 -> oauth2
