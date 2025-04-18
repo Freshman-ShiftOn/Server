@@ -8,20 +8,36 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
-        info = @Info(title = "User Service API 명세서",
-                     description = "Crewezy User Service RESTful API 명세서",
-                     version ="v1.0.0")
+        info = @Info(
+                title = "Crewezy API 명세서",
+                description = "Crewezy RESTful API 문서",
+                version = "v1.0.0"
+        )
 )
 @Configuration
-@RequiredArgsConstructor
 public class SwaggerConfig {
-    @Bean
-    public GroupedOpenApi customTestOpenAPI() {
-        String[] paths = {"/api/salaries/**","/api/web/auth/**","/api/auth/**"};
 
+    @Bean
+    public GroupedOpenApi webAuthApi() {
         return GroupedOpenApi.builder()
-                .group("User service 위한 API")
-                .pathsToMatch(paths)
+                .group("web-auth-api") // 웹용 인증 관련
+                .pathsToMatch("/api/web/auth/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi generalAuthApi() {
+        return GroupedOpenApi.builder()
+                .group("general-auth-api") // 일반 인증
+                .pathsToMatch("/api/auth/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi salaryApi() {
+        return GroupedOpenApi.builder()
+                .group("salary-api") // 급여 관련
+                .pathsToMatch("/api/salaries/**")
                 .build();
     }
 }
