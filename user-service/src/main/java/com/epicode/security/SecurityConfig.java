@@ -23,7 +23,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf( (csrf) -> csrf.disable());
-        http
+        httpQ
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/web/auth/**","/api/auth/**","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html","/kakao/login","/error").permitAll()
                         .anyRequest().authenticated()
@@ -32,8 +32,8 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .addFilterBefore(new JwtAuthenticationFilter(secretKey),
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/api/auth/kakao/callback") //커스텀 정의 경로
+                // .oauth2Login(oauth2 -> oauth2
+                //         .loginPage("/api/auth/kakao/callback") //커스텀 정의 경로
                 );
 
         return http.build();
