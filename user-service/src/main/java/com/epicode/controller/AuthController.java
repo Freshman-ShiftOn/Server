@@ -104,8 +104,8 @@ public class AuthController {
 
     /////////////////////////////////////
     /// web 버전 in APP
-    @GetMapping("/kakao/login/test")
-    public ResponseEntity<String> KakaoTestLogin(@RequestParam String code) {
+    @PostMapping("/kakao/login/test")
+    public ResponseEntity<String> KakaoTestLogin(@RequestBody String code) {
         log.info("Received Kakao authorization code: {}", code);
 
         try {
