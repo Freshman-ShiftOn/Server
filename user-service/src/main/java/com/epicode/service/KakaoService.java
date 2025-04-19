@@ -95,35 +95,35 @@ public class KakaoService {
 
 
 
-//AccessCode로부터 받아오기 버전(Web)-> return JWT
-   public String BossAuthenticateWithKakao(String code) {
-       try {
-           String accessToken = getAccessTokenFromKakao(code);
-           if (accessToken == null || accessToken.isEmpty()) {
-               throw new CustomException(ErrorCode.TOKEN_ERROR);
-           }
+    //Boss: AccessCode로부터 받아오기 버전(Web)-> return JWT
+    public String BossAuthenticateWithKakao(String code) {
+        try {
+            String accessToken = getAccessTokenFromKakao(code);
+            if (accessToken == null || accessToken.isEmpty()) {
+                throw new CustomException(ErrorCode.TOKEN_ERROR);
+            }
 
-            Boss boss = getBossInfoFromKakao(accessToken);
-            String userEmail = boss.getEmail();
-           if (userEmail == null || userEmail.isEmpty()) {
-               throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
-           }
-           
+                Boss boss = getBossInfoFromKakao(accessToken);
+                String userEmail = boss.getEmail();
+            if (userEmail == null || userEmail.isEmpty()) {
+                throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
+            }
+            
 
-           if (!bossRepository.existsByEmail(userEmail)) {
-                bossService.saveBoss(boss);
-           }
+            if (!bossRepository.existsByEmail(userEmail)) {
+                    bossService.saveBoss(boss);
+            }
 
-           Long bossId = bossRepository.findByEmail(userEmail).getId();
-           List<Long> branches = bossBranchRepository.findBranchIdsByBossId(bossId);
+            Long bossId = bossRepository.findByEmail(userEmail).getId();
+            List<Long> branches = bossBranchRepository.findBranchIdsByBossId(bossId);
 
-           return jwtUtil.generateToken(userEmail, branches, bossId); // JWT 토큰 생성
-       } catch (Exception e) {
-           throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함: " + e.getMessage(), e);
-       }
-   }
+            return jwtUtil.generateToken(userEmail, branches, bossId); // JWT 토큰 생성
+        } catch (Exception e) {
+            throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함: " + e.getMessage(), e);
+        }
+    }
 
-   private String getAccessTokenFromKakao(String code) {
+    public String getAccessTokenFromKakao(String code) {
        try {
            HttpHeaders headers = new HttpHeaders();
            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

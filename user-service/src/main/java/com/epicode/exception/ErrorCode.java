@@ -14,7 +14,9 @@ public enum ErrorCode {
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다."),
     TOKEN_ERROR(HttpStatus.UNAUTHORIZED, "토큰을 확인할 수 없습니다."),
     USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 가입 된 사용자입니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "가입되지 않은 사용자입니다.");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "가입되지 않은 사용자입니다."),
+    USER_PWD_INVALID(HttpStatus.UNAUTHORIZED, "비밀번호 체크 필요"),
+    LOGIN_TYPE_ERROR(HttpStatus.NOT_FOUND, "다른 방식 로그인 필요");
 
     private final HttpStatus httpStatus;
     private final String message;

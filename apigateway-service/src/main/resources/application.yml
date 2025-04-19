@@ -24,7 +24,7 @@ spring:
   cloud:
     gateway:
       globalcors:
-        cors-configurations:
+        corsConfigurations:
           '[/**]':
             allowedOrigins: "*"       # 모든 도메인 허용
             allowedMethods: "*"       # 모든 HTTP 메서드 허용 (GET, POST, PUT, DELETE 등)
@@ -40,6 +40,11 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/auth/**
+            
+        - id: web-user-service
+          uri: lb://WEB-USER-SERVICE
+          predicates:
+            - Path=/api/web/auth/**
 
         - id: user-service-salaries
           uri: lb://USER-SERVICE
