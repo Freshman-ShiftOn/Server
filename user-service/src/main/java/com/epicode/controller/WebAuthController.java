@@ -86,7 +86,7 @@ public class WebAuthController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO request) {
         try {
             User user = userRepository.findByEmail(request.getEmail());
-            if (userRepository.findByEmail(request.getEmail())!=null) {
+            if (userRepository.findByEmail(request.getEmail())==null) {
                 throw new CustomException(ErrorCode.USER_NOT_FOUND);
             }//사용자를 찾을 수 없음
             UserCredentials credential = credentialRepository.findById(user.getId())
