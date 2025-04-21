@@ -63,7 +63,7 @@ public class WebAuthController {
    }
 
    @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody @Valid SignUpRequestDTO request) {
+    public ResponseEntity<?> signUp(@RequestBody SignUpRequestDTO request) {
         if (userRepository.findByEmail(request.getEmail())!=null) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
         }//이미 있는 사용자-중복 가입 불가
