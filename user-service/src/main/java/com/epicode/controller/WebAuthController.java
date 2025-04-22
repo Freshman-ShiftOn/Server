@@ -47,7 +47,7 @@ public class WebAuthController {
 
        try {
            // KakaoService를 통해 JWT 토큰 발급
-           String jwtToken = kakaoService.BossAuthenticateWithKakao(code);
+           String jwtToken = kakaoService.UserAuthenticateWithKakao(code);
            // JWT 토큰 반환
            return ResponseEntity.ok(jwtToken);
        } catch (IllegalStateException e) {

@@ -26,10 +26,8 @@ public class KakaoService {
     private final RestTemplate restTemplate; // RestTemplate Bean 주입
     private final Environment env;
     private final UserRepository userRepository;
-    private final BossRepository bossRepository;
-    private final BossService bossService;
+    private final UserService userService;
     private final UserBranchRepository userBranchRepository;
-    private final BossBranchRepository bossBranchRepository;
     private final JwtUtil jwtUtil;
 
 //    public void redirectToKakao(HttpServletResponse response) {
@@ -96,28 +94,28 @@ public class KakaoService {
 
 
     //Boss: AccessCode로부터 받아오기 버전(Web)-> return JWT
-    public String BossAuthenticateWithKakao(String code) {
+    public String UserAuthenticateWithKakao(String code) {
         try {
             String accessToken = getAccessTokenFromKakao(code);
             if (accessToken == null || accessToken.isEmpty()) {
                 throw new CustomException(ErrorCode.TOKEN_ERROR);
             }
 
-                Boss boss = getBossInfoFromKakao(accessToken);
-                String userEmail = boss.getEmail();
+                User user = getUserInfoFromKakao(accessToken);
+                String userEmail = user.getEmail();
             if (userEmail == null || userEmail.isEmpty()) {
                 throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
             }
             
 
-            if (!bossRepository.existsByEmail(userEmail)) {
-                    bossService.saveBoss(boss);
+            if (!userRepository.existsByEmail(userEmail)) {
+                    userService.saveUser(user);
             }
 
-            Long bossId = bossRepository.findByEmail(userEmail).getId();
-            List<Long> branches = bossBranchRepository.findBranchIdsByBossId(bossId);
+            Long userId = userRepository.findByEmail(userEmail).getId();
+            List<Long> branches = userBranchRepository.findBranchIdsByUserId(userId);
 
-            return jwtUtil.generateToken(userEmail, branches, bossId); // JWT 토큰 생성
+            return jwtUtil.generateToken(userEmail, branches, userId); // JWT 토큰 생성
         } catch (Exception e) {
             throw new RuntimeException("Auth code로 access token 발급을 시도했으나 실패함: " + e.getMessage(), e);
         }
@@ -167,48 +165,6 @@ public class KakaoService {
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 User kakaoUser = new User();// 카카오 계정 정보 가져오기
-                Map<String, Object> kakaoAccount = (Map<String, Object>) response.getBody().get("kakao_account");
-
-                // 프로필 정보 가져오기
-                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-
-                // 이메일 추출
-                String email = (String) kakaoAccount.get("email");
-
-                // 닉네임 추출 (프로필이 있는 경우)
-                String nickname = (profile != null) ? (String) profile.get("nickname") : "닉네임 없음";
-
-                // 사용자 고유 ID 추출
-                //Long userId = (Long) response.getBody().get("id");
-
-                // 유저 객체에 값 설정
-                kakaoUser.setEmail(email != null ? email : "이메일 없음");
-                kakaoUser.setName(nickname);
-                //kakaoUser.setId(userId);
-                return kakaoUser;
-            } else {
-                throw new RuntimeException("Failed to fetch user info from Kakao: " + response.getStatusCode());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("카카오 유저 정보 요청 중 오류: " + e.getMessage());
-        }
-    }
-
-    private Boss getBossInfoFromKakao(String accessToken) {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + accessToken);
-
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<Map> response = restTemplate.exchange(
-                    env.getProperty("spring.security.oauth2.client.provider.kakao.user-info-uri"),
-                    HttpMethod.GET,
-                    entity,
-                    Map.class
-            );
-
-            if (response.getStatusCode() == HttpStatus.OK) {
-                Boss kakaoUser = new Boss();// 카카오 계정 정보 가져오기
                 Map<String, Object> kakaoAccount = (Map<String, Object>) response.getBody().get("kakao_account");
 
                 // 프로필 정보 가져오기
