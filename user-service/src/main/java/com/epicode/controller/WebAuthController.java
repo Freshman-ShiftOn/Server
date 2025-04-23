@@ -48,6 +48,7 @@ public class WebAuthController {
         try {
             // KakaoService를 통해 엑세스 토큰 발급
             String accessToken = kakaoService.getAccessTokenFromKakao(code);
+            log.info("Received Kakao accessToken: {}", accessToken);
             // JWT 토큰 반환
             return ResponseEntity.ok(accessToken);
         } catch (IllegalStateException e) {
