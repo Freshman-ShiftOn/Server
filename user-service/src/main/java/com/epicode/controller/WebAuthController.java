@@ -41,15 +41,14 @@ public class WebAuthController {
                     @Parameter(name = "email", description = "사용자 이메일", required = true)
             }
     )
-   @GetMapping("/kakao/login")
-   public ResponseEntity<String> KakaoWebLogin(@RequestParam String code) {
+   @PostMapping("/kakao/login")
+   public ResponseEntity<String> KakaoWebLogin(@RequestBody String code) {
         log.info("Received Kakao authorization code: {}", code);
 
         try {
             // KakaoService를 통해 엑세스 토큰 발급
             String accessToken = kakaoService.getAccessTokenFromKakao(code);
             log.info("Received Kakao accessToken: {}", accessToken);
-            // JWT 토큰 반환
             return ResponseEntity.ok(accessToken);
         } catch (IllegalStateException e) {
             log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
