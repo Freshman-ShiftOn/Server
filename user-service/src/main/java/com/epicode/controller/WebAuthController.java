@@ -43,23 +43,23 @@ public class WebAuthController {
     )
    @GetMapping("/kakao/login")
    public ResponseEntity<String> KakaoWebLogin(@RequestParam String code) {
-       log.info("Received Kakao authorization code: {}", code);
+        log.info("Received Kakao authorization code: {}", code);
 
-       try {
-           // KakaoService를 통해 JWT 토큰 발급
-           String jwtToken = kakaoService.UserAuthenticateWithKakao(code);
-           // JWT 토큰 반환
-           return ResponseEntity.ok(jwtToken);
-       } catch (IllegalStateException e) {
-           log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
-       } catch (RuntimeException e) {
-           log.error("카카오 콜백 처리 중 오류: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
-       } catch (Exception e) {
-           log.error("예상치 못한 오류 발생: {}", e.getMessage());
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
-       }
+        try {
+            // KakaoService를 통해 엑세스 토큰 발급
+            String accessToken = kakaoService.getAccessTokenFromKakao(code);
+            // JWT 토큰 반환
+            return ResponseEntity.ok(accessToken);
+        } catch (IllegalStateException e) {
+            log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("카카오 콜백 처리 중 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("예상치 못한 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
+        }
    }
 
    @PostMapping("/signup")
