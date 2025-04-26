@@ -17,6 +17,18 @@ public class Branch {
     @Column(nullable = false, length = 100, unique = true)
     private String name;
 
+    @Column(nullable = false)
+    private String adress;
+
+    @Column(nullable = true)
+    private String dial_numbers;
+
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '10030'")
+    private String basic_cost = "10030";
+
+    @Column(nullable = true)
+    private String weekly_allowance;
+
     @Column(length = 2083)
     private String images;
 
