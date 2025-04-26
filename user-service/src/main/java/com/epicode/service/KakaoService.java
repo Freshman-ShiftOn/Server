@@ -1,5 +1,4 @@
 package com.epicode.service;
-import com.epicode.domain.Boss;
 import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
