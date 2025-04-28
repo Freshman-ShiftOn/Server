@@ -1,7 +1,6 @@
 package com.example.calendarservice.controller;
 
 import com.example.calendarservice.dto.RepeatScheduleRequest;
-import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.dto.ShiftRequestsByBranchMonthResponseDto;
 import com.example.calendarservice.dto.UpdateShiftRequestDto;
 import com.example.calendarservice.model.Schedule;
@@ -58,9 +57,13 @@ public class CalendarController {
             @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody Schedule schedule) {
+
+        // 요청 데이터에서 branchId와 userId 설정
         schedule.setBranchId(branchId);
         schedule.setWorkerId(Long.valueOf(userId));
         schedule.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
+
+        // 스케줄 생성
         Schedule newSchedule = scheduleService.createSchedule(schedule);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
     }
@@ -108,9 +111,8 @@ public class CalendarController {
     public ResponseEntity<List<Schedule>> updateSchedules(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Long scheduleId,
-            @RequestBody RepeatScheduleUpdateRequest request) {
+            @RequestBody RepeatScheduleRequest request) {
 
-        // 해당 스케줄이 현재 유저의 스케줄인지 검증
         if (!scheduleService.isUserSchedule(scheduleId, Long.valueOf(userId))) {
             throw new IllegalArgumentException("Unauthorized: The schedule does not belong to the authenticated user.");
         }

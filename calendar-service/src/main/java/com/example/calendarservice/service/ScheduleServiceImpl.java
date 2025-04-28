@@ -1,7 +1,6 @@
 package com.example.calendarservice.service;
 
 import com.example.calendarservice.dto.RepeatScheduleRequest;
-import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.exception.ResourceNotFoundException;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.repository.ScheduleRepository;
@@ -79,9 +78,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<Schedule> createRepeatSchedules(RepeatScheduleRequest repeatRequest) {
         List<Schedule> schedules = new ArrayList<>();
 
-        // 날짜와 반복 로직 처리
-        LocalDate startDate = repeatRequest.getRepeat().getStartDate();
-        LocalDate endDate = repeatRequest.getRepeat().getEndDate();
+        LocalDate startDate = repeatRequest.getStartDate();
+        LocalDate endDate = repeatRequest.getEndDate();
         LocalTime startTime = repeatRequest.getStartTime();
         LocalTime endTime = repeatRequest.getEndTime();
 
@@ -94,42 +92,22 @@ public class ScheduleServiceImpl implements ScheduleService {
         firstSchedule.setRepeatGroupId(repeatGroupId);
         scheduleRepository.save(firstSchedule);
 
-        switch (repeatRequest.getRepeat().getType()) {
-            case "DAILY":
-                for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-                    schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
-                }
-                break;
-
-            case "WEEKLY":
-                for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusWeeks(1)) {
-                    schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
-                }
-                break;
-
-            case "CUSTOM":
-                List<DayOfWeek> daysOfWeek = repeatRequest.getRepeat().getDaysOfWeek();
-                for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-                    if (daysOfWeek.contains(date.getDayOfWeek())) {
-                        schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
-                    }
-                }
-                break;
-
-            default:
-                throw new IllegalArgumentException("Invalid repeat type: " + repeatRequest.getRepeat().getType());
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            if (repeatRequest.getDaysOfWeek().contains(date.getDayOfWeek())) {
+                schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
+            }
         }
 
         // 스케줄 저장
         return scheduleRepository.saveAll(schedules);
     }
 
-    private Schedule createScheduleFromRepeatRequest(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime, Long repeatGroupId) {
+    private Schedule createScheduleFromRepeatRequest(RepeatScheduleRequest repeatRequest, LocalDate date, LocalTime startTime, LocalTime endTime, Long repeatGroupId) {
         return Schedule.builder()
-                .branchId(request.getBranchId())
-                .workerId(request.getWorkerId())
-                .workerName(request.getWorkerName())
-                .workType(request.getWorkType())
+                .branchId(repeatRequest.getBranchId())
+                .workerId(repeatRequest.getWorkerId())
+                .workerName(repeatRequest.getWorkerName())
+                .workType(repeatRequest.getWorkType())
                 .inputType(2) // 반복근무
                 .repeatGroupId(repeatGroupId)
                 .startTime(convertToDate(date.atTime(startTime)))
@@ -142,50 +120,40 @@ public class ScheduleServiceImpl implements ScheduleService {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public List<Schedule> updateRepeatSchedule(Long scheduleId, RepeatScheduleUpdateRequest request) {
+    @Override
+    @Transactional
+    public List<Schedule> updateRepeatSchedule(Long scheduleId, RepeatScheduleRequest repeatRequest) {
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
 
-        List<Schedule> schedulesToUpdate = new ArrayList<>();
+        Long repeatGroupId = existingSchedule.getRepeatGroupId();
 
-        switch (request.getUpdateOption()) {
-            case "ONE":
-                // 이 일정만 수정 (독립적으로 변경)
-                existingSchedule.setWorkType(request.getWorkType());
-                existingSchedule.setStartTime(request.getStartTime());
-                existingSchedule.setEndTime(request.getEndTime());
-                existingSchedule.setInputType(1); // 단일 일정으로 변경
-                schedulesToUpdate.add(scheduleRepository.save(existingSchedule));
-                break;
+        // 기존 스케줄 조회
+        List<Schedule> existingSchedules = scheduleRepository.findByRepeatGroupId(repeatGroupId);
 
-            case "AFTER":
-                // 해당 날짜 이후(포함) 모든 일정 수정
-                schedulesToUpdate = scheduleRepository.findByRepeatGroupIdAndStartTimeGreaterThanEqual(
-                        existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
-                for (Schedule schedule : schedulesToUpdate) {
-                    schedule.setWorkType(request.getWorkType());
-                    schedule.setStartTime(request.getStartTime());
-                    schedule.setEndTime(request.getEndTime());
-                }
-                schedulesToUpdate = scheduleRepository.saveAll(schedulesToUpdate);
-                break;
+        // ShiftRequest 먼저 삭제
+        List<Long> scheduleIdsToDelete = existingSchedules.stream()
+                .map(Schedule::getId)
+                .toList();
+        shiftRequestRepository.deleteByScheduleIdIn(scheduleIdsToDelete);
 
-            case "ALL":
-                // 전체 반복 일정 수정
-                schedulesToUpdate = scheduleRepository.findByRepeatGroupId(existingSchedule.getRepeatGroupId());
-                for (Schedule schedule : schedulesToUpdate) {
-                    schedule.setWorkType(request.getWorkType());
-                    schedule.setStartTime(request.getStartTime());
-                    schedule.setEndTime(request.getEndTime());
-                }
-                schedulesToUpdate = scheduleRepository.saveAll(schedulesToUpdate);
-                break;
+        // 기존 스케줄 삭제
+        scheduleRepository.deleteAll(existingSchedules);
 
-            default:
-                throw new IllegalArgumentException("Invalid update option: " + request.getUpdateOption());
+        // 새 스케줄 생성
+        List<Schedule> newSchedules = new ArrayList<>();
+        LocalDate startDate = repeatRequest.getStartDate();
+        LocalDate endDate = repeatRequest.getEndDate();
+        LocalTime startTime = repeatRequest.getStartTime();
+        LocalTime endTime = repeatRequest.getEndTime();
+
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            if (repeatRequest.getDaysOfWeek().contains(date.getDayOfWeek())) {
+                newSchedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
+            }
         }
 
-        return schedulesToUpdate;
+        return scheduleRepository.saveAll(newSchedules);
     }
 
     @Transactional

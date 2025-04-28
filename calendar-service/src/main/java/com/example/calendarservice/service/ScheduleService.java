@@ -1,7 +1,6 @@
 package com.example.calendarservice.service;
 
 import com.example.calendarservice.dto.RepeatScheduleRequest;
-import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.model.Schedule;
 
 import java.util.List;
@@ -14,8 +13,8 @@ public interface ScheduleService {
     List<Schedule> getSchedulesByBranchIdAndUserId(Long branchId, Integer month, Long userId);
     boolean isUserSchedule(Long scheduleId, Long userId);
     boolean isScheduleInBranch(Long scheduleId, Long branchId);
-    List<Schedule> createRepeatSchedules(RepeatScheduleRequest repeatRequest);
+    List<Schedule> createRepeatSchedules(RepeatScheduleRequest request);
 
-    List<Schedule> updateRepeatSchedule(Long scheduleId, RepeatScheduleUpdateRequest request);
+    List<Schedule> updateRepeatSchedule(Long scheduleId, RepeatScheduleRequest request);
     void deleteRepeatSchedule(Long scheduleId, String deleteOption);
 }
