@@ -2,6 +2,7 @@ package com.epicode.controller;
 import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
 import com.epicode.security.JwtUtil;
+import com.epicode.service.AppleService;
 import com.epicode.service.KakaoService;
 import com.epicode.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final Environment env;
     private final KakaoService kakaoService;
+    private final AppleService appleService;
     private final UserService userService;
     @Operation(
             summary = "사용자 카카오 로그인",
@@ -69,6 +73,47 @@ public class AuthController {
         } catch (Exception e) {
             log.error("예상치 못한 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "사용자 애플 로그인", description = "애플 로그인 URL을 생성하여 반환합니다.")
+    @GetMapping("/apple/login")
+    public ResponseEntity<String> redirectToApple() {
+        try {
+            String clientId = env.getProperty("spring.security.oauth2.client.registration.apple.client-id");
+            String redirectUri = env.getProperty("spring.security.oauth2.client.registration.apple.redirect-uri");
+            String state = UUID.randomUUID().toString(); // CSRF 방지용 랜덤 문자열
+
+
+            if (clientId == null || redirectUri == null) {
+                throw new IllegalStateException("Apple OAuth 환경 변수가 누락되었습니다. application.yml 파일을 확인하세요.");
+            }
+
+            String appleAuthUrl = String.format(
+                    "https://appleid.apple.com/auth/authorize?response_type=code&response_mode=form_post&client_id=%s&redirect_uri=%s&scope=name%%20email&state=%s",
+                    clientId, redirectUri, state
+            );
+
+            return ResponseEntity.ok(appleAuthUrl);
+        } catch (Exception e) {
+            log.error("애플 로그인 URL 생성 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("애플 로그인 URL 생성 오류");
+        }
+    }
+
+    @Operation(summary = "애플 로그인 콜백", description = "Apple에서 반환한 code를 처리하여 JWT 발급")
+    @PostMapping("/apple/callback")
+    public ResponseEntity<String> handleAppleCallback(@RequestBody String code) {
+        try {
+            // AppleService에서 토큰 요청 및 사용자 인증 처리
+            String jwtToken = appleService.authenticateWithApple(code);
+            return ResponseEntity.ok(jwtToken);
+        } catch (IllegalStateException e) {
+            log.error("애플 인증 실패 - 상태 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("애플 인증 실패: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("애플 콜백 처리 중 오류: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
         }
     }
 
