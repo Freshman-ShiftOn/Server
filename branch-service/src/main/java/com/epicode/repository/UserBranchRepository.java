@@ -24,6 +24,5 @@ public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
     List<WorkerProjection> findWorkersByBranchId(Long branchId);
     boolean existsByUserIdAndBranchId(Long userId, Long branchId);
     void deleteByUserAndBranch(User user, Branch branch);
-
     Optional<UserBranch> findByUserAndBranch(User user, Branch branch);
 }
