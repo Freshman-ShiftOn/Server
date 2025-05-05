@@ -25,6 +25,9 @@ public class UserBranch {
     @JoinColumn(name = "branch_id", nullable = false)
     private Branch branch;
 
+    @Column
+    private String roles;
+
     @Column(name = "joined_at")
     private LocalDateTime joinedAt = LocalDateTime.now();
 }
