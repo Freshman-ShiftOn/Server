@@ -94,22 +94,23 @@ public class ScheduleServiceImpl implements ScheduleService {
         firstSchedule.setRepeatGroupId(repeatGroupId);
         scheduleRepository.save(firstSchedule);
 
+        // 나머지 일정 생성
         switch (repeatRequest.getRepeat().getType()) {
             case "DAILY":
-                for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+                for (LocalDate date = startDate.plusDays(1); !date.isAfter(endDate); date = date.plusDays(1)) {
                     schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
                 }
                 break;
 
             case "WEEKLY":
-                for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusWeeks(1)) {
+                for (LocalDate date = startDate.plusDays(1); !date.isAfter(endDate); date = date.plusWeeks(1)) {
                     schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
                 }
                 break;
 
             case "CUSTOM":
                 List<DayOfWeek> daysOfWeek = repeatRequest.getRepeat().getDaysOfWeek();
-                for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+                for (LocalDate date = startDate.plusDays(1); !date.isAfter(endDate); date = date.plusDays(1)) {
                     if (daysOfWeek.contains(date.getDayOfWeek())) {
                         schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
                     }
