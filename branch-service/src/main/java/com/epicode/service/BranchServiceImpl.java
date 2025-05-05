@@ -38,6 +38,11 @@ public class BranchServiceImpl implements BranchService {
     public List<BranchIdNameProjection> getBranchesByUserId(Long userId) {
         return userBranchRepository.findBranchIdsAndNamesByUserId(userId);
     }
+
+    @Override
+    public String getBranchNameByBranchId(Long branchId) {
+        return branchRepository.findNameById(branchId).getName();
+    }
 //
 //    //branchIds기반 branchName 조회
 //    @Override

@@ -14,7 +14,9 @@ import java.util.List;
 @Repository
 public interface BranchRepository extends JpaRepository<Branch, Long> {
     Branch findIdByName(String name);
+    Branch findNameById(Long id);
     @Query("SELECT b.name FROM Branch b WHERE b.id IN :branchIds")
     List<String> findBranchNamesByIds(@Param("branchIds") List<Long> branchIds);
     boolean existsByName(String name);
+
 }

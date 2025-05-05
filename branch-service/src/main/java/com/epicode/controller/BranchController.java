@@ -1,15 +1,11 @@
 package com.epicode.controller;
 
-import com.epicode.dto.BranchIdNameProjection;
-import com.epicode.dto.WorkerProjection;
-import com.epicode.exception.CustomException;
-import com.epicode.exception.ErrorCode;
+import com.epicode.dto.*;
+import com.epicode.exception.*;
 import com.epicode.model.Branch;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.InviteToken;
-import com.epicode.service.BranchService;
-import com.epicode.service.InviteService;
-import com.epicode.service.UserBranchService;
+import com.epicode.service.*;
 import io.jsonwebtoken.Claims;
 import com.epicode.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RequestMapping({"/api/branch"})
 @Tag(
@@ -218,12 +212,14 @@ public class BranchController {
             }
     )
     @GetMapping("/invite/generate")
-    public ResponseEntity<String> generateInviteToken(
+    public ResponseEntity<BranchNameAndToken> generateInviteToken(
             @RequestParam String inviterEmail,
             //@RequestParam String inviteeEmail,
             @RequestParam Long branchId
     ) {
         String inviteToken = inviteService.generateInviteToken(inviterEmail, branchId);
-        return ResponseEntity.ok(inviteToken);
+        String branchName = branchService.getBranchNameByBranchId(branchId);
+        BranchNameAndToken result = new BranchNameAndToken(branchName,inviteToken);
+        return ResponseEntity.ok(result);
     }
 }
