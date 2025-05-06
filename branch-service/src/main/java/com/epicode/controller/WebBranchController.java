@@ -40,9 +40,10 @@ public class WebBranchController {
                     @Parameter(name = "Worker", description = "근무자", required = true)
             }
     )
-    // 특정 유저의 특정 브랜치 탈퇴
-    @DeleteMapping("/signout/{branchId}")
-    public ResponseEntity<String> deleteUserBranch(@RequestHeader("X-Authenticated-User") String email, @PathVariable Long branchId) {
+    @PostMapping("/workers")
+    public ResponseEntity<?> AddWorkers(
+            @
+            @PathVariable Long branchId) {
         try {
             String branchName = userBranchService.deleteUserBranchByEmailAndBranchId(email, branchId);
             return ResponseEntity.ok("Branch '" + branchName + "' removed successfully for user: " + email);

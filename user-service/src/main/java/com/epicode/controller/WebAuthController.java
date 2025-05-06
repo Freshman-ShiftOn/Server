@@ -106,9 +106,6 @@ public class WebAuthController {
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            log.error("로그인 오류", e);
-            return ResponseEntity.internalServerError().body("서버 오류");
         }
     }
     
