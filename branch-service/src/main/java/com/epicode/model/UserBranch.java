@@ -24,6 +24,9 @@ public class UserBranch {
     @Column
     private String roles;
 
+    @Column
+    private String personalCost;
+
     @Column(name = "joined_at")
     private LocalDateTime joinedAt = LocalDateTime.now();
 }
