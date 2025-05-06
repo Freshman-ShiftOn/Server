@@ -13,5 +13,6 @@ public class WorkerDTO {
     private String name;
     private String phoneNums;
     private String roles;
+    private String status;
     private Integer cost;
 }

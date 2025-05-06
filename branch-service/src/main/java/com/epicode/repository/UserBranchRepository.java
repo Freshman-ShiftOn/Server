@@ -26,7 +26,7 @@ public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
 //    List<WorkerProjection> findWorkersByBranchId(Long branchId);
 
     @Query("SELECT new com.example.WorkerDTO(" +
-            "u.name, u.phoneNums, ub.roles, " +
+            "u.name, u.phoneNums, ub.roles, ub.status," +
             "COALESCE(ub.personalCost, b.basicCost)) " +
             "FROM UserBranch ub " +
             "JOIN ub.user u " +
