@@ -29,7 +29,7 @@ public class UserBranch {
     private String roles;
 
     @Column
-    private String personalCost;
+    private String personal_cost;
 
     @Column
     private String status;
