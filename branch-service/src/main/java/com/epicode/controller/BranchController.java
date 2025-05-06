@@ -222,4 +222,19 @@ public class BranchController {
         BranchNameAndToken result = new BranchNameAndToken(branchName,inviteToken);
         return ResponseEntity.ok(result);
     }
+
+    @Operation(
+            summary = "초대장 토큰으로부터 지점명 받아오기",
+            description = "초대장 토큰으로부터 받아옵니다.",
+            parameters = {
+                    @Parameter(name = "inviteToken", description = "초대장 토큰", required = true, example = "dkks#$@#$")
+            }
+    )
+    @GetMapping("/invite")
+    public ResponseEntity<String> getBranchName(
+            @RequestHeader("X-Invite-Branch-Id") String branchId
+    ) {
+        String branchName = branchService.getBranchNameByBranchId(Long.valueOf(branchId));
+        return ResponseEntity.ok(branchName);
+    }
 }
