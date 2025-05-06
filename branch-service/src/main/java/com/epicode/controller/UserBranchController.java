@@ -34,6 +34,27 @@ import java.util.List;
 public class UserBranchController {
     private final UserBranchService userBranchService;
 
+//    @Operation(
+//            summary = "(사장님) 매장 근무자 추가",
+//            description = "매장 근무자를 추가합니다.",
+//            parameters = {
+//                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
+//                    @Parameter(name = "BranchId", description = "지점 ID", required = true),
+//                    @Parameter(name = "Worker", description = "근무자", required = true)
+//            }
+//    )
+//    // 특정 유저의 특정 브랜치 탈퇴
+//    @DeleteMapping("/signout/{branchId}")
+//    public ResponseEntity<String> deleteUserBranch(@RequestHeader("X-Authenticated-User") String email, @PathVariable Long branchId) {
+//        try {
+//            String branchName = userBranchService.deleteUserBranchByEmailAndBranchId(email, branchId);
+//            return ResponseEntity.ok("Branch '" + branchName + "' removed successfully for user: " + email);
+//        } catch (CustomException e) {
+//            return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());
+//        }
+//    }
+
+
     @Operation(
             summary = "사용자 지점 탈퇴",
             description = "특정 지점을 탈퇴합니다.",
@@ -52,4 +73,6 @@ public class UserBranchController {
             return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());
         }
     }
+
+
 }
