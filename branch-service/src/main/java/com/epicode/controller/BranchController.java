@@ -114,27 +114,6 @@ public class BranchController {
     }
 
 
-    @Operation(
-            summary = "매장 근무 동료들 조회",
-            description = "해당 매장에 근무하는 근무자의 이름,역할,번호,시급이 반환됩니다.",
-            parameters = {
-                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
-                    @Parameter(name = "branchId", description = "조회할 매장Id", required = true, example = "101")
-            }
-    )
-    @GetMapping("/{branchId}/workers")
-    public List<WorkerDTO> getWorkersByBranchId(
-            @PathVariable Long branchId,
-            @RequestHeader("X-Authenticated-User-Id") String userId) {
-        List<Long> branchList = userBranchRepository.findBranchIdsByUserId(Long.valueOf(userId));
-        boolean exist = false;
-        for(Long l:branchList){
-            if(l==branchId) exist = true;
-        }
-        if(!exist) throw new CustomException(ErrorCode.USER_BRANCH_NOT_FOUND);
-        return branchService.getWorkersByBranchId(branchId);
-    }
-
 
     @Operation(
             summary = "특정 매장 프로필 조회",

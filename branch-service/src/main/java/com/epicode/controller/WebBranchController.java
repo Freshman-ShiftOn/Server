@@ -1,6 +1,7 @@
 package com.epicode.controller;
 
 import com.epicode.dto.WorkerDTO;
+import com.epicode.dto.WorkerRequestDTO;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.repository.UserBranchRepository;
@@ -12,6 +13,7 @@ import com.epicode.service.S3Service;
 import com.epicode.service.UserBranchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,20 +38,14 @@ public class WebBranchController {
             description = "매장 근무자를 추가합니다.",
             parameters = {
                     @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
-                    @Parameter(name = "BranchId", description = "지점 ID", required = true),
-                    @Parameter(name = "Worker", description = "근무자", required = true)
+                    @Parameter(name = "WorkerRequestDTO", description = "근무자", required = true)
             }
     )
     @PostMapping("/workers")
     public ResponseEntity<?> AddWorkers(
-            @
-            @PathVariable Long branchId) {
-        try {
-            String branchName = userBranchService.deleteUserBranchByEmailAndBranchId(email, branchId);
-            return ResponseEntity.ok("Branch '" + branchName + "' removed successfully for user: " + email);
-        } catch (CustomException e) {
-            return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(e.getMessage());
-        }
+            @RequestBody WorkerRequestDTO dto) {
+        userBranchService.addUserAtBranch(dto);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
