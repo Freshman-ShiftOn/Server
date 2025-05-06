@@ -1,5 +1,6 @@
 package com.epicode.service;
 import com.epicode.dto.BranchIdNameProjection;
+import com.epicode.dto.BranchRequestDTO;
 import com.epicode.dto.WorkerDTO;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
@@ -62,22 +63,29 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     @Transactional
-    public void createBranch(Branch branch, Long userId, String email) {
-        User user = userRepository.findIdByEmail(email);
+    public void createBranch(BranchRequestDTO dto) {
+        User user = userRepository.findIdByEmail(dto.getEmail());
 
-        if (user == null || !user.getId().equals(userId)) {
+        if (user == null || !user.getId().equals(dto.getUserId())) {
             throw new CustomException(ErrorCode.USER_NOT_AUTHORIZED);
         }
 
         //Branch 저장
-        if(branchRepository.existsByName(branch.getName())){
+        if(branchRepository.existsByName(dto.getName())){
             throw new CustomException(ErrorCode.INVALID_BRANCH_NAME);
         }
-        Branch savedBranch = branchRepository.save(branch);
+        Branch requestBranch = new Branch();
+        requestBranch.setName(dto.getName());
+        requestBranch.setAdress(dto.getAdress());
+        requestBranch.setBasic_cost(dto.getBasic_cost());
+        requestBranch.setDial_numbers(dto.getDial_numbers());
+        requestBranch.setWeekly_allowance(dto.getWeekly_allowance());
+        Branch savedBranch = branchRepository.save(requestBranch);
 
         UserBranch userBranch = new UserBranch();
         userBranch.setUser(user);
         userBranch.setBranch(savedBranch);
+        userBranch.setRoles("사장");
         userBranch.setJoinedAt(LocalDateTime.now());
 
         //UserBranch 저장

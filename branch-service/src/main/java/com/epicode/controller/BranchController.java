@@ -109,7 +109,15 @@ public class BranchController {
             @RequestHeader("X-Authenticated-User") String email
     ) {
         Long userId = userRepository.findIdByEmail(email).getId();
-        branchService.createBranch(branch, userId, email);
+        BranchRequestDTO dto = new BranchRequestDTO();
+        dto.setName(branch.getName());
+        dto.setAdress(branch.getAdress());
+        dto.setDial_numbers(branch.getDial_numbers());
+        dto.setBasic_cost(branch.getBasic_cost());
+        dto.setWeekly_allowance(branch.getWeekly_allowance());
+        dto.setUserId(userId);
+        dto.setEmail(email);
+        branchService.createBranch(dto);
         return ResponseEntity.ok().build();
     }
 
