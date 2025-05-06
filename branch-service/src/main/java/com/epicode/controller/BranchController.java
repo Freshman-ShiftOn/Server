@@ -3,6 +3,7 @@ package com.epicode.controller;
 import com.epicode.dto.*;
 import com.epicode.exception.*;
 import com.epicode.model.Branch;
+import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.InviteToken;
 import com.epicode.service.*;
@@ -29,7 +30,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BranchController {
     private final BranchService branchService;
-    private final UserBranchService userBranchService;
+    private final UserBranchRepository userBranchRepository;
     private final S3Service s3Service;
     private final UserRepository userRepository;
     private final InviteService inviteService;
@@ -108,23 +109,18 @@ public class BranchController {
             @RequestHeader("X-Authenticated-User") String email
     ) {
         Long userId = userRepository.findIdByEmail(email).getId();
-        branchService.createBranch(branch, userId, email);
+        BranchRequestDTO dto = new BranchRequestDTO();
+        dto.setName(branch.getName());
+        dto.setAdress(branch.getAdress());
+        dto.setDial_numbers(branch.getDial_numbers());
+        dto.setBasic_cost(branch.getBasic_cost());
+        dto.setWeekly_allowance(branch.getWeekly_allowance());
+        dto.setUserId(userId);
+        dto.setEmail(email);
+        branchService.createBranch(dto);
         return ResponseEntity.ok().build();
     }
 
-
-    @Operation(
-            summary = "매장 근무 동료들 조회",
-            description = "해당 매장에 근무하는 근무자의 id,name이 반환됩니다.",
-            parameters = {
-                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
-                    @Parameter(name = "branchId", description = "조회할 매장Id", required = true, example = "101")
-            }
-    )
-    @GetMapping("/{branchId}/workers")
-    public List<WorkerProjection> getWorkersByBranchId(@PathVariable Long branchId) {
-        return branchService.getWorkersByBranchId(branchId);
-    }
 
 
     @Operation(

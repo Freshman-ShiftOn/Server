@@ -12,6 +12,7 @@ public enum ErrorCode {
     USER_BRANCH_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 브랜치에서 유저 정보를 찾을 수 없습니다."),
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "사용자가 인증되지 않았습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "서비스에 가입되지 않은 사용자입니다."),
+    USER_ALREADY_EXISTS(HttpStatus.NOT_FOUND, "이미 있는 사용자입니다."),
     USER_NOT_INVITED(HttpStatus.UNAUTHORIZED, "초대받은 사용자와 현재 사용자가 일치하지 않습니다."),
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다.");
 

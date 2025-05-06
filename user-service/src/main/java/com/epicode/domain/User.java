@@ -21,7 +21,7 @@ public class User {
     private String name;
 
     @Column
-    private String phoneNums;
+    private String phone_nums;
 
     @Column(name = "created_at", updatable = false)
     private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now();

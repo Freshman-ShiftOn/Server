@@ -1,5 +1,6 @@
 package com.epicode.service;
 
+import com.epicode.dto.WorkerRequestDTO;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.model.Branch;
@@ -19,6 +20,31 @@ public class UserBranchServiceImpl implements UserBranchService {
     private final UserBranchRepository userBranchRepository;
     private final UserRepository userRepository;
     private final BranchRepository branchRepository;
+
+    @Transactional
+    @Override
+    public void addUserAtBranch(WorkerRequestDTO dto) {
+        if (userRepository.findIdByEmail(dto.getEmail()) != null) {
+            throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
+        }
+
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setName(dto.getName());
+        user.setPhone_nums(dto.getPhoneNums());
+        user = userRepository.save(user);
+
+        Branch branch = branchRepository.findById(dto.getBranchId())
+                .orElseThrow(() -> new CustomException(ErrorCode.BRANCH_NOT_FOUND));
+
+        UserBranch userBranch = new UserBranch();
+        userBranch.setUser(user);
+        userBranch.setBranch(branch);
+        userBranch.setRoles(dto.getRoles());
+        userBranch.setPersonal_cost(String.valueOf(dto.getCost()));
+        userBranch.setStatus(dto.getStatus());
+        userBranchRepository.save(userBranch);
+    }
 
     @Override
     public void joinBranch(Long userId, Long branchId) {
