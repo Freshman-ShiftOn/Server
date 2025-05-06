@@ -3,6 +3,7 @@ package com.epicode.controller;
 import com.epicode.dto.*;
 import com.epicode.exception.*;
 import com.epicode.model.Branch;
+import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.InviteToken;
 import com.epicode.service.*;
@@ -29,7 +30,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BranchController {
     private final BranchService branchService;
-    private final UserBranchService userBranchService;
+    private final UserBranchRepository userBranchRepository;
     private final S3Service s3Service;
     private final UserRepository userRepository;
     private final InviteService inviteService;
@@ -122,7 +123,15 @@ public class BranchController {
             }
     )
     @GetMapping("/{branchId}/workers")
-    public List<WorkerProjection> getWorkersByBranchId(@PathVariable Long branchId) {
+    public List<WorkerDTO> getWorkersByBranchId(
+            @PathVariable Long branchId,
+            @RequestHeader("X-Authenticated-User-Id") String userId) {
+        List<Long> branchList = userBranchRepository.findBranchIdsByUserId(Long.valueOf(userId));
+        boolean exist = false;
+        for(Long l:branchList){
+            if(l==branchId) exist = true;
+        }
+        if(!exist) throw new CustomException(ErrorCode.USER_BRANCH_NOT_FOUND);
         return branchService.getWorkersByBranchId(branchId);
     }
 

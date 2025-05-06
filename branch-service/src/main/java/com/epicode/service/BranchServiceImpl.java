@@ -1,6 +1,6 @@
 package com.epicode.service;
 import com.epicode.dto.BranchIdNameProjection;
-import com.epicode.dto.WorkerProjection;
+import com.epicode.dto.WorkerDTO;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.model.Branch;
@@ -84,8 +84,16 @@ public class BranchServiceImpl implements BranchService {
         userBranchRepository.save(userBranch);
     }
 
+//    @Override
+//    public List<WorkerProjection> getWorkersByBranchId(Long branchId) {
+//        if (branchId == null) {
+//            throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
+//        }
+//        return userBranchRepository.findWorkersByBranchId(branchId);
+//    }
+
     @Override
-    public List<WorkerProjection> getWorkersByBranchId(Long branchId) {
+    public List<WorkerDTO> getWorkersByBranchId(Long branchId) {
         if (branchId == null) {
             throw new CustomException(ErrorCode.BRANCH_NOT_FOUND);
         }
