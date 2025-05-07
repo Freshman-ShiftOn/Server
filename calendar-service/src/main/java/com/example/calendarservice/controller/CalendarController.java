@@ -1,9 +1,6 @@
 package com.example.calendarservice.controller;
 
-import com.example.calendarservice.dto.RepeatScheduleRequest;
-import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
-import com.example.calendarservice.dto.ShiftRequestsByBranchMonthResponseDto;
-import com.example.calendarservice.dto.UpdateShiftRequestDto;
+import com.example.calendarservice.dto.*;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
 import com.example.calendarservice.service.ScheduleService;
@@ -13,12 +10,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -207,27 +206,24 @@ public class CalendarController {
     // 대타 요청 내역 조회 (지점 필터 추가)
     @GetMapping("/request-shift")
     @Operation(summary = "대타 요청 내역 조회 (마이페이지용)", description = "특정한 유저의 대타 요청 내역을 조회한다.")
-    public ResponseEntity<List<ShiftRequest>> getShiftRequestsByUser(
+    public ResponseEntity<List<ShiftRequestDto>> getShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestParam(value = "branchId", required = false) Long branchId) {
 
-        List<ShiftRequest> shiftRequests = shiftRequestService
-                .getShiftRequestsByUser(Long.valueOf(userId), branchId);
-
-        return ResponseEntity.ok(shiftRequests);
+        List<ShiftRequestDto> dtos = shiftRequestService.getShiftRequestsByUser(Long.valueOf(userId), branchId);
+        return ResponseEntity.ok(dtos);
     }
 
     // 대타 수락 내역 조회 (지점 필터 추가)
     @GetMapping("/accepted-shift")
     @Operation(summary = "대타 수락 내역 조회 (마이페이지용)", description = "특정 유저가 수락한 대타 요청 내역을 조회한다.")
-    public ResponseEntity<List<ShiftRequest>> getAcceptedShiftRequestsByUser(
+    public ResponseEntity<List<ShiftRequestDto>> getAcceptedShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestParam(value = "branchId", required = false) Long branchId) {
 
-        List<ShiftRequest> acceptedShiftRequests = shiftRequestService
-                .getAcceptedShiftRequestsByUser(Long.valueOf(userId), branchId);
+        List<ShiftRequestDto> dtos = shiftRequestService.getAcceptedShiftRequestsByUser(Long.valueOf(userId), branchId);
 
-        return ResponseEntity.ok(acceptedShiftRequests);
+        return ResponseEntity.ok(dtos);
     }
 
     // 지점 대타 요청 내역 조회 (캘린더용)
