@@ -15,6 +15,7 @@ import java.time.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -59,9 +60,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (!scheduleRepository.existsById(scheduleId)) {
             throw new ResourceNotFoundException("Schedule not found with id " + scheduleId);
         }
+        Schedule deletedSchedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));;
+
         // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
         shiftRequestRepository.deleteByScheduleId(scheduleId);
         scheduleRepository.deleteById(scheduleId);
+        scheduleEventProducer.sendScheduleDeletedEvent(deletedSchedule);
     }
 
     @Override
