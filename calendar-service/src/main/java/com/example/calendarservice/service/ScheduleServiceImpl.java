@@ -3,6 +3,7 @@ package com.example.calendarservice.service;
 import com.example.calendarservice.dto.RepeatScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.exception.ResourceNotFoundException;
+import com.example.calendarservice.message.ScheduleEventProducer;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.repository.ScheduleRepository;
 import com.example.calendarservice.repository.ShiftRequestRepository;
@@ -21,10 +22,13 @@ import java.util.List;
 public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ShiftRequestRepository shiftRequestRepository;
+    private final ScheduleEventProducer scheduleEventProducer;
 
     @Override
     public Schedule createSchedule(Schedule schedule) {
-        return scheduleRepository.save(schedule);
+        Schedule saved = scheduleRepository.save(schedule);
+        scheduleEventProducer.sendScheduleWorkedEvent(saved);
+        return saved;
     }
 
     @Override
@@ -120,7 +124,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 throw new IllegalArgumentException("Invalid repeat type: " + repeatRequest.getRepeat().getType());
         }
 
-        // 스케줄 저장
+        //스케줄 저장
         return scheduleRepository.saveAll(schedules);
     }
 
