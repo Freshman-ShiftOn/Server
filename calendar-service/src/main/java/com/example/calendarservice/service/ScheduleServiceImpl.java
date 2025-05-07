@@ -36,13 +36,22 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
 
+        boolean timeChanged =
+                !existingSchedule.getStartTime().equals(schedule.getStartTime()) ||
+                        !existingSchedule.getEndTime().equals(schedule.getEndTime());
         existingSchedule.setBranchId(schedule.getBranchId());
         existingSchedule.setWorkerId(schedule.getWorkerId());
         existingSchedule.setWorkType(schedule.getWorkType());
         existingSchedule.setStartTime(schedule.getStartTime());
         existingSchedule.setEndTime(schedule.getEndTime());
 
-        return scheduleRepository.save(existingSchedule);
+        Schedule updated = scheduleRepository.save(existingSchedule);
+
+        if (timeChanged) {
+            scheduleEventProducer.sendScheduleWorkedEvent(updated);
+        }
+
+        return updated;
     }
 
     @Override
