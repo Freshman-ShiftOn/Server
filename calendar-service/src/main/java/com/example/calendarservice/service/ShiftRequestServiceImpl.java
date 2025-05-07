@@ -2,6 +2,7 @@ package com.example.calendarservice.service;
 
 import com.example.calendarservice.dto.ShiftRequestDto;
 import com.example.calendarservice.exception.ResourceNotFoundException;
+import com.example.calendarservice.model.Branch;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
 import com.example.calendarservice.repository.BranchRepository;
@@ -143,7 +144,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
                 .map(shift -> {
                     ShiftRequestDto dto = new ShiftRequestDto();
                     BeanUtils.copyProperties(shift, dto);
-                    String branchName = branchRepository.findNameById(shift.getBranchId());
+                    String branchName = getBranchNameById(shift.getBranchId());
                     dto.setBranchName(branchName);
                     return dto;
                 })
@@ -164,11 +165,17 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
                 .map(shift -> {
                     ShiftRequestDto dto = new ShiftRequestDto();
                     BeanUtils.copyProperties(shift, dto);
-                    String branchName = branchRepository.findNameById(shift.getBranchId());
+                    String branchName = getBranchNameById(shift.getBranchId());
                     dto.setBranchName(branchName);
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private String getBranchNameById(Long id) {
+        return branchRepository.findById(id)
+                .map(Branch::getName)
+                .orElse("미등록 지점");
     }
 
     private Schedule getScheduleFromShiftRequest(Long shiftRequestId) {
