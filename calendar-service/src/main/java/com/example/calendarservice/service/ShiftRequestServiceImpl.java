@@ -1,16 +1,20 @@
 package com.example.calendarservice.service;
 
+import com.example.calendarservice.dto.ShiftRequestDto;
 import com.example.calendarservice.exception.ResourceNotFoundException;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
+import com.example.calendarservice.repository.BranchRepository;
 import com.example.calendarservice.repository.ScheduleRepository;
 import com.example.calendarservice.repository.ShiftRequestRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 
     private final ShiftRequestRepository shiftRequestRepository;
     private final ScheduleRepository scheduleRepository;
+    private final BranchRepository branchRepository;
 
     @Override
     public ShiftRequest createShiftRequest(ShiftRequest shiftRequest) {
@@ -125,21 +130,45 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public List<ShiftRequest> getShiftRequestsByUser(Long workerId, Long branchId){
+    public List<ShiftRequestDto> getShiftRequestsByUser(Long workerId, Long branchId){
+        List<ShiftRequest> shiftRequests;
+
         if (branchId != null) {
-            return shiftRequestRepository.findByWorkerIdAndBranchId(workerId, branchId);
+            shiftRequests = shiftRequestRepository.findByWorkerIdAndBranchId(workerId, branchId);
         } else {
-            return shiftRequestRepository.findByWorkerId(workerId);
+            shiftRequests = shiftRequestRepository.findByWorkerId(workerId);
         }
+
+        return shiftRequests.stream()
+                .map(shift -> {
+                    ShiftRequestDto dto = new ShiftRequestDto();
+                    BeanUtils.copyProperties(shift, dto);
+                    String branchName = branchRepository.findNameById(shift.getBranchId());
+                    dto.setBranchName(branchName);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<ShiftRequest> getAcceptedShiftRequestsByUser(Long acceptId, Long branchId) {
+    public List<ShiftRequestDto> getAcceptedShiftRequestsByUser(Long acceptId, Long branchId) {
+        List<ShiftRequest> acceptedRequests;
+
         if (branchId != null) {
-            return shiftRequestRepository.findByAcceptIdAndBranchId(acceptId, branchId);
+            acceptedRequests = shiftRequestRepository.findByAcceptIdAndBranchId(acceptId, branchId);
         } else {
-            return shiftRequestRepository.findByAcceptId(acceptId);
+            acceptedRequests = shiftRequestRepository.findByAcceptId(acceptId);
         }
+
+        return acceptedRequests.stream()
+                .map(shift -> {
+                    ShiftRequestDto dto = new ShiftRequestDto();
+                    BeanUtils.copyProperties(shift, dto);
+                    String branchName = branchRepository.findNameById(shift.getBranchId());
+                    dto.setBranchName(branchName);
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     private Schedule getScheduleFromShiftRequest(Long shiftRequestId) {
