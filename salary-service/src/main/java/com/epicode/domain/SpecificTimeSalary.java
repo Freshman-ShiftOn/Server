@@ -22,8 +22,8 @@ public class SpecificTimeSalary {
             @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
             @JoinColumn(name = "branch_id", referencedColumnName = "branch_id")
     })
-    @ToString.Exclude // 순환 참조 방지
-    @EqualsAndHashCode.Exclude // 순환 참조 방지
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Salary salary;
 
     @Column(name = "specific_days", nullable = false)

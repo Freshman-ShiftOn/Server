@@ -18,6 +18,8 @@ spring:
       enabled: false
   application:
     name: salary-service
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   jpa:
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect

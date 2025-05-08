@@ -34,7 +34,7 @@ public class Salary {
     @Column(name = "basic_salary", nullable = false, precision = 10, scale = 2)
     private BigDecimal basicSalary; //기본 시급
 
-    @Column(name = "weekly_allowance", nullable = false)
+    @Column(name = "weekly_allowance", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean weeklyAllowance; //주휴수당 여부
 
     @Column(name = "payment_date")
