@@ -138,9 +138,11 @@ public class ScheduleServiceImpl implements ScheduleService {
             default:
                 throw new IllegalArgumentException("Invalid repeat type: " + repeatRequest.getRepeat().getType());
         }
-
+        List<Schedule> saved = scheduleRepository.saveAll(schedules);
+        scheduleEventProducer.sendScheduleWorkedEvent(firstSchedule);
+        scheduleEventProducer.sendSchedules(saved);
         //스케줄 저장
-        return scheduleRepository.saveAll(schedules);
+        return saved;
     }
 
     private Schedule createScheduleFromRepeatRequest(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime, Long repeatGroupId) {
@@ -214,6 +216,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         switch (deleteOption) {
             case "ONE":
+                scheduleEventProducer.sendScheduleDeletedEvent(existingSchedule);
                 // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
                 shiftRequestRepository.deleteByScheduleId(scheduleId);
                 // 이 일정만 삭제
@@ -224,6 +227,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                 // 해당 날짜 이후(포함) 모든 일정 삭제
                 List<Schedule> schedulesToDelete = scheduleRepository.findByRepeatGroupIdAndStartTimeGreaterThanEqual(
                         existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
+
+                scheduleEventProducer.sendDeletedSchedules(schedulesToDelete);
 
                 // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
                 List<Long> scheduleIdsToDelete = schedulesToDelete.stream().map(Schedule::getId).toList();
@@ -236,6 +241,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 // 전체 반복 일정 삭제
                 List<Schedule> allSchedules = scheduleRepository.findByRepeatGroupId(existingSchedule.getRepeatGroupId());
 
+                scheduleEventProducer.sendDeletedSchedules(allSchedules);
                 // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
                 List<Long> allScheduleIds = allSchedules.stream().map(Schedule::getId).toList();
                 shiftRequestRepository.deleteByScheduleIdIn(allScheduleIds);

@@ -8,7 +8,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
@@ -18,13 +18,7 @@ public class ScheduleEventProducer {
     private final KafkaTemplate<String, ScheduleWorkedEventDTO> kafkaTemplate;
 
     public void sendScheduleWorkedEvent(Schedule schedule) {
-        ScheduleWorkedEventDTO dto = ScheduleWorkedEventDTO.builder()
-                .userId(schedule.getWorkerId())
-                .branchId(schedule.getBranchId())
-                .startTime(schedule.getStartTime())
-                .endTime(schedule.getEndTime())
-                .build();
-
+        ScheduleWorkedEventDTO dto = toDto(schedule);
         CompletableFuture<SendResult<String, ScheduleWorkedEventDTO>> future =
                 kafkaTemplate.send("salary-topic", dto);
         future.thenAccept(result -> {
@@ -34,15 +28,29 @@ public class ScheduleEventProducer {
             return null;
         });
     }
+    //bulk 이벤트
+    public void sendSchedules(List<Schedule> schedules) {
+        schedules.forEach(this::sendScheduleWorkedEvent);
+    }
 
     public void sendScheduleDeletedEvent(Schedule schedule) {
-        ScheduleWorkedEventDTO dto = ScheduleWorkedEventDTO.builder()
+        ScheduleWorkedEventDTO dto = toDto(schedule);
+
+        kafkaTemplate.send("salary-delete-topic", dto); // 다른 토픽 사용 권장
+    }
+
+    //bulk 삭제
+    public void sendDeletedSchedules(List<Schedule> schedules) {
+        schedules.forEach(this::sendScheduleDeletedEvent);
+    }
+
+    //DTO생성
+    private ScheduleWorkedEventDTO toDto(Schedule schedule) {
+        return ScheduleWorkedEventDTO.builder()
                 .userId(schedule.getWorkerId())
                 .branchId(schedule.getBranchId())
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())
                 .build();
-
-        kafkaTemplate.send("salary-delete-topic", dto); // 다른 토픽 사용 권장
     }
 }
