@@ -103,9 +103,7 @@ jobs:
           DB_URL: ${{ secrets.DB_URL }}
           JWT_KEY: ${{ secrets.JWT_KEY }}
           SPRING_KAFKA_BOOTSTRAP_SERVERS: ${{ secrets.SPRING_KAFKA_BOOTSTRAP_SERVERS }}
-        run: |
-          chmod +x ./gradlew
-          ./gradlew clean build -x test
+        run: ./gradlew clean build -x test
 
       - name: Build branch-service
         working-directory: branch-service
