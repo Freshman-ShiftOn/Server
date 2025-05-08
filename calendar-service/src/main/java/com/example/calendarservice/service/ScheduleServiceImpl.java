@@ -138,9 +138,11 @@ public class ScheduleServiceImpl implements ScheduleService {
             default:
                 throw new IllegalArgumentException("Invalid repeat type: " + repeatRequest.getRepeat().getType());
         }
-
+        List<Schedule> saved = scheduleRepository.saveAll(schedules);
+        scheduleEventProducer.sendScheduleWorkedEvent(firstSchedule);
+        scheduleEventProducer.sendSchedules(saved);
         //스케줄 저장
-        return scheduleRepository.saveAll(schedules);
+        return saved;
     }
 
     private Schedule createScheduleFromRepeatRequest(RepeatScheduleRequest request, LocalDate date, LocalTime startTime, LocalTime endTime, Long repeatGroupId) {
