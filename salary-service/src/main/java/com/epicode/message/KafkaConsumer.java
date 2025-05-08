@@ -14,11 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.IsoFields;
+import java.time.temporal.WeekFields;
 import java.util.Date;
 import java.util.Optional;
 
@@ -84,11 +85,12 @@ public class KafkaConsumer {
 
     private WeeklyUserSalaryKey extractWeekKey(Date date) {
         ZonedDateTime zdt = date.toInstant().atZone(ZoneId.systemDefault());
-        return new WeeklyUserSalaryKey(
-                zdt.get(IsoFields.WEEK_BASED_YEAR),
-                zdt.getMonthValue(),
-                zdt.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
-        );
+
+        int year = zdt.getYear();
+        int month = zdt.getMonthValue();
+        int weekOfMonth = zdt.get(WeekFields.of(DayOfWeek.MONDAY, 1).weekOfMonth());
+
+        return new WeeklyUserSalaryKey(year, month, weekOfMonth);
     }
 
     private Optional<BigDecimal> getHourlyWage(Long userId, Long branchId) {
