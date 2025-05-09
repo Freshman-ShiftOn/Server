@@ -170,4 +170,8 @@ public class SalaryServiceImpl implements SalaryService {
         return salaryQueryRepo.findWeeklySalary(branchId, month);
     }
 
+    public List<WeeklySalaryDto> getMonthSalaryInfo(Long branchId, int month) {
+        return salaryQueryRepo.findMonthlySalary(branchId, month);
+    }
+
 }

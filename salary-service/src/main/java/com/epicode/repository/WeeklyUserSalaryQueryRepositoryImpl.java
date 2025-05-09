@@ -44,4 +44,33 @@ public class WeeklyUserSalaryQueryRepositoryImpl implements WeeklyUserSalaryQuer
                 )
                 .fetch();
     }
+
+    public List<WeeklySalaryDto> findMonthlySalary(Long branchId, int month) {
+        QWeeklyUserSalary wus = QWeeklyUserSalary.weeklyUserSalary;
+        QUser u = QUser.user;
+        QUserBranch ub = QUserBranch.userBranch;
+
+        return queryFactory
+                .select(Projections.fields(WeeklySalaryDto.class,
+                        wus.userId.as("userId"),
+                        u.name.as("name"),
+                        wus.branchId.as("branchId"),
+                        wus.week.as("week"),
+                        wus.totalMinutes.as("totalMinutes"),
+                        ub.personal_cost.as("personal_cost"),
+                        wus.calculatedSalary.as("calculatedSalary"),
+                        wus.weeklyAllowanceEligible.as("weeklyAllowanceEligible")
+                ))
+                .from(wus)
+                .join(u).on(wus.userId.eq(u.id))
+                .join(ub).on(
+                        wus.userId.eq(ub.user.id),
+                        wus.branchId.eq(ub.branch.id)
+                )
+                .where(
+                        wus.branchId.eq(branchId),
+                        wus.month.eq(month)
+                )
+                .fetch();
+    }
 }
