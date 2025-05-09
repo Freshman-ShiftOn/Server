@@ -42,7 +42,7 @@ public class WeeklyUserSalary {
     @Column(name = "calculated_salary", nullable = false, precision = 10, scale = 2)
     private BigDecimal calculatedSalary;
 
-    @Column(name = "weekly_allowance_eligible", nullable = false)
+    @Column(name = "weekly_allowance_eligible", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean weeklyAllowanceEligible;
 
     @Column(name = "updated_at", nullable = false)

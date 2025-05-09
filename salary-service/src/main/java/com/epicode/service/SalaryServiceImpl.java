@@ -6,11 +6,13 @@ import com.epicode.domain.SpecificTimeSalary;
 import com.epicode.dto.SalaryRequestDTO;
 import com.epicode.dto.SalaryResponseDTO;
 import com.epicode.dto.SpecificTimeSalaryResponseDTO;
+import com.epicode.dto.WeeklySalaryDto;
 import com.epicode.exception.CustomException;
 import com.epicode.exception.ErrorCode;
 import com.epicode.repository.BranchRepository;
 import com.epicode.repository.SalaryRepository;
 import com.epicode.repository.SpecificTimeSalaryRepository;
+import com.epicode.repository.WeeklyUserSalaryQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class SalaryServiceImpl implements SalaryService {
     private final SalaryRepository salaryRepository;
     private final SpecificTimeSalaryRepository specificTimeSalaryRepository;
     private final BranchRepository branchRepository;
+    private final WeeklyUserSalaryQueryRepository salaryQueryRepo;
 
     @Override
     @Transactional
@@ -162,4 +165,10 @@ public class SalaryServiceImpl implements SalaryService {
         // 특별 시급 삭제
         specificTimeSalaryRepository.delete(specificTimeSalary);
     }
+
+    public WeeklySalaryDto getSalaryInfo(Long userId, Long branchId, int month, int week) {
+        return salaryQueryRepo.findWeeklySalary(userId, branchId, month, week)
+                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+    }
+
 }
