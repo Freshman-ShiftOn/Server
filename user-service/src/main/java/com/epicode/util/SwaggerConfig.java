@@ -28,8 +28,15 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi generalAuthApi() {
         return GroupedOpenApi.builder()
-                .group("general-auth-api") // 일반 인증
+                .group("auth-api") // 일반 인증
                 .pathsToMatch("/api/auth/**")
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi generalProfileApi() {
+        return GroupedOpenApi.builder()
+                .group("profile-api")
+                .pathsToMatch("/api/profile/**")
                 .build();
     }
 

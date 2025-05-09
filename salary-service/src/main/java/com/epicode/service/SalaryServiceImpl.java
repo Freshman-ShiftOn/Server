@@ -166,9 +166,8 @@ public class SalaryServiceImpl implements SalaryService {
         specificTimeSalaryRepository.delete(specificTimeSalary);
     }
 
-    public WeeklySalaryDto getSalaryInfo(Long userId, Long branchId, int month, int week) {
-        return salaryQueryRepo.findWeeklySalary(userId, branchId, month, week)
-                .orElseThrow(() -> new CustomException(ErrorCode.SALARY_NOT_FOUND));
+    public List<WeeklySalaryDto> getSalaryInfo(Long branchId, int month) {
+        return salaryQueryRepo.findWeeklySalary(branchId, month);
     }
 
 }

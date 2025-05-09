@@ -1,9 +1,8 @@
 package com.epicode.repository;
 
 import com.epicode.dto.WeeklySalaryDto;
-
-import java.util.Optional;
+import java.util.*;
 
 public interface WeeklyUserSalaryQueryRepository {
-    Optional<WeeklySalaryDto> findWeeklySalary(Long userId, Long branchId, int month, int week);
+    List<WeeklySalaryDto> findWeeklySalary(Long branchId, int month);
 }
