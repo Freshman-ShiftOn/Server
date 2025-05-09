@@ -117,15 +117,15 @@ public class SalaryController {
     }
 
     @Operation(
-            summary = "월간 급여 조회",
-            description = "특정 사용자(userId), 지점(branchId), 월(month), 주차(week)에 해당하는 주간 급여 정보를 조회합니다.",
+            summary = "월간 주별 급여 조회",
+            description = "지점(branchId), 월(month), 주차(week)에 해당하는 주간 급여 정보를 조회합니다.",
             parameters = {
                     @Parameter(name = "Authorization", description = "JWT 토큰 (Bearer 형식)", required = true, example = "Bearer eyJhbGciOiJIUzI1Ni..."),
                     @Parameter(name = "branchId", description = "지점 ID", required = true, example = "101"),
                     @Parameter(name = "month", description = "조회할 월", required = true, example = "5")
             }
     )
-    @GetMapping("/{branchId}/{month}")
+    @GetMapping("/{branchId}/{month}/week")
     public ResponseEntity<?> getWeeklySalary(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Long branchId,
