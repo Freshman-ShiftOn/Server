@@ -14,5 +14,5 @@ public interface SalaryService {
     SalaryResponseDTO getBasicSalary(Long userId, Long branchId); // 기본 시급 조회
     List<SpecificTimeSalaryResponseDTO> getSpecificSalaries(Long userId, Long branchId); // 특별 시급 조회
 
-    public WeeklySalaryDto getSalaryInfo(Long userId, Long branchId, int month, int week);
+    List<WeeklySalaryDto> getSalaryInfo(Long branchId, int month);
 }
