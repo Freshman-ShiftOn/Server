@@ -100,36 +100,44 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
 
         // 1. 기존 스케줄의 시작 시간이 대타 요청보다 빠른 경우
         if (originalStartTime.before(reqStartTime)) {
-            newSchedules.add(Schedule.builder()
+            Schedule beforeSchedule = Schedule.builder()
                     .branchId(schedule.getBranchId())
                     .workerId(schedule.getWorkerId()) // 요청자가 남는 부분
                     .workerName(schedule.getWorkerName()) // 요청자가 남는 부분
                     .workType(schedule.getWorkType())
                     .startTime(originalStartTime)
                     .endTime(reqStartTime)
+                    .repeatGroupId(schedule.getRepeatGroupId())
+                    .inputType(schedule.getInputType())
                     .lastUpdated(new Date())
-                    .build());
+                    .build();
+            newSchedules.add(beforeSchedule);
         }
 
         // 2. 기존 스케줄의 끝 시간이 대타 요청보다 늦은 경우
         if (originalEndTime.after(reqEndTime)) {
-            newSchedules.add(Schedule.builder()
+            Schedule afterSchedule = Schedule.builder()
                     .branchId(schedule.getBranchId())
                     .workerId(schedule.getWorkerId()) // 요청자가 남는 부분
                     .workerName(schedule.getWorkerName()) // 요청자가 남는 부분
                     .workType(schedule.getWorkType())
                     .startTime(reqEndTime)
                     .endTime(originalEndTime)
+                    .repeatGroupId(schedule.getRepeatGroupId())
+                    .inputType(schedule.getInputType())
                     .lastUpdated(new Date())
-                    .build());
+                    .build();
+            newSchedules.add(afterSchedule);
         }
 
-        // 3. 대타 요청 시간에 해당하는 스케줄 생성 (수락자)
+        // 3. 대타 요청 시간에 해당하는 스케줄 수정 (수락자)
         schedule.setWorkerId(acceptId); // 대타를 수락한 유저로 변경
         schedule.setWorkerName(acceptName); // 대타를 수락한 유저로 변경
         schedule.setStartTime(reqStartTime);
         schedule.setEndTime(reqEndTime);
         schedule.setWorkType(shiftRequest.getWorkType());
+        schedule.setRepeatGroupId(null);  // 반복근무 그룹에서 제외
+        schedule.setInputType(1);  // 단일 근무로 변경
 
         // 기존 스케줄 저장
         scheduleRepository.save(schedule);
