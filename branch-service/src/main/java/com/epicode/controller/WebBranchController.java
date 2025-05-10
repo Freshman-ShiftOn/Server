@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RequestMapping({"/api/branch"})
@@ -64,6 +65,7 @@ public class WebBranchController {
             @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         List<Long> branchList = userBranchRepository.findBranchIdsByUserId(Long.valueOf(userId));
+        System.out.println(branchList);
         boolean exist = false;
         for(Long l:branchList){
             if(l==branchId) exist = true;

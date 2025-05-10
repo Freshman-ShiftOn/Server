@@ -1,5 +1,5 @@
 package com.epicode.domain;
-
+import java.math.BigDecimal;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -29,7 +29,7 @@ public class UserBranch {
     private String roles;
 
     @Column
-    private String personal_cost;
+    private BigDecimal personal_cost;
 
     @Column
     private String status;
