@@ -27,6 +27,8 @@ public class QWeeklyUserSalary extends EntityPathBase<WeeklyUserSalary> {
 
     public final NumberPath<Integer> month = createNumber("month", Integer.class);
 
+    public final NumberPath<java.math.BigDecimal> totalAmount = createNumber("totalAmount", java.math.BigDecimal.class);
+
     public final NumberPath<Integer> totalMinutes = createNumber("totalMinutes", Integer.class);
 
     public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
@@ -34,6 +36,8 @@ public class QWeeklyUserSalary extends EntityPathBase<WeeklyUserSalary> {
     public final NumberPath<Long> userId = createNumber("userId", Long.class);
 
     public final NumberPath<Integer> week = createNumber("week", Integer.class);
+
+    public final NumberPath<java.math.BigDecimal> weeklyAllowanceAmount = createNumber("weeklyAllowanceAmount", java.math.BigDecimal.class);
 
     public final BooleanPath weeklyAllowanceEligible = createBoolean("weeklyAllowanceEligible");
 

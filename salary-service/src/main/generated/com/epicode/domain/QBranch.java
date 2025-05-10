@@ -33,7 +33,7 @@ public class QBranch extends EntityPathBase<Branch> {
 
     public final StringPath name = createString("name");
 
-    public final StringPath weekly_allowance = createString("weekly_allowance");
+    public final BooleanPath weekly_allowance = createBoolean("weekly_allowance");
 
     public QBranch(String variable) {
         super(Branch.class, forVariable(variable));

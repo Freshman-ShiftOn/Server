@@ -45,6 +45,12 @@ public class WeeklyUserSalary {
     @Column(name = "weekly_allowance_eligible", nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean weeklyAllowanceEligible;
 
+    @Column(name = "weekly_allowance_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal weeklyAllowanceAmount = BigDecimal.ZERO;
+
+    @Column(name = "total_amount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalAmount = BigDecimal.ZERO;
+
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }
