@@ -30,9 +30,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BranchController {
     private final BranchService branchService;
-    private final UserBranchRepository userBranchRepository;
     private final S3Service s3Service;
-    private final UserRepository userRepository;
     private final InviteService inviteService;
     private final InviteToken inviteTokenizer;
 
@@ -95,31 +93,6 @@ public class BranchController {
         }
     }
 
-    @PostMapping({"/create-branch"})
-    @Operation(
-            summary = "지점 추가",
-            description = "새로운 매장을 생성합니다.",
-            parameters = {
-                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
-                    @Parameter(name = "branch", description = "생성할 매장의 정보", required = true)
-            }
-    )
-    public ResponseEntity<Void> createBranch(
-            @RequestBody Branch branch,
-            @RequestHeader("X-Authenticated-User") String email
-    ) {
-        Long userId = userRepository.findIdByEmail(email).getId();
-        BranchRequestDTO dto = new BranchRequestDTO();
-        dto.setName(branch.getName());
-        dto.setAdress(branch.getAdress());
-        dto.setDial_numbers(branch.getDial_numbers());
-        dto.setBasic_cost(branch.getBasic_cost());
-        dto.setWeekly_allowance(branch.getWeekly_allowance());
-        dto.setUserId(userId);
-        dto.setEmail(email);
-        branchService.createBranch(dto);
-        return ResponseEntity.ok().build();
-    }
 
 
 

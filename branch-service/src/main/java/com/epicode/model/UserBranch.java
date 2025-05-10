@@ -3,6 +3,7 @@ package com.epicode.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -25,7 +26,7 @@ public class UserBranch {
     private String roles;
 
     @Column
-    private String personal_cost;
+    private BigDecimal personal_cost;
 
     @Column
     private String status;

@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,5 +17,5 @@ public class WorkerDTO {
     private String phoneNums;
     private String roles;
     private String status;
-    private Integer cost;
+    private BigDecimal cost;
 }

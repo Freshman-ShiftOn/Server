@@ -41,7 +41,7 @@ public class UserBranchServiceImpl implements UserBranchService {
         userBranch.setUser(user);
         userBranch.setBranch(branch);
         userBranch.setRoles(dto.getRoles());
-        userBranch.setPersonal_cost(String.valueOf(dto.getCost()));
+        userBranch.setPersonal_cost(dto.getCost());
         userBranch.setStatus(dto.getStatus());
         userBranchRepository.save(userBranch);
     }
