@@ -3,6 +3,7 @@ package com.example.calendarservice.service;
 import com.example.calendarservice.dto.RepeatScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.exception.ResourceNotFoundException;
+import com.example.calendarservice.exception.ScheduleConflictException;
 import com.example.calendarservice.message.ScheduleEventProducer;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.repository.ScheduleRepository;
@@ -37,9 +38,23 @@ public class ScheduleServiceImpl implements ScheduleService {
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
 
+        // 시간이 변경되는 경우에만 중복 체크
+        if (!existingSchedule.getStartTime().equals(schedule.getStartTime()) ||
+            !existingSchedule.getEndTime().equals(schedule.getEndTime())) {
+            // 자기 자신을 제외한 중복 체크
+            if (scheduleRepository.existsOverlappingSchedule(
+                    schedule.getWorkerId(), 
+                    schedule.getStartTime(), 
+                    schedule.getEndTime(),
+                    scheduleId)) { // scheduleId를 제외하고 검사
+                throw new ScheduleConflictException("해당 시간에 이미 다른 스케줄이 존재합니다.");
+            }
+        }
+
         boolean timeChanged =
                 !existingSchedule.getStartTime().equals(schedule.getStartTime()) ||
                         !existingSchedule.getEndTime().equals(schedule.getEndTime());
+        
         existingSchedule.setBranchId(schedule.getBranchId());
         existingSchedule.setWorkerId(schedule.getWorkerId());
         existingSchedule.setWorkType(schedule.getWorkType());
@@ -163,6 +178,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
+    @Override
     public List<Schedule> updateRepeatSchedule(Long scheduleId, RepeatScheduleUpdateRequest request) {
         Schedule existingSchedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
@@ -172,6 +188,14 @@ public class ScheduleServiceImpl implements ScheduleService {
         switch (request.getUpdateOption()) {
             case "ONE":
                 // 이 일정만 수정 (독립적으로 변경)
+                if (scheduleRepository.existsOverlappingSchedule(
+                        existingSchedule.getWorkerId(),
+                        request.getStartTime(),
+                        request.getEndTime(),
+                        scheduleId)) {
+                    throw new ScheduleConflictException("해당 시간에 이미 다른 스케줄이 존재합니다.");
+                }
+                
                 existingSchedule.setWorkType(request.getWorkType());
                 existingSchedule.setStartTime(request.getStartTime());
                 existingSchedule.setEndTime(request.getEndTime());
@@ -183,6 +207,20 @@ public class ScheduleServiceImpl implements ScheduleService {
                 // 해당 날짜 이후(포함) 모든 일정 수정
                 schedulesToUpdate = scheduleRepository.findByRepeatGroupIdAndStartTimeGreaterThanEqual(
                         existingSchedule.getRepeatGroupId(), existingSchedule.getStartTime());
+                
+                // 모든 수정될 일정에 대해 중복 체크
+                for (Schedule schedule : schedulesToUpdate) {
+                    if (scheduleRepository.existsOverlappingSchedule(
+                            schedule.getWorkerId(),
+                            request.getStartTime(),
+                            request.getEndTime(),
+                            schedule.getId())) {
+                        throw new ScheduleConflictException(
+                                String.format("스케줄 ID %d: 해당 시간에 이미 다른 스케줄이 존재합니다.", schedule.getId()));
+                    }
+                }
+
+                // 중복 체크 통과 후 일정 수정
                 for (Schedule schedule : schedulesToUpdate) {
                     schedule.setWorkType(request.getWorkType());
                     schedule.setStartTime(request.getStartTime());
@@ -194,6 +232,20 @@ public class ScheduleServiceImpl implements ScheduleService {
             case "ALL":
                 // 전체 반복 일정 수정
                 schedulesToUpdate = scheduleRepository.findByRepeatGroupId(existingSchedule.getRepeatGroupId());
+                
+                // 모든 수정될 일정에 대해 중복 체크
+                for (Schedule schedule : schedulesToUpdate) {
+                    if (scheduleRepository.existsOverlappingSchedule(
+                            schedule.getWorkerId(),
+                            request.getStartTime(),
+                            request.getEndTime(),
+                            schedule.getId())) {
+                        throw new ScheduleConflictException(
+                                String.format("스케줄 ID %d: 해당 시간에 이미 다른 스케줄이 존재합니다.", schedule.getId()));
+                    }
+                }
+
+                // 중복 체크 통과 후 일정 수정
                 for (Schedule schedule : schedulesToUpdate) {
                     schedule.setWorkType(request.getWorkType());
                     schedule.setStartTime(request.getStartTime());
