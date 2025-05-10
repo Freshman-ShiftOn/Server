@@ -134,18 +134,7 @@ public class AuthController {
         }
     }
 
-    @Operation(
-            summary = "사용자 이름 변경",
-            description = "사용자 정보를 변경합니다.",
-            parameters = {
-                    @Parameter(name = "name", description = "사용자 new이름", required = true)
-            }
-    )
-    @PutMapping("/edit/{name}")
-    public ResponseEntity<?> updateName(@RequestHeader("X-Authenticated-User-Id") String userId, @PathVariable String name) {
-        User updatedUser = userService.updateUserName(Long.parseLong(userId), name);
-        return ResponseEntity.ok(updatedUser);
-    }
+
 
     /////////////////////////////////////
     /// web 버전 in APP

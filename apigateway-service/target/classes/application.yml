@@ -42,14 +42,21 @@ spring:
             - Path=/api/auth/**
             
         - id: web-user-service
-          uri: lb://WEB-USER-SERVICE
+          uri: lb://USER-SERVICE
           predicates:
             - Path=/api/web/auth/**
 
-        - id: user-service-salaries
-          uri: lb://USER-SERVICE
+        - id: salaries-service
+          uri: lb://SALARY-SERVICE
           predicates:
             - Path=/api/salaries/**
+          filters:
+            - JwtAuthenticationFilter
+
+        - id: user-service-profile
+          uri: lb://PROFILE-SERVICE
+          predicates:
+            - Path=/api/profile/**
           filters:
             - JwtAuthenticationFilter
 

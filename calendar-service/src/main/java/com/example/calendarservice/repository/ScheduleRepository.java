@@ -19,4 +19,26 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     List<Schedule> findByRepeatGroupId(Long repeatGroupId);
     List<Schedule> findByRepeatGroupIdAndStartTimeGreaterThanEqual(Long repeatGroupId, Date startTime);
+
+    @Query("SELECT COUNT(s) > 0 FROM Schedule s " +
+           "WHERE s.workerId = :workerId " +
+           "AND s.id != :excludeId " +
+           "AND ((s.startTime <= :endTime AND s.endTime >= :startTime) " +
+           "OR (s.startTime >= :startTime AND s.startTime < :endTime) " +
+           "OR (s.endTime > :startTime AND s.endTime <= :endTime))")
+    boolean existsOverlappingSchedule(
+            @Param("workerId") Long workerId,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime,
+            @Param("excludeId") Long excludeId);
+
+    @Query("SELECT COUNT(s) > 0 FROM Schedule s " +
+           "WHERE s.workerId = :workerId " +
+           "AND ((s.startTime <= :endTime AND s.endTime >= :startTime) " +
+           "OR (s.startTime >= :startTime AND s.startTime < :endTime) " +
+           "OR (s.endTime > :startTime AND s.endTime <= :endTime))")
+    boolean existsOverlappingSchedule(
+            @Param("workerId") Long workerId,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime);
 }

@@ -1,15 +1,12 @@
 package com.epicode.controller;
 
-import com.epicode.dto.BranchIdNameProjection;
-import com.epicode.dto.WorkerProjection;
-import com.epicode.exception.CustomException;
-import com.epicode.exception.ErrorCode;
+import com.epicode.dto.*;
+import com.epicode.exception.*;
 import com.epicode.model.Branch;
+import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
 import com.epicode.security.InviteToken;
-import com.epicode.service.BranchService;
-import com.epicode.service.InviteService;
-import com.epicode.service.UserBranchService;
+import com.epicode.service.*;
 import io.jsonwebtoken.Claims;
 import com.epicode.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,9 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RequestMapping({"/api/branch"})
 @Tag(
@@ -35,7 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BranchController {
     private final BranchService branchService;
-    private final UserBranchService userBranchService;
+    private final UserBranchRepository userBranchRepository;
     private final S3Service s3Service;
     private final UserRepository userRepository;
     private final InviteService inviteService;
@@ -114,23 +109,18 @@ public class BranchController {
             @RequestHeader("X-Authenticated-User") String email
     ) {
         Long userId = userRepository.findIdByEmail(email).getId();
-        branchService.createBranch(branch, userId, email);
+        BranchRequestDTO dto = new BranchRequestDTO();
+        dto.setName(branch.getName());
+        dto.setAdress(branch.getAdress());
+        dto.setDial_numbers(branch.getDial_numbers());
+        dto.setBasic_cost(branch.getBasic_cost());
+        dto.setWeekly_allowance(branch.getWeekly_allowance());
+        dto.setUserId(userId);
+        dto.setEmail(email);
+        branchService.createBranch(dto);
         return ResponseEntity.ok().build();
     }
 
-
-    @Operation(
-            summary = "매장 근무 동료들 조회",
-            description = "해당 매장에 근무하는 근무자의 id,name이 반환됩니다.",
-            parameters = {
-                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true, example = "Bearer eyJhbGciOiJI..."),
-                    @Parameter(name = "branchId", description = "조회할 매장Id", required = true, example = "101")
-            }
-    )
-    @GetMapping("/{branchId}/workers")
-    public List<WorkerProjection> getWorkersByBranchId(@PathVariable Long branchId) {
-        return branchService.getWorkersByBranchId(branchId);
-    }
 
 
     @Operation(
@@ -218,12 +208,29 @@ public class BranchController {
             }
     )
     @GetMapping("/invite/generate")
-    public ResponseEntity<String> generateInviteToken(
+    public ResponseEntity<BranchNameAndToken> generateInviteToken(
             @RequestParam String inviterEmail,
             //@RequestParam String inviteeEmail,
             @RequestParam Long branchId
     ) {
         String inviteToken = inviteService.generateInviteToken(inviterEmail, branchId);
-        return ResponseEntity.ok(inviteToken);
+        String branchName = branchService.getBranchNameByBranchId(branchId);
+        BranchNameAndToken result = new BranchNameAndToken(branchName,inviteToken);
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(
+            summary = "초대장 토큰으로부터 지점명 받아오기",
+            description = "초대장 토큰으로부터 받아옵니다.",
+            parameters = {
+                    @Parameter(name = "inviteToken", description = "초대장 토큰", required = true, example = "dkks#$@#$")
+            }
+    )
+    @GetMapping("/invite")
+    public ResponseEntity<String> getBranchName(
+            @RequestHeader("X-Invite-Branch-Id") String branchId
+    ) {
+        String branchName = branchService.getBranchNameByBranchId(Long.valueOf(branchId));
+        return ResponseEntity.ok(branchName);
     }
 }

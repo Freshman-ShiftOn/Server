@@ -1,6 +1,7 @@
 package com.epicode.repository;
 
 import com.epicode.dto.BranchIdNameProjection;
+import com.epicode.dto.WorkerDTO;
 import com.epicode.dto.WorkerProjection;
 import com.epicode.model.Branch;
 import com.epicode.model.User;
@@ -19,11 +20,23 @@ public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
     List<BranchIdNameProjection> findBranchIdsAndNamesByUserId(Long userId);
 //    @Query("SELECT b.name FROM Branch b WHERE b.id IN :branchIds")
 //    List<String> findBranchNamesByIds(@Param("branchIds") List<Long> branchIds);
-    @Query("SELECT u.id AS id, u.name AS name " +
-            "FROM UserBranch ub JOIN ub.user u WHERE ub.branch.id = :branchId")
-    List<WorkerProjection> findWorkersByBranchId(Long branchId);
+    //직원id,name만 불러오는 기능
+//    @Query("SELECT u.id AS id, u.name AS name " +
+//            "FROM UserBranch ub JOIN ub.user u WHERE ub.branch.id = :branchId")
+//    List<WorkerProjection> findWorkersByBranchId(Long branchId);
+
+    @Query("SELECT new com.epicode.dto.WorkerDTO(" +
+            "u.name, u.phone_nums, u.email, ub.roles, ub.status, " +
+            "COALESCE(ub.personal_cost, b.basic_cost)) " +
+            "FROM UserBranch ub " +
+            "JOIN ub.user u " +
+            "JOIN ub.branch b " +
+            "WHERE b.id = :branchId")
+    List<WorkerDTO> findWorkersByBranchId(@Param("branchId") Long branchId);
+
     boolean existsByUserIdAndBranchId(Long userId, Long branchId);
     void deleteByUserAndBranch(User user, Branch branch);
-
     Optional<UserBranch> findByUserAndBranch(User user, Branch branch);
+    @Query("SELECT ub.branch.id FROM UserBranch ub WHERE ub.user.id = :userId")
+    List<Long> findBranchIdsByUserId(@Param("userId") Long userId);
 }

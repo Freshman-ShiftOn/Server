@@ -1,14 +1,12 @@
 package com.example.calendarservice.controller;
 
-import com.example.calendarservice.dto.RepeatScheduleRequest;
-import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
-import com.example.calendarservice.dto.ShiftRequestsByBranchMonthResponseDto;
-import com.example.calendarservice.dto.UpdateShiftRequestDto;
+import com.example.calendarservice.dto.*;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
 import com.example.calendarservice.service.ScheduleService;
 import com.example.calendarservice.service.ShiftRequestService;
 import com.example.calendarservice.service.UserService;
+import com.example.calendarservice.exception.ScheduleConflictException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -58,11 +56,15 @@ public class CalendarController {
             @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody Schedule schedule) {
-        schedule.setBranchId(branchId);
-        schedule.setWorkerId(Long.valueOf(userId));
-        schedule.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
-        Schedule newSchedule = scheduleService.createSchedule(schedule);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
+        try {
+            schedule.setBranchId(branchId);
+            schedule.setWorkerId(Long.valueOf(userId));
+            schedule.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
+            Schedule newSchedule = scheduleService.createSchedule(schedule);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
+        } catch (ScheduleConflictException e) {
+            throw e;
+        }
     }
 
     // 반복 스케줄 등록
@@ -72,15 +74,16 @@ public class CalendarController {
             @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestBody RepeatScheduleRequest repeatScheduleRequest) {
+        try {
+            repeatScheduleRequest.setBranchId(branchId);
+            repeatScheduleRequest.setWorkerId(Long.valueOf(userId));
+            repeatScheduleRequest.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
 
-        // 요청 데이터에서 branchId와 userId 설정
-        repeatScheduleRequest.setBranchId(branchId);
-        repeatScheduleRequest.setWorkerId(Long.valueOf(userId));
-        repeatScheduleRequest.setWorkerName(userService.getUserNameById(Long.valueOf(userId)));
-
-        // 반복 스케줄 생성
-        List<Schedule> schedules = scheduleService.createRepeatSchedules(repeatScheduleRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(schedules);
+            List<Schedule> schedules = scheduleService.createRepeatSchedules(repeatScheduleRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(schedules);
+        } catch (ScheduleConflictException e) {
+            throw e;
+        }
     }
 
     // 내 스케줄 수정
@@ -90,16 +93,17 @@ public class CalendarController {
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @PathVariable Long scheduleId,
             @RequestBody Schedule schedule) {
-
-        // 해당 스케줄이 현재 유저의 스케줄인지 검증
         if (!scheduleService.isUserSchedule(scheduleId, Long.valueOf(userId))) {
             throw new IllegalArgumentException("Unauthorized: The schedule does not belong to the authenticated user.");
         }
 
-        schedule.setWorkerId(Long.valueOf(userId));
-        Schedule updatedSchedule = scheduleService.updateSchedule(scheduleId, schedule);
-
-        return ResponseEntity.ok(updatedSchedule);
+        try {
+            schedule.setWorkerId(Long.valueOf(userId));
+            Schedule updatedSchedule = scheduleService.updateSchedule(scheduleId, schedule);
+            return ResponseEntity.ok(updatedSchedule);
+        } catch (ScheduleConflictException e) {
+            throw e;
+        }
     }
 
     // 반복 스케줄 수정
@@ -207,27 +211,24 @@ public class CalendarController {
     // 대타 요청 내역 조회 (지점 필터 추가)
     @GetMapping("/request-shift")
     @Operation(summary = "대타 요청 내역 조회 (마이페이지용)", description = "특정한 유저의 대타 요청 내역을 조회한다.")
-    public ResponseEntity<List<ShiftRequest>> getShiftRequestsByUser(
+    public ResponseEntity<List<ShiftRequestDto>> getShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestParam(value = "branchId", required = false) Long branchId) {
 
-        List<ShiftRequest> shiftRequests = shiftRequestService
-                .getShiftRequestsByUser(Long.valueOf(userId), branchId);
-
-        return ResponseEntity.ok(shiftRequests);
+        List<ShiftRequestDto> dtos = shiftRequestService.getShiftRequestsByUser(Long.valueOf(userId), branchId);
+        return ResponseEntity.ok(dtos);
     }
 
     // 대타 수락 내역 조회 (지점 필터 추가)
     @GetMapping("/accepted-shift")
     @Operation(summary = "대타 수락 내역 조회 (마이페이지용)", description = "특정 유저가 수락한 대타 요청 내역을 조회한다.")
-    public ResponseEntity<List<ShiftRequest>> getAcceptedShiftRequestsByUser(
+    public ResponseEntity<List<ShiftRequestDto>> getAcceptedShiftRequestsByUser(
             @RequestHeader("X-Authenticated-User-Id") String userId,
             @RequestParam(value = "branchId", required = false) Long branchId) {
 
-        List<ShiftRequest> acceptedShiftRequests = shiftRequestService
-                .getAcceptedShiftRequestsByUser(Long.valueOf(userId), branchId);
+        List<ShiftRequestDto> dtos = shiftRequestService.getAcceptedShiftRequestsByUser(Long.valueOf(userId), branchId);
 
-        return ResponseEntity.ok(acceptedShiftRequests);
+        return ResponseEntity.ok(dtos);
     }
 
     // 지점 대타 요청 내역 조회 (캘린더용)

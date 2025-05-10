@@ -33,6 +33,7 @@ jobs:
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
           echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
           echo "EPI_SERVER=${{ secrets.EPI_SERVER }}" >> .env
+          echo "SPRING_KAFKA_BOOTSTRAP_SERVERS=${{ secrets.SPRING_KAFKA_BOOTSTRAP_SERVERS }}" >> .env
           
 
       - name: Build manual-service
@@ -78,6 +79,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
           DB_URL: ${{ secrets.DB_URL }}
+          SPRING_KAFKA_BOOTSTRAP_SERVERS: ${{ secrets.SPRING_KAFKA_BOOTSTRAP_SERVERS }}
         run: ./gradlew clean build -x test
         
       - name: Build user-service
@@ -90,6 +92,17 @@ jobs:
           KAKAO_RESTAPI: ${{ secrets.KAKAO_RESTAPI }}
           BASE_URL: ${{ secrets.BASE_URL }}
           JWT_KEY: ${{ secrets.JWT_KEY }}
+        run: ./gradlew clean build -x test
+
+      - name: Build salary-service
+        working-directory: salary-service
+        env:
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          EUREKA_SERVER: ${{ secrets.EUREKA_SERVER }}
+          DB_URL: ${{ secrets.DB_URL }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          SPRING_KAFKA_BOOTSTRAP_SERVERS: ${{ secrets.SPRING_KAFKA_BOOTSTRAP_SERVERS }}
         run: ./gradlew clean build -x test
 
       - name: Build branch-service
@@ -119,6 +132,7 @@ jobs:
           docker build -t discovery-service:latest ./discovery-service
           docker build -t calendar-service:latest ./calendar-service
           docker build -t user-service:latest ./user-service
+          docker build -t salary-service:latest ./salary-service
           docker build -t branch-service:latest ./branch-service
           docker build -t approval-service:latest ./approval-service
 
@@ -129,6 +143,7 @@ jobs:
           docker save discovery-service:latest -o discovery-service.tar
           docker save calendar-service:latest -o calendar-service.tar
           docker save user-service:latest -o user-service.tar
+          docker save salary-service:latest -o salary-service.tar
           docker save branch-service:latest -o branch-service.tar
           docker save approval-service:latest -o approval-service.tar
           
@@ -151,6 +166,7 @@ jobs:
           scp -i epicode_key.pem -o StrictHostKeyChecking=no discovery-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no calendar-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no user-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
+          scp -i epicode_key.pem -o StrictHostKeyChecking=no salary-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no branch-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no approval-service.tar ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
           scp -i epicode_key.pem -o StrictHostKeyChecking=no docker-compose.yml ubuntu@${{ secrets.EC2_IP }}:/home/ubuntu/deploy/
@@ -164,6 +180,7 @@ jobs:
             docker load -i discovery-service.tar
             docker load -i calendar-service.tar
             docker load -i user-service.tar
+            docker load -i salary-service.tar
             docker load -i branch-service.tar
             docker load -i approval-service.tar
             docker-compose down || true

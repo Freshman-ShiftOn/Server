@@ -28,16 +28,16 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi generalAuthApi() {
         return GroupedOpenApi.builder()
-                .group("general-auth-api") // 일반 인증
+                .group("auth-api") // 일반 인증
                 .pathsToMatch("/api/auth/**")
                 .build();
     }
-
     @Bean
-    public GroupedOpenApi salaryApi() {
+    public GroupedOpenApi generalProfileApi() {
         return GroupedOpenApi.builder()
-                .group("salary-api") // 급여 관련
-                .pathsToMatch("/api/salaries/**")
+                .group("profile-api")
+                .pathsToMatch("/api/profile/**")
                 .build();
     }
+
 }
