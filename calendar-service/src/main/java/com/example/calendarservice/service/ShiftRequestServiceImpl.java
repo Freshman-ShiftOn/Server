@@ -2,6 +2,7 @@ package com.example.calendarservice.service;
 
 import com.example.calendarservice.dto.ShiftRequestDto;
 import com.example.calendarservice.exception.ResourceNotFoundException;
+import com.example.calendarservice.exception.ScheduleConflictException;
 import com.example.calendarservice.model.Branch;
 import com.example.calendarservice.model.Schedule;
 import com.example.calendarservice.model.ShiftRequest;
@@ -63,23 +64,34 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     @Override
     public ShiftRequest acceptShiftRequest(Long shiftRequestId, Long acceptId, String acceptName) {
         // 대타 요청 확인
-        ShiftRequest existingShiftRequest = shiftRequestRepository.findById(shiftRequestId)
+        ShiftRequest shiftRequest = shiftRequestRepository.findById(shiftRequestId)
                 .orElseThrow(() -> new ResourceNotFoundException("ShiftRequest not found with id " + shiftRequestId));
 
-        // 스케줄 가져오기
-        Schedule schedule = getScheduleFromShiftRequest(shiftRequestId);
-        if (schedule == null) {
-            throw new ResourceNotFoundException("Schedule not associated with ShiftRequest id " + shiftRequestId);
+        // 이미 수락된 대타 요청인지 확인
+        if (shiftRequest.getAcceptId() != null) {
+            throw new IllegalStateException("This shift request has already been accepted.");
+        }
+
+        // 대타 요청에 해당하는 스케줄 조회
+        Schedule schedule = scheduleRepository.findById(shiftRequest.getScheduleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + shiftRequest.getScheduleId()));
+
+        // 수락하려는 사람의 스케줄 중복 검사
+        if (scheduleRepository.existsOverlappingSchedule(
+                acceptId,
+                schedule.getStartTime(),
+                schedule.getEndTime())) {
+            throw new ScheduleConflictException("해당 시간에 이미 다른 스케줄이 존재하여 대타 요청을 수락할 수 없습니다.");
         }
 
         // 대타 요청 수락 처리
-        existingShiftRequest.setAcceptId(acceptId);
-        existingShiftRequest.setAcceptName(acceptName);
-        existingShiftRequest.setReqStatus("ACCEPTED");
-        shiftRequestRepository.save(existingShiftRequest);
+        shiftRequest.setAcceptId(acceptId);
+        shiftRequest.setAcceptName(acceptName);
+        shiftRequest.setReqStatus("ACCEPTED");
+        shiftRequestRepository.save(shiftRequest);
 
-        Date reqStartTime = existingShiftRequest.getReqStartTime();
-        Date reqEndTime = existingShiftRequest.getReqEndTime();
+        Date reqStartTime = shiftRequest.getReqStartTime();
+        Date reqEndTime = shiftRequest.getReqEndTime();
         Date originalStartTime = schedule.getStartTime();
         Date originalEndTime = schedule.getEndTime();
 
@@ -117,7 +129,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
         schedule.setWorkerName(acceptName); // 대타를 수락한 유저로 변경
         schedule.setStartTime(reqStartTime);
         schedule.setEndTime(reqEndTime);
-        schedule.setWorkType(existingShiftRequest.getWorkType());
+        schedule.setWorkType(shiftRequest.getWorkType());
 
         // 기존 스케줄 저장
         scheduleRepository.save(schedule);
@@ -127,7 +139,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
             scheduleRepository.save(newSchedule);
         }
 
-        return existingShiftRequest;
+        return shiftRequest;
     }
 
     @Override
