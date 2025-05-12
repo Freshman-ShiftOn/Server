@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -32,6 +33,8 @@ public class QDailyUserSalary extends EntityPathBase<DailyUserSalary> {
     public final DatePath<java.time.LocalDate> workDate = createDate("workDate", java.time.LocalDate.class);
 
     public final NumberPath<Integer> workedMinutes = createNumber("workedMinutes", Integer.class);
+
+    public final ListPath<String, StringPath> workType = this.<String, StringPath>createList("workType", String.class, StringPath.class, PathInits.DIRECT2);
 
     public QDailyUserSalary(String variable) {
         super(DailyUserSalary.class, forVariable(variable));

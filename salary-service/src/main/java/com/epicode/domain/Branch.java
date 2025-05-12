@@ -23,8 +23,8 @@ public class Branch {
     @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '10030'")
     private String basic_cost = "10030";
 
-    @Column
-    private boolean weekly_allowance;
+    @Column(nullable = true)
+    private Boolean weekly_allowance;
 
     @Column(nullable = false, length = 2083)
     private String images;
