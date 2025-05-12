@@ -83,7 +83,7 @@ public class WebBranchController {
                     @Parameter(name = "branch", description = "생성할 매장의 정보", required = true)
             }
     )
-    public ResponseEntity<Void> createBranch(
+    public ResponseEntity<Long> createBranch(
             @org.springframework.web.bind.annotation.RequestBody Branch branch,
             @RequestHeader("X-Authenticated-User") String email
     ) {
@@ -96,8 +96,8 @@ public class WebBranchController {
         dto.setWeekly_allowance(branch.getWeekly_allowance());
         dto.setUserId(userId);
         dto.setEmail(email);
-        branchService.createBranch(dto);
-        return ResponseEntity.ok().build();
+        Long branchId = branchService.createBranch(dto);
+        return ResponseEntity.ok(branchId);
     }
 
 

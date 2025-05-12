@@ -10,7 +10,7 @@ public interface BranchService {
     //List<String> getBranchNamesByUserId(Long userId);//브랜치 네임 가져오기(ver1)
     //List<String> getBranchNamesByUserIds(Long[] branchIds);
     Long getBranchIdByName(String name);
-    void createBranch(BranchRequestDTO dto);
+    Long createBranch(BranchRequestDTO dto);
     List<WorkerDTO> getWorkersByBranchId(Long branchId);
     Branch getBranchProfile(Long branchId);
     String getBranchNameByBranchId(Long branchId);
