@@ -2,7 +2,9 @@ package com.epicode.service;
 
 import com.epicode.domain.DailyUserSalary;
 import com.epicode.domain.UserBranch;
+import com.epicode.dto.DailyWorkDetailDTO;
 import com.epicode.dto.WeeklyBranchUserSummaryDTO;
+import com.epicode.dto.WeeklySalaryDetailDTO;
 import com.epicode.repository.DailyUserSalaryRepository;
 import com.epicode.repository.UserBranchRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +60,41 @@ public class SalarySummaryService {
         }
 
         return result;
+    }
+
+
+    public WeeklySalaryDetailDTO getUserWeeklySalaryDetail(Long branchId, Long userId, LocalDate start, LocalDate end) {
+        List<DailyUserSalary> salaries = dailySalaryRepo.findSalariesByBranchAndPeriod(branchId, start, end)
+                .stream()
+                .filter(s -> s.getUserId().equals(userId))
+                .toList();
+
+        int totalMinutes = salaries.stream().mapToInt(DailyUserSalary::getWorkedMinutes).sum();
+        BigDecimal baseSalary = salaries.stream()
+                .map(DailyUserSalary::getDailySalary)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        UserBranch user = userBranchRepository.findByUserIdAndBranchId(userId, branchId);
+
+        boolean eligible = totalMinutes >= 900;
+        BigDecimal weeklyAllowance = eligible ? user.getPersonal_cost().multiply(BigDecimal.valueOf(8)) : BigDecimal.ZERO;
+        String reason = eligible ? "주 15시간 이상 근무" : "주 15시간 미만 근무";
+        BigDecimal finalSalary = baseSalary.add(weeklyAllowance);
+
+        List<DailyWorkDetailDTO> dailyDetails = salaries.stream()
+                .map(s -> new DailyWorkDetailDTO(s.getWorkDate(), s.getWorkedMinutes()))
+                .toList();
+
+        return new WeeklySalaryDetailDTO(
+                user.getUser().getName(),
+                user.getPersonal_cost(),
+                totalMinutes,
+                baseSalary,
+                eligible,
+                reason,
+                weeklyAllowance,
+                finalSalary,
+                dailyDetails
+        );
     }
 }

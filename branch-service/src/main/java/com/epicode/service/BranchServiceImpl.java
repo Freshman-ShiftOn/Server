@@ -63,7 +63,7 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     @Transactional
-    public void createBranch(BranchRequestDTO dto) {
+    public Long createBranch(BranchRequestDTO dto) {
         User user = userRepository.findIdByEmail(dto.getEmail());
 
         if (user == null || !user.getId().equals(dto.getUserId())) {
@@ -89,7 +89,8 @@ public class BranchServiceImpl implements BranchService {
         userBranch.setJoinedAt(LocalDateTime.now());
 
         //UserBranch 저장
-        userBranchRepository.save(userBranch);
+        UserBranch branch = userBranchRepository.save(userBranch);
+        return branch.getBranch().getId();
     }
 
 //    @Override

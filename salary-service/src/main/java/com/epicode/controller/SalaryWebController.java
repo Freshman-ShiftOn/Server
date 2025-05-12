@@ -1,6 +1,7 @@
 package com.epicode.controller;
 
 import com.epicode.dto.WeeklyBranchUserSummaryDTO;
+import com.epicode.dto.WeeklySalaryDetailDTO;
 import com.epicode.dto.WeeklySalaryDto;
 import com.epicode.service.SalaryService;
 import com.epicode.service.SalarySummaryService;
@@ -23,6 +24,16 @@ public class SalaryWebController {
     private final SalaryService salaryService;
     private final SalarySummaryService summaryService;
 
+    @Operation(
+            summary = "기간 급여 조회",
+            description = "시작일~마감일에 해당하는 지점의 급여 정보를 조회합니다.(주휴 포함)",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT 토큰 (Bearer 형식)", required = true, example = "Bearer eyJhbGciOiJIUzI1Ni..."),
+                    @Parameter(name = "branchId", required = true, example = "101"),
+                    @Parameter(name = "startDate", required = true, example = "2025-05-01"),
+                    @Parameter(name = "endDate", required = true, example = "2025-05-31")
+            }
+    )
     @GetMapping("/summary")
     public ResponseEntity<?> getWeeklyBranchSummary(
             @RequestParam Long branchId,
@@ -37,6 +48,31 @@ public class SalaryWebController {
             return ResponseEntity.ok(Collections.emptyList());
         }
         return ResponseEntity.ok(result);
+    }
+
+    @Operation(
+            summary = "사용자 상세 급여 조회",
+            description = "userId, 기간, 지점을 기준으로 특정 사용자의 급여 상세를 조회합니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", required = true, example = "Bearer ey..."),
+                    @Parameter(name = "branchId", required = true, example = "101"),
+                    @Parameter(name = "userId", required = true, example = "5"),
+                    @Parameter(name = "startDate", required = true, example = "2025-05-01"),
+                    @Parameter(name = "endDate", required = true, example = "2025-05-31")
+            }
+    )
+    @GetMapping("/detail")
+    public ResponseEntity<?> getUserSalaryDetail(
+            @RequestParam Long branchId,
+            @RequestParam Long userId,
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        WeeklySalaryDetailDTO detail = summaryService.getUserWeeklySalaryDetail(branchId, userId, start, end);
+        return ResponseEntity.ok(detail);
     }
 
     @Operation(
