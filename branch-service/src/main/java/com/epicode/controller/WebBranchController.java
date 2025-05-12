@@ -8,22 +8,20 @@ import com.epicode.exception.ErrorCode;
 import com.epicode.model.Branch;
 import com.epicode.repository.UserBranchRepository;
 import com.epicode.repository.UserRepository;
-import com.epicode.security.InviteToken;
 import com.epicode.service.BranchService;
-import com.epicode.service.InviteService;
-import com.epicode.service.S3Service;
 import com.epicode.service.UserBranchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RequestMapping({"/api/branch"})
 @Tag(
         name = "web branch-service-controller",
@@ -48,6 +46,7 @@ public class WebBranchController {
     @PostMapping("/workers")
     public ResponseEntity<?> AddWorkers(
             @RequestBody WorkerRequestDTO dto) {
+        log.info("받은 dto: {}", dto);
         userBranchService.addUserAtBranch(dto);
         return ResponseEntity.ok().build();
     }
