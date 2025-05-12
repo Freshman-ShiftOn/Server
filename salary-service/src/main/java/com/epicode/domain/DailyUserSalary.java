@@ -31,9 +31,9 @@ public class DailyUserSalary {
     @Column(name = "work_date", nullable = false)
     private LocalDate workDate;
 
-//    @Convert(converter = StringListConverter.class) // 리스트를 JSON으로 변환
-//    @Column(name = "work_type", columnDefinition = "TEXT")
-//    private List<String> workType;
+    @Convert(converter = StringListConverter.class) // 리스트를 JSON으로 변환
+    @Column(name = "work_type", columnDefinition = "TEXT")
+    private List<String> workType;
 
     @Column(name = "worked_minutes", nullable = false)
     private Integer workedMinutes;

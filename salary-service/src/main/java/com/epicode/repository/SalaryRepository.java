@@ -17,6 +17,7 @@ public interface SalaryRepository extends JpaRepository<Salary, SalaryId> {
     // 특정 Branch의 모든 Salary 조회
     List<Salary> findAllByBranchId(Long branchId);
 
+
     // userId + BranchId로 특별 시급만 조회
     @Query("SELECT s FROM Salary s JOIN s.specificTimeSalaries sts WHERE s.branchId = :branchId AND s.userId = :userId")
     List<Salary> findSpecificTimeSalariesByBranchIdAndUserId(@Param("branchId") Long branchId, @Param("userId") Long userId);

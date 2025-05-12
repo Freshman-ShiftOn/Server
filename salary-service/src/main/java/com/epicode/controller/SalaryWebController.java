@@ -1,7 +1,9 @@
 package com.epicode.controller;
 
+import com.epicode.dto.WeeklyBranchUserSummaryDTO;
 import com.epicode.dto.WeeklySalaryDto;
 import com.epicode.service.SalaryService;
+import com.epicode.service.SalarySummaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -17,6 +21,23 @@ import java.util.List;
 @Tag(name = "급여 관리 Web API", description = "웹 사용자 기본 시급 및 특별 시급 관련 API를 제공합니다.")
 public class SalaryWebController {
     private final SalaryService salaryService;
+    private final SalarySummaryService summaryService;
+
+    @GetMapping("/summary")
+    public ResponseEntity<?> getWeeklyBranchSummary(
+            @RequestParam Long branchId,
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+        LocalDate start = LocalDate.parse(startDate);  // yyyy-MM-dd 형식
+        LocalDate end = LocalDate.parse(endDate);
+
+        List<WeeklyBranchUserSummaryDTO> result = summaryService.getWeeklySummaryByBranch(branchId, start, end);
+        if (result.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        return ResponseEntity.ok(result);
+    }
 
     @Operation(
             summary = "월간 주별 급여 조회",
@@ -55,7 +76,4 @@ public class SalaryWebController {
         List<WeeklySalaryDto> salary = salaryService.getSalaryInfo(branchId, month);
         return ResponseEntity.ok(salary);
     }
-
-
-
 }
