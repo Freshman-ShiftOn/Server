@@ -1,18 +1,24 @@
 package com.epicode.controller;
 import com.epicode.domain.User;
 import com.epicode.exception.CustomException;
-import com.epicode.security.JwtUtil;
+import com.epicode.exception.ErrorCode;
+import com.epicode.repository.UserRepository;
 import com.epicode.service.KakaoService;
 import com.epicode.service.UserService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +29,11 @@ public class AuthController {
     private final Environment env;
     private final KakaoService kakaoService;
     private final UserService userService;
+    private final UserRepository userRepository;
+
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
     @Operation(
             summary = "사용자 카카오 로그인",
             description = "사용자의 카카오 정보로 로그인을 시도합니다.(없으면 회원가입 후 로그인 자동)"
@@ -53,13 +64,38 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "사용자 카카오 로그인(콜백)",
+            description = "로그인 후 JWT토큰, 사용자 정보를 리턴 받습니다."
+    )
     @PostMapping("/kakao/callback")
-    public ResponseEntity<String> handleKakaoCallback(@RequestBody String accessToken) {
+    public ResponseEntity<?> handleKakaoCallback(@RequestBody String accessToken) {
         try {
             // KakaoService를 통해 JWT 토큰 발급
             String jwtToken = kakaoService.authenticateWithKakao(accessToken);
+
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(jwtToken)
+                    .getBody();
+
+            Long userId = claims.get("userId", Long.class);
+            String name = claims.get("nickName", String.class);
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            String email = user.getEmail();
+
+            // 응답 구성
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", jwtToken);
+            response.put("user", Map.of(
+                    "id", userId,
+                    "email", email,
+                    "name", name
+            ));
             // JWT 토큰 반환
-            return ResponseEntity.ok(jwtToken);
+            return ResponseEntity.ok(response);
         } catch (IllegalStateException e) {
             log.error("카카오 인증 실패 - 상태 오류: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("카카오 인증 실패: " + e.getMessage());
