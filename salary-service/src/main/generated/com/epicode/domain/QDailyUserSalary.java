@@ -34,6 +34,8 @@ public class QDailyUserSalary extends EntityPathBase<DailyUserSalary> {
 
     public final NumberPath<Integer> workedMinutes = createNumber("workedMinutes", Integer.class);
 
+    public final StringPath workTime = createString("workTime");
+
     public final ListPath<String, StringPath> workType = this.<String, StringPath>createList("workType", String.class, StringPath.class, PathInits.DIRECT2);
 
     public QDailyUserSalary(String variable) {
