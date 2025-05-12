@@ -28,7 +28,7 @@ public class QUserBranch extends EntityPathBase<UserBranch> {
 
     public final DateTimePath<java.time.LocalDateTime> joinedAt = createDateTime("joinedAt", java.time.LocalDateTime.class);
 
-    public final StringPath personal_cost = createString("personal_cost");
+    public final NumberPath<java.math.BigDecimal> personal_cost = createNumber("personal_cost", java.math.BigDecimal.class);
 
     public final StringPath roles = createString("roles");
 
