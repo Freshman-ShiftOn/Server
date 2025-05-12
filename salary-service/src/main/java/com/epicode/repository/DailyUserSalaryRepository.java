@@ -18,6 +18,7 @@ public interface DailyUserSalaryRepository extends JpaRepository<DailyUserSalary
     SELECT d FROM DailyUserSalary d
     WHERE d.branchId = :branchId
       AND d.workDate BETWEEN :start AND :end
+      ORDER BY d.workDate ASC, d.workTime ASC
 """)
     List<DailyUserSalary> findSalariesByBranchAndPeriod(
             @Param("branchId") Long branchId,

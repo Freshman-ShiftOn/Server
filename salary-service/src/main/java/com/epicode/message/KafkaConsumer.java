@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -42,11 +43,16 @@ public class KafkaConsumer {
         BigDecimal hourlyWage = hourlyWageOpt.get();
         int minutes = calculateWorkedMinutes(dto.getStartTime(), dto.getEndTime());
         LocalDate workDate = toLocalDate(dto.getStartTime());
+        LocalTime startTime = toLocalTime(dto.getStartTime());
+        LocalTime endTime = toLocalTime(dto.getEndTime());
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String workTimeStr = startTime.format(timeFormatter) + " - " + endTime.format(timeFormatter);
 
-        saveOrUpdateDailySalary(dto, workDate, minutes, hourlyWage);
+        saveOrUpdateDailySalary(dto, workDate, minutes, hourlyWage, workTimeStr);
     }
 
-    private void saveOrUpdateDailySalary(ScheduleWorkedEventDTO dto, LocalDate workDate, int minutes, BigDecimal hourlyWage) {
+    //일급 누적
+    private void saveOrUpdateDailySalary(ScheduleWorkedEventDTO dto, LocalDate workDate, int minutes, BigDecimal hourlyWage, String workTimeStr) {
         BigDecimal dailySalary = hourlyWage.multiply(BigDecimal.valueOf(minutes))
                 .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
 
@@ -67,9 +73,11 @@ public class KafkaConsumer {
             DailyUserSalary newDaily = DailyUserSalary.builder()
                     .userId(dto.getUserId())
                     .branchId(dto.getBranchId())
-                    .workDate(workDate)
+                    .workDate(workDate)//일
+                    .workTime(workTimeStr)
                     .workedMinutes(minutes)
                     .dailySalary(dailySalary)
+                    .workType(dto.getWorkType())
                     .createdAt(LocalDateTime.now())
                     .build();
 
@@ -96,8 +104,18 @@ public class KafkaConsumer {
         return salaryRepository.findByUserIdAndBranchId(userId, branchId).map(Salary::getBasicSalary);
     }
 
+    //날짜(yyyy-MM-dd)
     private LocalDate toLocalDate(Date date) {
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
+
+    //시간(TT:mm)
+    private LocalTime toLocalTime(Date date) {
+        return date.toInstant()
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .toLocalTime();
+    }
+
+
 }
 

@@ -7,6 +7,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -30,6 +31,9 @@ public class DailyUserSalary {
 
     @Column(name = "work_date", nullable = false)
     private LocalDate workDate;
+
+    @Column(name = "work_time", nullable = false)
+    private String workTime;
 
     @Convert(converter = StringListConverter.class) // 리스트를 JSON으로 변환
     @Column(name = "work_type", columnDefinition = "TEXT")

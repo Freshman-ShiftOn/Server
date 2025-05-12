@@ -51,6 +51,7 @@ public class ScheduleEventProducer {
                 .branchId(schedule.getBranchId())
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())
+                .workType(schedule.getWorkType())
                 .build();
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,8 +25,6 @@ public class SalarySummaryService {
 
     public List<WeeklyBranchUserSummaryDTO> getWeeklySummaryByBranch(Long branchId, LocalDate start, LocalDate end) {
         List<DailyUserSalary> salaries = dailySalaryRepo.findSalariesByBranchAndPeriod(branchId, start, end);
-        List<DailyUserSalary> test = dailySalaryRepo.findSalariesByBranchAndPeriod(101L, LocalDate.of(2025,5,7), LocalDate.of(2025,5,7));
-        System.out.println("count = " + test.size());
         Map<Long, List<DailyUserSalary>> groupedByUser = salaries.stream()
                 .collect(Collectors.groupingBy(DailyUserSalary::getUserId));
 
@@ -81,8 +81,15 @@ public class SalarySummaryService {
         String reason = eligible ? "주 15시간 이상 근무" : "주 15시간 미만 근무";
         BigDecimal finalSalary = baseSalary.add(weeklyAllowance);
 
+
         List<DailyWorkDetailDTO> dailyDetails = salaries.stream()
-                .map(s -> new DailyWorkDetailDTO(s.getWorkDate(), s.getWorkedMinutes()))
+                .map(s -> new DailyWorkDetailDTO(
+                        s.getWorkDate(),
+                        s.getWorkDate().getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN),
+                        s.getWorkTime(),
+                        s.getWorkedMinutes(),
+                        s.getWorkType()
+                ))
                 .toList();
 
         return new WeeklySalaryDetailDTO(

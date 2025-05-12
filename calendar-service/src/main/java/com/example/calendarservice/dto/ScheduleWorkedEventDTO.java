@@ -2,6 +2,7 @@ package com.example.calendarservice.dto;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -12,4 +13,5 @@ public class ScheduleWorkedEventDTO {
     private Long branchId;
     private Date startTime;
     private Date endTime;
+    private List<String> workType;
 }
