@@ -11,7 +11,7 @@ public class Branch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String name;
 
     @Column(nullable = false)
@@ -20,15 +20,15 @@ public class Branch {
     @Column(nullable = true)
     private String dial_numbers;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '10030'")
+    @Column(columnDefinition = "VARCHAR(255) DEFAULT '10030'")
     private String basic_cost = "10030";
 
-    @Column(nullable = true)
-    private String weekly_allowance;
+    @Column
+    private Boolean weekly_allowance;
 
-    @Column(nullable = false, length = 2083)
+    @Column(nullable = true, length = 2083)
     private String images;
 
-    @Column
+    @Column(nullable = true)
     private String contents;
 }
