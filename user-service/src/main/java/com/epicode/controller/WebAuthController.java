@@ -18,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,7 +64,7 @@ public class WebAuthController {
         }
    }
 
-   @PostMapping("/signup")
+    @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody SignUpRequestDTO request) {
         if (userRepository.findByEmail(request.getEmail())!=null) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXISTS);
@@ -102,7 +104,17 @@ public class WebAuthController {
                 .toList();
 
             String token = jwtUtil.generateToken(user.getEmail(), branchIds, user.getId());
-            return ResponseEntity.ok(token);
+
+            // 응답 구성
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("user", Map.of(
+                    "id", user.getId(),
+                    "email", user.getEmail(),
+                    "branchIds", branchIds
+            ));
+            // JWT 토큰 반환
+            return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

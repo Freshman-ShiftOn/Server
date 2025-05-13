@@ -19,4 +19,5 @@ public class BranchRequestDTO {
 
     private Long userId;//boss id
     private String email;//boss email => for 교차검증
+    private String images;
 }

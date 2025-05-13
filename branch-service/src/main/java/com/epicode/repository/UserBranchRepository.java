@@ -40,4 +40,12 @@ public interface UserBranchRepository extends JpaRepository<UserBranch, Long> {
     Optional<UserBranch> findByUserAndBranch(User user, Branch branch);
     @Query("SELECT ub.branch.id FROM UserBranch ub WHERE ub.user.id = :userId")
     List<Long> findBranchIdsByUserId(@Param("userId") Long userId);
+
+    @Query("""
+    SELECT COUNT(ub) > 0
+    FROM UserBranch ub
+    JOIN ub.branch b
+    WHERE ub.user.id = :userId AND b.name = :branchName
+    """)
+    boolean existsByUserIdAndBranchName(@Param("userId") Long userId, @Param("branchName") String branchName);
 }

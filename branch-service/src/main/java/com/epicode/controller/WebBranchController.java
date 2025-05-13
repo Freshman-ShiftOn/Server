@@ -1,5 +1,4 @@
 package com.epicode.controller;
-
 import com.epicode.dto.BranchRequestDTO;
 import com.epicode.dto.WorkerDTO;
 import com.epicode.dto.WorkerRequestDTO;
@@ -83,7 +82,7 @@ public class WebBranchController {
             }
     )
     public ResponseEntity<Long> createBranch(
-            @org.springframework.web.bind.annotation.RequestBody Branch branch,
+            @RequestBody Branch branch,
             @RequestHeader("X-Authenticated-User") String email
     ) {
         Long userId = userRepository.findIdByEmail(email).getId();
@@ -95,6 +94,7 @@ public class WebBranchController {
         dto.setWeekly_allowance(branch.getWeekly_allowance());
         dto.setUserId(userId);
         dto.setEmail(email);
+        dto.setImages(branch.getImages());
         Long branchId = branchService.createBranch(dto);
         return ResponseEntity.ok(branchId);
     }

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-    INVALID_BRANCH_NAME(HttpStatus.BAD_REQUEST, "브랜치명이 유효하지 않습니다."),
+    INVALID_BRANCH_NAME(HttpStatus.BAD_REQUEST, "브랜치명이 유효하지 않습니다.(이미 사용 중인 지점명)"),
     BRANCH_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 브랜치를 찾을 수 없습니다."),
     USER_BRANCH_EXISTS(HttpStatus.CONFLICT, "이미 가입되어 있는 매장입니다."),
     USER_BRANCH_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 브랜치에서 유저 정보를 찾을 수 없습니다."),
