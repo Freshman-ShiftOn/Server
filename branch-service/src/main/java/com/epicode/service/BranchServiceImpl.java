@@ -71,7 +71,7 @@ public class BranchServiceImpl implements BranchService {
         }
 
         //Branch 저장
-        if(branchRepository.existsByName(dto.getName())){
+        if(userBranchRepository.existsByUserIdAndBranchName(user.getId(),dto.getName())){
             throw new CustomException(ErrorCode.INVALID_BRANCH_NAME);
         }
         Branch requestBranch = new Branch();
@@ -80,6 +80,8 @@ public class BranchServiceImpl implements BranchService {
         requestBranch.setBasic_cost(dto.getBasic_cost());
         requestBranch.setDial_numbers(dto.getDial_numbers());
         requestBranch.setWeekly_allowance(dto.getWeekly_allowance());
+        requestBranch.setImages(dto.getImages());
+
         Branch savedBranch = branchRepository.save(requestBranch);
 
         UserBranch userBranch = new UserBranch();

@@ -23,15 +23,15 @@ public class Branch {
     @Column(nullable = true)
     private String dial_numbers;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT '10030'")
+    @Column(columnDefinition = "VARCHAR(255) DEFAULT '10030'")
     private String basic_cost = "10030";
 
     @Column
     private Boolean weekly_allowance;
 
-    @Column(length = 2083)
+    @Column(nullable = true, length = 2083)
     private String images;
 
-    @Column
+    @Column(nullable = true)
     private String contents;
 }
