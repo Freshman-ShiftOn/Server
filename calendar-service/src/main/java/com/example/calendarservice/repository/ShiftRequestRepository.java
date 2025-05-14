@@ -23,6 +23,28 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     List<ShiftRequest> findByWorkerIdAndBranchId(Long workerId, Long branchId);
     List<ShiftRequest> findByAcceptIdAndBranchId(Long acceptId, Long branchId);
 
+    @Query(value = "SELECT sr FROM ShiftRequest sr " +
+           "WHERE (sr.workerId = :workerId) " +
+           "AND (sr.branchId = :branchId) " +
+           "AND FUNCTION('timezone', 'Asia/Seoul', sr.reqEndTime) > FUNCTION('timezone', 'Asia/Seoul', CURRENT_TIMESTAMP)")
+    List<ShiftRequest> findActiveRequestsByWorkerIdAndBranchId(
+            @Param("workerId") Long workerId,
+            @Param("branchId") Long branchId);
+
+    @Query(value = "SELECT sr FROM ShiftRequest sr " +
+           "WHERE sr.workerId = :workerId " +
+           "AND FUNCTION('timezone', 'Asia/Seoul', sr.reqEndTime) > FUNCTION('timezone', 'Asia/Seoul', CURRENT_TIMESTAMP)")
+    List<ShiftRequest> findActiveRequestsByWorkerId(@Param("workerId") Long workerId);
+
+    @Query(value = "SELECT sr FROM ShiftRequest sr " +
+           "JOIN Schedule s ON sr.scheduleId = s.id " +
+           "WHERE s.branchId = :branchId " +
+           "AND FUNCTION('MONTH', FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month " +
+           "AND FUNCTION('timezone', 'Asia/Seoul', sr.reqEndTime) > FUNCTION('timezone', 'Asia/Seoul', CURRENT_TIMESTAMP)")
+    List<ShiftRequest> findActiveRequestsByBranchIdAndMonth(
+            @Param("branchId") Long branchId,
+            @Param("month") Integer month);
+
     @Modifying
     @Transactional
     void deleteByScheduleId(Long scheduleId);
@@ -34,7 +56,7 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     @Query("SELECT sr FROM ShiftRequest sr " +
             "JOIN Schedule s ON sr.scheduleId = s.id " +
             "WHERE s.branchId = :branchId " +
-            "  AND FUNCTION('MONTH', s.startTime) = :month")
+            "AND FUNCTION('MONTH', FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month")
     List<ShiftRequest> findByBranchIdAndMonth(@Param("branchId") Long branchId,
                                               @Param("month") Integer month);
 }

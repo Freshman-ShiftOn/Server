@@ -161,13 +161,13 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
-    public List<ShiftRequestDto> getShiftRequestsByUser(Long workerId, Long branchId){
+    public List<ShiftRequestDto> getShiftRequestsByUser(Long workerId, Long branchId) {
         List<ShiftRequest> shiftRequests;
 
         if (branchId != null) {
-            shiftRequests = shiftRequestRepository.findByWorkerIdAndBranchId(workerId, branchId);
+            shiftRequests = shiftRequestRepository.findActiveRequestsByWorkerIdAndBranchId(workerId, branchId);
         } else {
-            shiftRequests = shiftRequestRepository.findByWorkerId(workerId);
+            shiftRequests = shiftRequestRepository.findActiveRequestsByWorkerId(workerId);
         }
 
         return shiftRequests.stream()
@@ -216,9 +216,8 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
                 .orElse(null); // ✅ scheduleId를 기반으로 Schedule 조회
     }
 
+    @Override
     public List<ShiftRequest> getShiftRequestsByBranchAndMonth(Long branchId, Integer month) {
-        // Repository를 통해 조건에 맞는 ShiftRequest 리스트를 조회.
-        // 예) 아래처럼 쿼리 메서드를 작성하거나 Query DSL, JPQL 등을 활용할 수 있습니다.
-        return shiftRequestRepository.findByBranchIdAndMonth(branchId, month);
+        return shiftRequestRepository.findActiveRequestsByBranchIdAndMonth(branchId, month);
     }
 }
