@@ -72,6 +72,21 @@ public class UserBranchServiceImpl implements UserBranchService {
         userBranchRepository.save(userBranch);
     }
 
+    @Transactional
+    @Override
+    public void deleteUserFromBranch(String email, Long branchId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BRANCH_NOT_FOUND));
+
+        UserBranch userBranch = userBranchRepository.findByUserAndBranch(user, branch)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_BRANCH_NOT_FOUND));
+
+        userBranchRepository.delete(userBranch);
+    }
+
     @Override
     public void joinBranch(Long userId, Long branchId) {
         //입력값 검증
