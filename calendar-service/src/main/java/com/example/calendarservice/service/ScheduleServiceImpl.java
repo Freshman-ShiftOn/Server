@@ -76,7 +76,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ResourceNotFoundException("Schedule not found with id " + scheduleId);
         }
         Schedule deletedSchedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));;
+                .orElseThrow(() -> new ResourceNotFoundException("Schedule not found with id " + scheduleId));
 
         // 외래 키 오류 방지를 위해 먼저 ShiftRequest 삭제
         shiftRequestRepository.deleteByScheduleId(scheduleId);
@@ -175,7 +175,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private Date convertToDate(LocalDateTime localDateTime) {
-        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        return Date.from(localDateTime.atZone(ZoneId.of("Asia/Seoul")).toInstant());
     }
 
     @Override

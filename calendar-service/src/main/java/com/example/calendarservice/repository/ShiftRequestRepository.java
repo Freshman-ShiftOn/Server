@@ -39,7 +39,7 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     @Query(value = "SELECT sr FROM ShiftRequest sr " +
            "JOIN Schedule s ON sr.scheduleId = s.id " +
            "WHERE s.branchId = :branchId " +
-           "AND FUNCTION('MONTH', FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month " +
+           "AND EXTRACT(MONTH FROM FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month " +
            "AND FUNCTION('timezone', 'Asia/Seoul', sr.reqEndTime) > FUNCTION('timezone', 'Asia/Seoul', CURRENT_TIMESTAMP)")
     List<ShiftRequest> findActiveRequestsByBranchIdAndMonth(
             @Param("branchId") Long branchId,
@@ -56,7 +56,7 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     @Query("SELECT sr FROM ShiftRequest sr " +
             "JOIN Schedule s ON sr.scheduleId = s.id " +
             "WHERE s.branchId = :branchId " +
-            "AND FUNCTION('MONTH', FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month")
+            "AND EXTRACT(MONTH FROM FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month")
     List<ShiftRequest> findByBranchIdAndMonth(@Param("branchId") Long branchId,
                                               @Param("month") Integer month);
 }
