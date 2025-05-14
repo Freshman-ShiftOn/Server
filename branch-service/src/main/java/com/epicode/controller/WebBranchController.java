@@ -132,6 +132,8 @@ public class WebBranchController {
         dto.setUserId(userId);
         dto.setEmail(email);
         dto.setImages(branch.getImages());
+        dto.setOpenTime(branch.getOpenTime());
+        dto.setEndTime(branch.getEndTime());
         Long branchId = branchService.createBranch(dto);
         return ResponseEntity.ok(branchId);
     }
