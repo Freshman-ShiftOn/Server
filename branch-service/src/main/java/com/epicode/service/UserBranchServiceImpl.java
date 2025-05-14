@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserBranchServiceImpl implements UserBranchService {
@@ -44,6 +46,45 @@ public class UserBranchServiceImpl implements UserBranchService {
         userBranch.setPersonal_cost(dto.getCost());
         userBranch.setStatus(dto.getStatus());
         userBranchRepository.save(userBranch);
+    }
+
+    @Transactional
+    @Override
+    public void updateUserAtBranch(WorkerRequestDTO dto) {
+        User user = userRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.setName(dto.getName());
+        user.setPhone_nums(dto.getPhoneNums());
+        userRepository.save(user);
+
+        UserBranch userBranch = userBranchRepository.findByUserAndBranch(
+                user,
+                branchRepository.findById(dto.getBranchId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.BRANCH_NOT_FOUND))
+        ).orElseThrow(() -> new CustomException(ErrorCode.USER_BRANCH_NOT_FOUND));
+
+        userBranch.setRoles(dto.getRoles());
+        userBranch.setStatus(dto.getStatus());
+        userBranch.setPersonal_cost(dto.getCost());
+        userBranch.setJoinedAt(LocalDateTime.now());
+
+        userBranchRepository.save(userBranch);
+    }
+
+    @Transactional
+    @Override
+    public void deleteUserFromBranch(String email, Long branchId) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new CustomException(ErrorCode.BRANCH_NOT_FOUND));
+
+        UserBranch userBranch = userBranchRepository.findByUserAndBranch(user, branch)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_BRANCH_NOT_FOUND));
+
+        userBranchRepository.delete(userBranch);
     }
 
     @Override

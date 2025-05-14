@@ -6,4 +6,6 @@ public interface UserBranchService {
     void addUserAtBranch(WorkerRequestDTO dto);
     void joinBranch(Long userId, Long branchId);
     String deleteUserBranchByEmailAndBranchId(String email, Long branchId);
+    void updateUserAtBranch(WorkerRequestDTO dto);
+    void deleteUserFromBranch(String email, Long branchId);
 }

@@ -51,6 +51,43 @@ public class WebBranchController {
     }
 
     @Operation(
+            summary = "(사장님) 매장 근무자 정보 수정",
+            description = "지정된 근무자의 정보를 수정합니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true),
+                    @Parameter(name = "WorkerRequestDTO", description = "근무자 정보", required = true)
+            }
+    )
+    @PutMapping("/{branchId}/workers")
+    public ResponseEntity<?> updateWorker(
+            @RequestBody WorkerRequestDTO dto
+    ) {
+        log.info("수정 요청 dto: {}", dto);
+        userBranchService.updateUserAtBranch(dto);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @Operation(
+            summary = "(사장님) 매장 근무자 삭제",
+            description = "지정된 매장의 근무자를 삭제합니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true),
+                    @Parameter(name = "email", description = "삭제할 근무자의 이메일", required = true),
+                    @Parameter(name = "branchId", description = "지점 ID", required = true)
+            }
+    )
+    @DeleteMapping("/workers")
+    public ResponseEntity<?> deleteWorker(
+            @RequestParam String email,
+            @RequestParam Long branchId
+    ) {
+        userBranchService.deleteUserFromBranch(email, branchId);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @Operation(
             summary = "매장 근무 동료들 조회",
             description = "해당 매장에 근무하는 근무자의 이름,역할,번호,시급,상태가 반환됩니다.",
             parameters = {
