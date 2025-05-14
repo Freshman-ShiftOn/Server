@@ -81,7 +81,8 @@ public class BranchServiceImpl implements BranchService {
         requestBranch.setDial_numbers(dto.getDial_numbers());
         requestBranch.setWeekly_allowance(dto.getWeekly_allowance());
         requestBranch.setImages(dto.getImages());
-
+        requestBranch.setOpenTime(dto.getOpenTime());
+        requestBranch.setEndTime(dto.getEndTime());
         Branch savedBranch = branchRepository.save(requestBranch);
 
         UserBranch userBranch = new UserBranch();

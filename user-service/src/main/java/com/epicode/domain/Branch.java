@@ -31,4 +31,10 @@ public class Branch {
 
     @Column(nullable = true)
     private String contents;
+
+    @Column(nullable = true)
+    private String openTime;
+
+    @Column(nullable = true)
+    private String endTime;
 }
