@@ -12,10 +12,12 @@ import com.example.calendarservice.repository.ShiftRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,8 +34,15 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
         if (!scheduleRepository.existsById(shiftRequest.getScheduleId())) {
             throw new ResourceNotFoundException("Schedule not found with id : " + shiftRequest.getScheduleId());
         }
-        if (shiftRequestRepository.existsByScheduleId(shiftRequest.getScheduleId())) {
-            throw new ResourceNotFoundException("ScheduleRequest already with schedule id : " + shiftRequest.getScheduleId());
+
+        // 기존 ShiftRequest가 있는지 확인하고, 있다면 상태 체크
+        Optional<ShiftRequest> existingRequest = shiftRequestRepository.findByScheduleId(shiftRequest.getScheduleId());
+        if (existingRequest.isPresent()) {
+            ShiftRequest existing = existingRequest.get();
+            // ACCEPTED 상태가 아닌 경우에만 예외 발생
+            if (!"ACCEPTED".equals(existing.getReqStatus())) {
+                throw new IllegalStateException("ScheduleRequest already exists with schedule id : " + shiftRequest.getScheduleId());
+            }
         }
         return shiftRequestRepository.save(shiftRequest);
     }
@@ -62,6 +71,7 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
     }
 
     @Override
+    @Transactional
     public ShiftRequest acceptShiftRequest(Long shiftRequestId, Long acceptId, String acceptName) {
         // 대타 요청 확인
         ShiftRequest shiftRequest = shiftRequestRepository.findById(shiftRequestId)

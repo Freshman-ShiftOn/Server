@@ -10,11 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long> {
     boolean existsByIdAndWorkerId(Long id, Long workerId);
     boolean existsByScheduleId(Long scheduleId);
+    Optional<ShiftRequest> findByScheduleId(Long scheduleId);
     List<ShiftRequest> findByWorkerId(Long workerId);
     List<ShiftRequest> findByAcceptId(Long acceptId);
 
