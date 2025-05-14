@@ -11,12 +11,14 @@ import java.util.List;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    @Query("SELECT s FROM Schedule s WHERE s.branchId = :branchId " +
-           "AND EXTRACT(MONTH FROM FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month")
+    @Query(value = "SELECT s FROM Schedule s WHERE s.branchId = :branchId " +
+           "AND MONTH(CONVERT_TZ(s.startTime, '+00:00', 'Asia/Seoul')) = :month", 
+           nativeQuery = true)
     List<Schedule> findByBranchIdAndMonth(@Param("branchId") Long branchId, @Param("month") Integer month);
 
-    @Query("SELECT s FROM Schedule s WHERE s.branchId = :branchId AND s.workerId = :userId " +
-           "AND EXTRACT(MONTH FROM FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month")
+    @Query(value = "SELECT s FROM Schedule s WHERE s.branchId = :branchId AND s.workerId = :userId " +
+           "AND MONTH(CONVERT_TZ(s.startTime, '+00:00', 'Asia/Seoul')) = :month", 
+           nativeQuery = true)
     List<Schedule> findByBranchIdAndMonthAndUserId(@Param("branchId") Long branchId, 
                                                   @Param("month") Integer month, 
                                                   @Param("userId") Long userId);
@@ -27,8 +29,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query(value = "SELECT EXISTS(SELECT 1 FROM schedule s " +
            "WHERE s.workerId = :workerId " +
            "AND (:excludeId IS NULL OR s.id != :excludeId) " +
-           "AND NOT (s.endTime AT TIME ZONE 'Asia/Seoul' <= :startTime AT TIME ZONE 'Asia/Seoul' " +
-           "OR s.startTime AT TIME ZONE 'Asia/Seoul' >= :endTime AT TIME ZONE 'Asia/Seoul'))", 
+           "AND NOT (CONVERT_TZ(s.endTime, '+00:00', 'Asia/Seoul') <= CONVERT_TZ(:startTime, '+00:00', 'Asia/Seoul') " +
+           "OR CONVERT_TZ(s.startTime, '+00:00', 'Asia/Seoul') >= CONVERT_TZ(:endTime, '+00:00', 'Asia/Seoul')))" , 
            nativeQuery = true)
     boolean existsOverlappingSchedule(
             @Param("workerId") Long workerId,
@@ -38,8 +40,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     @Query(value = "SELECT EXISTS(SELECT 1 FROM schedule s " +
            "WHERE s.workerId = :workerId " +
-           "AND NOT (s.endTime AT TIME ZONE 'Asia/Seoul' <= :startTime AT TIME ZONE 'Asia/Seoul' " +
-           "OR s.startTime AT TIME ZONE 'Asia/Seoul' >= :endTime AT TIME ZONE 'Asia/Seoul'))", 
+           "AND NOT (CONVERT_TZ(s.endTime, '+00:00', 'Asia/Seoul') <= CONVERT_TZ(:startTime, '+00:00', 'Asia/Seoul') " +
+           "OR CONVERT_TZ(s.startTime, '+00:00', 'Asia/Seoul') >= CONVERT_TZ(:endTime, '+00:00', 'Asia/Seoul')))" , 
            nativeQuery = true)
     boolean existsOverlappingSchedule(
             @Param("workerId") Long workerId,

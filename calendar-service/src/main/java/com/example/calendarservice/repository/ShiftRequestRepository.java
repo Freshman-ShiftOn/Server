@@ -26,21 +26,24 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     @Query(value = "SELECT sr FROM ShiftRequest sr " +
            "WHERE (sr.workerId = :workerId) " +
            "AND (sr.branchId = :branchId) " +
-           "AND FUNCTION('timezone', 'Asia/Seoul', sr.reqEndTime) > FUNCTION('timezone', 'Asia/Seoul', CURRENT_TIMESTAMP)")
+           "AND CONVERT_TZ(sr.reqEndTime, '+00:00', 'Asia/Seoul') > CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', 'Asia/Seoul')", 
+           nativeQuery = true)
     List<ShiftRequest> findActiveRequestsByWorkerIdAndBranchId(
             @Param("workerId") Long workerId,
             @Param("branchId") Long branchId);
 
     @Query(value = "SELECT sr FROM ShiftRequest sr " +
            "WHERE sr.workerId = :workerId " +
-           "AND FUNCTION('timezone', 'Asia/Seoul', sr.reqEndTime) > FUNCTION('timezone', 'Asia/Seoul', CURRENT_TIMESTAMP)")
+           "AND CONVERT_TZ(sr.reqEndTime, '+00:00', 'Asia/Seoul') > CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', 'Asia/Seoul')", 
+           nativeQuery = true)
     List<ShiftRequest> findActiveRequestsByWorkerId(@Param("workerId") Long workerId);
 
     @Query(value = "SELECT sr FROM ShiftRequest sr " +
            "JOIN Schedule s ON sr.scheduleId = s.id " +
            "WHERE s.branchId = :branchId " +
-           "AND EXTRACT(MONTH FROM FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month " +
-           "AND FUNCTION('timezone', 'Asia/Seoul', sr.reqEndTime) > FUNCTION('timezone', 'Asia/Seoul', CURRENT_TIMESTAMP)")
+           "AND MONTH(CONVERT_TZ(s.startTime, '+00:00', 'Asia/Seoul')) = :month " +
+           "AND CONVERT_TZ(sr.reqEndTime, '+00:00', 'Asia/Seoul') > CONVERT_TZ(CURRENT_TIMESTAMP, '+00:00', 'Asia/Seoul')", 
+           nativeQuery = true)
     List<ShiftRequest> findActiveRequestsByBranchIdAndMonth(
             @Param("branchId") Long branchId,
             @Param("month") Integer month);
@@ -53,10 +56,11 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
     @Transactional
     void deleteByScheduleIdIn(List<Long> scheduleIds);
 
-    @Query("SELECT sr FROM ShiftRequest sr " +
+    @Query(value = "SELECT sr FROM ShiftRequest sr " +
             "JOIN Schedule s ON sr.scheduleId = s.id " +
             "WHERE s.branchId = :branchId " +
-            "AND EXTRACT(MONTH FROM FUNCTION('timezone', 'Asia/Seoul', s.startTime)) = :month")
+            "AND MONTH(CONVERT_TZ(s.startTime, '+00:00', 'Asia/Seoul')) = :month", 
+            nativeQuery = true)
     List<ShiftRequest> findByBranchIdAndMonth(@Param("branchId") Long branchId,
                                               @Param("month") Integer month);
 }
