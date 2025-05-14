@@ -20,23 +20,23 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByRepeatGroupId(Long repeatGroupId);
     List<Schedule> findByRepeatGroupIdAndStartTimeGreaterThanEqual(Long repeatGroupId, Date startTime);
 
-    @Query("SELECT COUNT(s) > 0 FROM Schedule s " +
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM schedule s " +
            "WHERE s.workerId = :workerId " +
-           "AND s.id != :excludeId " +
-           "AND ((s.startTime <= :endTime AND s.endTime >= :startTime) " +
-           "OR (s.startTime >= :startTime AND s.startTime < :endTime) " +
-           "OR (s.endTime > :startTime AND s.endTime <= :endTime))")
+           "AND (:excludeId IS NULL OR s.id != :excludeId) " +
+           "AND NOT (s.endTime AT TIME ZONE 'Asia/Seoul' <= :startTime AT TIME ZONE 'Asia/Seoul' " +
+           "OR s.startTime AT TIME ZONE 'Asia/Seoul' >= :endTime AT TIME ZONE 'Asia/Seoul'))", 
+           nativeQuery = true)
     boolean existsOverlappingSchedule(
             @Param("workerId") Long workerId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
             @Param("excludeId") Long excludeId);
 
-    @Query("SELECT COUNT(s) > 0 FROM Schedule s " +
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM schedule s " +
            "WHERE s.workerId = :workerId " +
-           "AND ((s.startTime <= :endTime AND s.endTime >= :startTime) " +
-           "OR (s.startTime >= :startTime AND s.startTime < :endTime) " +
-           "OR (s.endTime > :startTime AND s.endTime <= :endTime))")
+           "AND NOT (s.endTime AT TIME ZONE 'Asia/Seoul' <= :startTime AT TIME ZONE 'Asia/Seoul' " +
+           "OR s.startTime AT TIME ZONE 'Asia/Seoul' >= :endTime AT TIME ZONE 'Asia/Seoul'))", 
+           nativeQuery = true)
     boolean existsOverlappingSchedule(
             @Param("workerId") Long workerId,
             @Param("startTime") Date startTime,

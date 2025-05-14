@@ -89,8 +89,8 @@ public class ShiftRequestServiceImpl implements ShiftRequestService {
         // 수락하려는 사람의 스케줄 중복 검사
         if (scheduleRepository.existsOverlappingSchedule(
                 acceptId,
-                schedule.getStartTime(),
-                schedule.getEndTime())) {
+                shiftRequest.getReqStartTime(),
+                shiftRequest.getReqEndTime())) {
             throw new ScheduleConflictException("해당 시간에 이미 다른 스케줄이 존재하여 대타 요청을 수락할 수 없습니다.");
         }
 
