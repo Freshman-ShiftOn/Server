@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class WorkerDTO {
+    private Long userId;
     private String name;
     private String email;
     private String phoneNums;

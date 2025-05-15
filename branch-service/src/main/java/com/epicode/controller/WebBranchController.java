@@ -100,7 +100,7 @@ public class WebBranchController {
             @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         List<Long> branchList = userBranchRepository.findBranchIdsByUserId(Long.valueOf(userId));
-        System.out.println(branchList);
+        //System.out.println(branchList);
         boolean exist = false;
         for(Long l:branchList){
             if(l==branchId) exist = true;
