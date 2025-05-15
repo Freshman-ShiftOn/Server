@@ -7,5 +7,5 @@ public interface UserBranchService {
     void joinBranch(Long userId, Long branchId);
     String deleteUserBranchByEmailAndBranchId(String email, Long branchId);
     void updateUserAtBranch(WorkerRequestDTO dto);
-    void deleteUserFromBranch(String email, Long branchId);
+    void deleteUserFromBranch(Long userId, Long branchId);
 }

@@ -58,7 +58,7 @@ public class WebBranchController {
                     @Parameter(name = "WorkerRequestDTO", description = "근무자 정보", required = true)
             }
     )
-    @PutMapping("/{branchId}/workers")
+    @PutMapping("/{branchId}/edit-workers")
     public ResponseEntity<?> updateWorker(
             @RequestBody WorkerRequestDTO dto
     ) {
@@ -73,16 +73,16 @@ public class WebBranchController {
             description = "지정된 매장의 근무자를 삭제합니다.",
             parameters = {
                     @Parameter(name = "Authorization", description = "JWT Bearer 토큰", required = true),
-                    @Parameter(name = "email", description = "삭제할 근무자의 이메일", required = true),
-                    @Parameter(name = "branchId", description = "지점 ID", required = true)
+                    @Parameter(name = "branchId", description = "지점 ID", required = true),
+                    @Parameter(name = "userId", description = "삭제할 근무자의 아이디", required = true)
             }
     )
-    @DeleteMapping("/workers")
+    @DeleteMapping("/{branchId}/{userId}")
     public ResponseEntity<?> deleteWorker(
-            @RequestParam String email,
-            @RequestParam Long branchId
+            @PathVariable Long userId,
+            @PathVariable Long branchId
     ) {
-        userBranchService.deleteUserFromBranch(email, branchId);
+        userBranchService.deleteUserFromBranch(userId, branchId);
         return ResponseEntity.ok().build();
     }
 
@@ -100,7 +100,7 @@ public class WebBranchController {
             @PathVariable Long branchId,
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         List<Long> branchList = userBranchRepository.findBranchIdsByUserId(Long.valueOf(userId));
-        System.out.println(branchList);
+        //System.out.println(branchList);
         boolean exist = false;
         for(Long l:branchList){
             if(l==branchId) exist = true;

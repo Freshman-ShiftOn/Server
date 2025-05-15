@@ -104,4 +104,34 @@ public class SalarySummaryService {
                 dailyDetails
         );
     }
+
+    public BigDecimal getTotalSalarySumByBranch(Long branchId, LocalDate start, LocalDate end) {
+        List<DailyUserSalary> salaries = dailySalaryRepo.findSalariesByBranchAndPeriod(branchId, start, end);
+
+        Map<Long, List<DailyUserSalary>> groupedByUser = salaries.stream()
+                .collect(Collectors.groupingBy(DailyUserSalary::getUserId));
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Map.Entry<Long, List<DailyUserSalary>> entry : groupedByUser.entrySet()) {
+            Long userId = entry.getKey();
+            List<DailyUserSalary> userSalaries = entry.getValue();
+
+            int totalMinutes = userSalaries.stream().mapToInt(DailyUserSalary::getWorkedMinutes).sum();
+            BigDecimal totalSalary = userSalaries.stream()
+                    .map(DailyUserSalary::getDailySalary)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            UserBranch user = userBranchRepository.findByUserIdAndBranchId(userId, branchId);
+
+            boolean eligible = totalMinutes >= 900;
+            BigDecimal weeklyAllowance = eligible
+                    ? user.getPersonal_cost().multiply(BigDecimal.valueOf(8))
+                    : BigDecimal.ZERO;
+
+            total = total.add(totalSalary).add(weeklyAllowance);
+        }
+
+        return total;
+    }
 }
