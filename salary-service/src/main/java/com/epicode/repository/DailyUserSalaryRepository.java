@@ -25,4 +25,14 @@ public interface DailyUserSalaryRepository extends JpaRepository<DailyUserSalary
             @Param("start") LocalDate start,
             @Param("end") LocalDate end
     );
+
+//    @Query("""
+//    SELECT d FROM DailyUserSalary d
+//    WHERE
+//""")
+//    List<DailyUserSalary> findSalariesByBranchAndPeriod(
+//            @Param("branchId") Long branchId,
+//            @Param("start") LocalDate start,
+//            @Param("end") LocalDate end
+//    );
 }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +24,22 @@ import java.util.List;
 public class SalaryWebController {
     private final SalaryService salaryService;
     private final SalarySummaryService summaryService;
+
+//    @Operation(
+//            summary = "월 총 급여 조회-토탈",
+//            description = "월, 지점Id을 기준으로 지점의 월 급여 총액을 조회합니다.",
+//            parameters = {
+//                    @Parameter(name = "Authorization", required = true, example = "Bearer ey..."),
+//                    @Parameter(name = "branchId", required = true, example = "101")
+//            }
+//    )
+//    @GetMapping("{branchId}/month-total")
+//    public ResponseEntity<?> getBranchSalaryTotal(
+//            @PathVariable Long branchId
+//    ) {
+//        BigDecimal month_salaries =
+//        return ResponseEntity.ok(detail);
+//    }
 
     @Operation(
             summary = "기간 급여 조회",
@@ -76,7 +93,7 @@ public class SalaryWebController {
     }
 
     @Operation(
-            summary = "월간 주별 급여 조회",
+            summary = "월간 주별 급여 조회-상세",
             description = "지점(branchId), 월(month), 주차(week)에 해당하는 주간 급여 정보를 조회합니다.",
             parameters = {
                     @Parameter(name = "Authorization", description = "JWT 토큰 (Bearer 형식)", required = true, example = "Bearer eyJhbGciOiJIUzI1Ni..."),
@@ -95,7 +112,7 @@ public class SalaryWebController {
     }
 
     @Operation(
-            summary = "월간 급여 조회",
+            summary = "월간 급여 조회-상세",
             description = "지점(branchId), 월(month)에 해당하는 주간 급여 정보를 총 조회합니다.",
             parameters = {
                     @Parameter(name = "Authorization", description = "JWT 토큰 (Bearer 형식)", required = true, example = "Bearer eyJhbGciOiJIUzI1Ni..."),
@@ -112,4 +129,6 @@ public class SalaryWebController {
         List<WeeklySalaryDto> salary = salaryService.getSalaryInfo(branchId, month);
         return ResponseEntity.ok(salary);
     }
+
+
 }

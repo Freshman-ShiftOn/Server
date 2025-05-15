@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @Builder
 public class WorkerRequestDTO {
     private Long branchId;
+    private Long userId;
     private String email;
     private String name;
     private String phoneNums;

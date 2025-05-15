@@ -51,10 +51,11 @@ public class UserBranchServiceImpl implements UserBranchService {
     @Transactional
     @Override
     public void updateUserAtBranch(WorkerRequestDTO dto) {
-        User user = userRepository.findByEmail(dto.getEmail())
+        User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         user.setName(dto.getName());
+        user.setEmail(dto.getEmail());//Email을 이렇게 바꾸는 거 괜찮으려나..
         user.setPhone_nums(dto.getPhoneNums());
         userRepository.save(user);
 
@@ -74,8 +75,8 @@ public class UserBranchServiceImpl implements UserBranchService {
 
     @Transactional
     @Override
-    public void deleteUserFromBranch(String email, Long branchId) {
-        User user = userRepository.findByEmail(email)
+    public void deleteUserFromBranch(Long userId, Long branchId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Branch branch = branchRepository.findById(branchId)
