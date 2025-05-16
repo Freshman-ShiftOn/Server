@@ -27,11 +27,15 @@ public class QBranch extends EntityPathBase<Branch> {
 
     public final StringPath dial_numbers = createString("dial_numbers");
 
+    public final StringPath endTime = createString("endTime");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath images = createString("images");
 
     public final StringPath name = createString("name");
+
+    public final StringPath openTime = createString("openTime");
 
     public final BooleanPath weekly_allowance = createBoolean("weekly_allowance");
 
