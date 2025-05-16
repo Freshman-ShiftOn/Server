@@ -55,7 +55,7 @@ spring:
             - JwtAuthenticationFilter
 
         - id: user-service-profile
-          uri: lb://PROFILE-SERVICE
+          uri: lb://USER-SERVICE
           predicates:
             - Path=/api/profile/**
           filters:
