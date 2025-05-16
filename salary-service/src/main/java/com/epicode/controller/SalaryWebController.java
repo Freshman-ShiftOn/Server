@@ -25,21 +25,28 @@ public class SalaryWebController {
     private final SalaryService salaryService;
     private final SalarySummaryService summaryService;
 
-//    @Operation(
-//            summary = "월 총 급여 조회-토탈",
-//            description = "월, 지점Id을 기준으로 지점의 월 급여 총액을 조회합니다.",
-//            parameters = {
-//                    @Parameter(name = "Authorization", required = true, example = "Bearer ey..."),
-//                    @Parameter(name = "branchId", required = true, example = "101")
-//            }
-//    )
-//    @GetMapping("{branchId}/month-total")
-//    public ResponseEntity<?> getBranchSalaryTotal(
-//            @PathVariable Long branchId
-//    ) {
-//        BigDecimal month_salaries =
-//        return ResponseEntity.ok(detail);
-//    }
+    @Operation(
+            summary = "월 총 급여 조회-토탈",
+            description = "월, 지점Id을 기준으로 지점의 월 급여 총액을 조회합니다.",
+            parameters = {
+                    @Parameter(name = "Authorization", required = true, example = "Bearer ey..."),
+                    @Parameter(name = "branchId", required = true, example = "101"),
+                    @Parameter(name = "startDate", required = true, example = "2025-05-01"),
+                    @Parameter(name = "endDate", required = true, example = "2025-05-31")
+            }
+    )
+    @GetMapping("{branchId}/total")
+    public ResponseEntity<?> getBranchSalaryTotal(
+            @PathVariable Long branchId,
+            @RequestParam String startDate,
+            @RequestParam String endDate
+
+    ) {
+        LocalDate start = LocalDate.parse(startDate);  // yyyy-MM-dd 형식
+        LocalDate end = LocalDate.parse(endDate);
+        BigDecimal month_salaries = summaryService.getTotalSalarySumByBranch(branchId,start,end);
+        return ResponseEntity.ok(month_salaries);
+    }
 
     @Operation(
             summary = "기간 급여 조회",
@@ -51,9 +58,9 @@ public class SalaryWebController {
                     @Parameter(name = "endDate", required = true, example = "2025-05-31")
             }
     )
-    @GetMapping("/summary")
+    @GetMapping("{branchId}/summary-list")
     public ResponseEntity<?> getWeeklyBranchSummary(
-            @RequestParam Long branchId,
+            @PathVariable Long branchId,
             @RequestParam String startDate,
             @RequestParam String endDate
     ) {
@@ -78,9 +85,9 @@ public class SalaryWebController {
                     @Parameter(name = "endDate", required = true, example = "2025-05-31")
             }
     )
-    @GetMapping("/detail")
+    @GetMapping("{branchId}/detail")
     public ResponseEntity<?> getUserSalaryDetail(
-            @RequestParam Long branchId,
+            @PathVariable Long branchId,
             @RequestParam Long userId,
             @RequestParam String startDate,
             @RequestParam String endDate
