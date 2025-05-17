@@ -1,5 +1,7 @@
 package com.example.calendarservice.service;
 
+import com.example.calendarservice.dto.OwnerRepeatScheduleRequest;
+import com.example.calendarservice.dto.OwnerScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.model.Schedule;
@@ -15,7 +17,8 @@ public interface ScheduleService {
     boolean isUserSchedule(Long scheduleId, Long userId);
     boolean isScheduleInBranch(Long scheduleId, Long branchId);
     List<Schedule> createRepeatSchedules(RepeatScheduleRequest repeatRequest);
-
+    List<Schedule> createSchedulesForWorkers(OwnerScheduleRequest request);
+    List<Schedule> createRepeatSchedulesForWorkers(OwnerRepeatScheduleRequest request);
     List<Schedule> updateRepeatSchedule(Long scheduleId, RepeatScheduleUpdateRequest request);
     void deleteRepeatSchedule(Long scheduleId, String deleteOption);
 }

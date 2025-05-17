@@ -1,5 +1,7 @@
 package com.example.calendarservice.service;
 
+import com.example.calendarservice.dto.OwnerRepeatScheduleRequest;
+import com.example.calendarservice.dto.OwnerScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleRequest;
 import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.exception.ResourceNotFoundException;
@@ -25,9 +27,17 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ShiftRequestRepository shiftRequestRepository;
     private final ScheduleEventProducer scheduleEventProducer;
+    private final UserService userService;
 
     @Override
     public Schedule createSchedule(Schedule schedule) {
+        if (scheduleRepository.existsOverlappingSchedule(
+                schedule.getWorkerId(),
+                schedule.getStartTime(),
+                schedule.getEndTime(),
+                null)) {
+            throw new ScheduleConflictException("해당 시간에 이미 다른 스케줄이 존재합니다.");
+        }
         Schedule saved = scheduleRepository.save(schedule);
         scheduleEventProducer.sendScheduleWorkedEvent(saved);
         return saved;
@@ -304,5 +314,93 @@ public class ScheduleServiceImpl implements ScheduleService {
             default:
                 throw new IllegalArgumentException("Invalid delete option: " + deleteOption);
         }
+    }
+
+    @Override
+    public List<Schedule> createSchedulesForWorkers(OwnerScheduleRequest request) {
+        List<Schedule> schedules = new ArrayList<>();
+        List<Schedule> savedSchedules = new ArrayList<>();
+        
+        LocalDateTime startDateTime = LocalDateTime.of(request.getDate(), request.getStartTime());
+        LocalDateTime endDateTime = LocalDateTime.of(request.getDate(), request.getEndTime());
+        
+        Date startTime = convertToDate(startDateTime);
+        Date endTime = convertToDate(endDateTime);
+        
+        // 각 워커 ID에 대해 스케줄 생성
+        for (Long workerId : request.getWorkerIds()) {
+            // 중복 체크
+            if (scheduleRepository.existsOverlappingSchedule(
+                    workerId, 
+                    startTime, 
+                    endTime, 
+                    null)) {
+                throw new ScheduleConflictException("해당 시간에 이미 다른 스케줄이 존재합니다. 사용자 ID: " + workerId);
+            }
+            
+            String workerName = userService.getUserNameById(workerId);
+            
+            Schedule schedule = Schedule.builder()
+                    .branchId(request.getBranchId())
+                    .workerId(workerId)
+                    .workerName(workerName)
+                    .workType(request.getWorkType())
+                    .inputType(request.getInputType() != null ? request.getInputType() : 1) // 기본값 1 (기본근무)
+                    .startTime(startTime)
+                    .endTime(endTime)
+                    .lastUpdated(new Date())
+                    .build();
+            
+            schedules.add(schedule);
+        }
+        
+        // 모든 스케줄 저장
+        savedSchedules = scheduleRepository.saveAll(schedules);
+        
+        // 이벤트 발행
+        scheduleEventProducer.sendSchedules(savedSchedules);
+        
+        return savedSchedules;
+    }
+
+    @Override
+    public List<Schedule> createRepeatSchedulesForWorkers(OwnerRepeatScheduleRequest request) {
+        List<Schedule> allSavedSchedules = new ArrayList<>();
+        
+        // 모든 근무자에 대해 반복 일정 생성
+        for (Long workerId : request.getWorkerIds()) {
+            String workerName = userService.getUserNameById(workerId);
+            
+            // 해당 근무자에 대한 RepeatScheduleRequest 생성
+            RepeatScheduleRequest repeatRequest = new RepeatScheduleRequest();
+            repeatRequest.setBranchId(request.getBranchId());
+            repeatRequest.setWorkerId(workerId);
+            repeatRequest.setWorkerName(workerName);
+            repeatRequest.setStartTime(request.getStartTime());
+            repeatRequest.setEndTime(request.getEndTime());
+            repeatRequest.setWorkType(request.getWorkType());
+            repeatRequest.setRepeat(convertRepeat(request.getRepeat()));
+            
+            // 근무자 일정 생성 (기존 createRepeatSchedules 메소드 사용)
+            try {
+                List<Schedule> workerSchedules = createRepeatSchedules(repeatRequest);
+                allSavedSchedules.addAll(workerSchedules);
+            } catch (ScheduleConflictException e) {
+                // 한 근무자가 실패했을 때 예외 정보에 근무자 ID 추가
+                throw new ScheduleConflictException("근무자 ID " + workerId + "의 스케줄 생성 실패: " + e.getMessage());
+            }
+        }
+        
+        return allSavedSchedules;
+    }
+
+    // OwnerRepeatScheduleRequest.Repeat를 RepeatScheduleRequest.Repeat로 변환
+    private RepeatScheduleRequest.Repeat convertRepeat(OwnerRepeatScheduleRequest.Repeat ownerRepeat) {
+        RepeatScheduleRequest.Repeat repeat = new RepeatScheduleRequest.Repeat();
+        repeat.setType(ownerRepeat.getType());
+        repeat.setDaysOfWeek(ownerRepeat.getDaysOfWeek());
+        repeat.setStartDate(ownerRepeat.getStartDate());
+        repeat.setEndDate(ownerRepeat.getEndDate());
+        return repeat;
     }
 }

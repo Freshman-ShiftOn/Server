@@ -262,4 +262,36 @@ public class CalendarController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 사장님용 스케줄 등록 (여러 근무자 한번에 등록)
+    @PostMapping("/{branchId}/owner")
+    @Operation(summary = "사장님용 스케줄 등록", description = "사장님이 여러 근무자의 스케줄을 한번에 등록합니다.")
+    public ResponseEntity<List<Schedule>> registerOwnerSchedule(
+            @PathVariable Long branchId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestBody OwnerScheduleRequest request) {
+        try {
+            request.setBranchId(branchId);
+            List<Schedule> schedules = scheduleService.createSchedulesForWorkers(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(schedules);
+        } catch (ScheduleConflictException e) {
+            throw e;
+        }
+    }
+
+    // 사장님용 반복 스케줄 등록
+    @PostMapping("/{branchId}/owner/bulk")
+    @Operation(summary = "사장님용 반복 스케줄 등록", description = "사장님이 여러 근무자의 반복 스케줄을 한번에 등록합니다.")
+    public ResponseEntity<List<Schedule>> registerOwnerRepeatSchedule(
+            @PathVariable Long branchId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestBody OwnerRepeatScheduleRequest request) {
+        try {
+            request.setBranchId(branchId);
+            List<Schedule> schedules = scheduleService.createRepeatSchedulesForWorkers(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(schedules);
+        } catch (ScheduleConflictException e) {
+            throw e;
+        }
+    }
 }
