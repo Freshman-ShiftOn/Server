@@ -11,10 +11,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +49,30 @@ public class CalendarController {
             @PathVariable Integer month,
             @RequestHeader("X-Authenticated-User-Id") String userId) {
         List<Schedule> schedules = scheduleService.getSchedulesByBranchIdAndUserId(branchId, month, Long.valueOf(userId));
+        return ResponseEntity.ok(schedules);
+    }
+
+    // 지점 스케줄 범위 조회 (주간, 커스텀 기간)
+    @GetMapping("/{branchId}/range")
+    @Operation(summary = "지점 스케줄 범위 조회", description = "해당 매장의 지점 스케줄을 특정 날짜 범위로 조회한다. (주간 조회 등에 활용)")
+    public ResponseEntity<List<Schedule>> getSchedulesByBranchIdAndDateRange(
+            @PathVariable Long branchId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<Schedule> schedules = scheduleService.getSchedulesByBranchIdAndDateRange(branchId, startDate, endDate);
+        return ResponseEntity.ok(schedules);
+    }
+
+    // 지점 스케줄 개인별 범위 조회 (주간, 커스텀 기간)
+    @GetMapping("/{branchId}/range/user")
+    @Operation(summary = "지점 스케줄 개인별 범위 조회", description = "해당 매장의 특정 유저 스케줄을 날짜 범위로 조회한다. (주간 조회 등에 활용)")
+    public ResponseEntity<List<Schedule>> getSchedulesByBranchIdAndUserIdAndDateRange(
+            @PathVariable Long branchId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestHeader("X-Authenticated-User-Id") String userId) {
+        List<Schedule> schedules = scheduleService.getSchedulesByBranchIdAndUserIdAndDateRange(
+                branchId, Long.valueOf(userId), startDate, endDate);
         return ResponseEntity.ok(schedules);
     }
 
@@ -261,5 +288,37 @@ public class CalendarController {
                 new ShiftRequestsByBranchMonthResponseDto(myRequests, othersRequests);
 
         return ResponseEntity.ok(response);
+    }
+
+    // 사장님용 스케줄 등록 (여러 근무자 한번에 등록)
+    @PostMapping("/{branchId}/owner")
+    @Operation(summary = "사장님용 스케줄 등록", description = "사장님이 여러 근무자의 스케줄을 한번에 등록합니다.")
+    public ResponseEntity<List<Schedule>> registerOwnerSchedule(
+            @PathVariable Long branchId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestBody OwnerScheduleRequest request) {
+        try {
+            request.setBranchId(branchId);
+            List<Schedule> schedules = scheduleService.createSchedulesForWorkers(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(schedules);
+        } catch (ScheduleConflictException e) {
+            throw e;
+        }
+    }
+
+    // 사장님용 반복 스케줄 등록
+    @PostMapping("/{branchId}/owner/bulk")
+    @Operation(summary = "사장님용 반복 스케줄 등록", description = "사장님이 여러 근무자의 반복 스케줄을 한번에 등록합니다.")
+    public ResponseEntity<List<Schedule>> registerOwnerRepeatSchedule(
+            @PathVariable Long branchId,
+            @RequestHeader("X-Authenticated-User-Id") String userId,
+            @RequestBody OwnerRepeatScheduleRequest request) {
+        try {
+            request.setBranchId(branchId);
+            List<Schedule> schedules = scheduleService.createRepeatSchedulesForWorkers(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(schedules);
+        } catch (ScheduleConflictException e) {
+            throw e;
+        }
     }
 }

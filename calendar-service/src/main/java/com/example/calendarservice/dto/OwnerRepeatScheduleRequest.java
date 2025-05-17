@@ -9,10 +9,9 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Data
-public class RepeatScheduleRequest {
+public class OwnerRepeatScheduleRequest {
     private Long branchId;
-    private Long workerId;
-    private String workerName;
+    private List<Long> workerIds;
     
     @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime startTime;
@@ -22,6 +21,7 @@ public class RepeatScheduleRequest {
     
     private Repeat repeat;
     private List<String> workType;
+    private Integer inputType;
 
     @Data
     public static class Repeat {
@@ -34,4 +34,4 @@ public class RepeatScheduleRequest {
         @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate endDate;
     }
-}
+} 
