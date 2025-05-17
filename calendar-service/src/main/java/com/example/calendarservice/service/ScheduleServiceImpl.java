@@ -403,4 +403,28 @@ public class ScheduleServiceImpl implements ScheduleService {
         repeat.setEndDate(ownerRepeat.getEndDate());
         return repeat;
     }
+
+    @Override
+    public List<Schedule> getSchedulesByBranchIdAndDateRange(Long branchId, LocalDate startDate, LocalDate endDate) {
+        // 시작 날짜는 00:00:00, 종료 날짜는 23:59:59로 설정
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+        
+        Date startTime = convertToDate(startDateTime);
+        Date endTime = convertToDate(endDateTime);
+        
+        return scheduleRepository.findByBranchIdAndDateRange(branchId, startTime, endTime);
+    }
+
+    @Override
+    public List<Schedule> getSchedulesByBranchIdAndUserIdAndDateRange(Long branchId, Long userId, LocalDate startDate, LocalDate endDate) {
+        // 시작 날짜는 00:00:00, 종료 날짜는 23:59:59로 설정
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+        
+        Date startTime = convertToDate(startDateTime);
+        Date endTime = convertToDate(endDateTime);
+        
+        return scheduleRepository.findByBranchIdAndUserIdAndDateRange(branchId, userId, startTime, endTime);
+    }
 }

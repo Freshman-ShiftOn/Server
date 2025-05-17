@@ -41,4 +41,23 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             @Param("workerId") Long workerId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime);
+
+    @Query("SELECT s FROM Schedule s WHERE s.branchId = :branchId " +
+           "AND ((s.startTime BETWEEN :startDate AND :endDate) " +
+           "OR (s.endTime BETWEEN :startDate AND :endDate) " +
+           "OR (s.startTime <= :startDate AND s.endTime >= :endDate))")
+    List<Schedule> findByBranchIdAndDateRange(
+            @Param("branchId") Long branchId,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate);
+
+    @Query("SELECT s FROM Schedule s WHERE s.branchId = :branchId AND s.workerId = :userId " +
+           "AND ((s.startTime BETWEEN :startDate AND :endDate) " +
+           "OR (s.endTime BETWEEN :startDate AND :endDate) " +
+           "OR (s.startTime <= :startDate AND s.endTime >= :endDate))")
+    List<Schedule> findByBranchIdAndUserIdAndDateRange(
+            @Param("branchId") Long branchId,
+            @Param("userId") Long userId,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate);
 }
