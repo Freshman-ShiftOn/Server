@@ -1,6 +1,7 @@
 package com.example.calendarservice.model;
 
 import com.example.calendarservice.util.StringListConverter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,15 +41,18 @@ public class Schedule {
     @Column(name = "input_type", nullable = false)
     private Integer inputType;
 
-     @Column(name = "repeat_group_id")
+    @Column(name = "repeat_group_id")
     private Long repeatGroupId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "start_time", nullable = false)
     private Date startTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(name = "end_time", nullable = false)
     private Date endTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @LastModifiedDate // 자동 업데이트
     @Column(name = "last_updated", nullable = false)
     private Date lastUpdated;

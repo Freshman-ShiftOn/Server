@@ -146,7 +146,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 break;
 
             case "WEEKLY":
-                for (LocalDate date = startDate.plusDays(1); !date.isAfter(endDate); date = date.plusWeeks(1)) {
+                for (LocalDate date = startDate.plusWeeks(1); !date.isAfter(endDate); date = date.plusWeeks(1)) {
                     schedules.add(createScheduleFromRepeatRequest(repeatRequest, date, startTime, endTime, repeatGroupId));
                 }
                 break;
@@ -321,11 +321,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<Schedule> schedules = new ArrayList<>();
         List<Schedule> savedSchedules = new ArrayList<>();
         
-        LocalDateTime startDateTime = LocalDateTime.of(request.getDate(), request.getStartTime());
-        LocalDateTime endDateTime = LocalDateTime.of(request.getDate(), request.getEndTime());
-        
-        Date startTime = convertToDate(startDateTime);
-        Date endTime = convertToDate(endDateTime);
+        Date startTime = convertToDate(request.getStartTime());
+        Date endTime = convertToDate(request.getEndTime());
         
         // 각 워커 ID에 대해 스케줄 생성
         for (Long workerId : request.getWorkerIds()) {

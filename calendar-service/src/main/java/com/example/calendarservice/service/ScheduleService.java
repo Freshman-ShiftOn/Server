@@ -7,6 +7,7 @@ import com.example.calendarservice.dto.RepeatScheduleUpdateRequest;
 import com.example.calendarservice.model.Schedule;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ScheduleService {
